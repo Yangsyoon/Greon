@@ -25,7 +25,7 @@ class ShareCubit extends Cubit<ShareState> {
 
     image.writeAsBytesSync(bytes);
 
-    await Share.shareFiles([image.path]);
+    await Share.share(image.path);
   }
 
   void shareScreenshot() async {

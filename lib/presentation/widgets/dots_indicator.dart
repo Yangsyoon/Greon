@@ -6,7 +6,7 @@ import '../../configs/app_dimensions.dart';
 Widget Dotsindicator({int? dotsIndex, required int dotsCount,required Color activeColor}) {
   return DotsIndicator(
     dotsCount: dotsCount,
-    position: dotsIndex!,
+    position: dotsIndex!.toDouble(),
     decorator: DotsDecorator(
         color: Colors.white,
         activeColor: activeColor,

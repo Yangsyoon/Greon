@@ -14,7 +14,7 @@ void registerCommonDependencies() async {
   sl.registerLazySingleton(() => sharedPreferences);
   sl.registerLazySingleton(() => secureStorage);
   sl.registerLazySingleton(() => http.Client());
-  sl.registerLazySingleton(() => InternetConnectionChecker());
+  sl.registerLazySingleton(() => InternetConnectionChecker.createInstance());
 
   // Register NetworkInfo
   sl.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl(sl()));
