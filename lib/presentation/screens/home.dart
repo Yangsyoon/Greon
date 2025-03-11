@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "FEATURED CATEGORIES",
+                              "공지사항",
                               style: AppText.h2b
                                   ?.copyWith(color: AppColors.CommonCyan),
                             ),
@@ -113,7 +113,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "VIEW ALL",
+                                    "모두 보기",
                                     style: AppText.b2b
                                         ?.copyWith(color: AppColors.CommonCyan),
                                   ),
@@ -160,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "FEATURED PRODUCTS",
+                              "판매 모종",
                               style: AppText.h2b
                                   ?.copyWith(color: AppColors.CommonCyan),
                             ),
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Row(
                                 children: [
                                   Text(
-                                    "VIEW ALL",
+                                    "모두 보기",
                                     style: AppText.b2b
                                         ?.copyWith(color: AppColors.CommonCyan),
                                   ),

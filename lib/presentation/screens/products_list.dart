@@ -201,7 +201,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                         builder: (context, filterState) {
                           return filterState.categories.length == 0
                               ? Text(
-                                  "All Products".toUpperCase(),
+                                  "전체상품".toUpperCase(),
                                   style: AppText.b1b
                                       ?.copyWith(color: AppColors.GreyText),
                                 )
@@ -252,7 +252,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                   ? const SizedBox.shrink()
                                   : BlackDot(),
                               Space.x!,
-                              Text("Sort by",
+                              Text("정렬",
                                   style: AppText.b1
                                       ?.copyWith(color: AppColors.GreyText))
                             ],
@@ -274,7 +274,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                   ? BlackDot()
                                   : const SizedBox.shrink(),
                               Space.x!,
-                              Text("Filter",
+                              Text("필터",
                                   style: AppText.b1
                                       ?.copyWith(color: AppColors.GreyText))
                             ],

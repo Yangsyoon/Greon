@@ -44,7 +44,7 @@ class BottomNavigation extends StatelessWidget {
                         BlendMode.srcIn),
                   ),
                 ),
-                label: 'Home',
+                label: '홈',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
@@ -61,7 +61,7 @@ class BottomNavigation extends StatelessWidget {
                         BlendMode.srcIn),
                   ),
                 ),
-                label: 'Categories',
+                label: '뉴스피드',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
@@ -78,7 +78,7 @@ class BottomNavigation extends StatelessWidget {
                         BlendMode.srcIn),
                   ),
                 ),
-                label: 'Products',
+                label: '모종샵',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
@@ -95,7 +95,7 @@ class BottomNavigation extends StatelessWidget {
                         BlendMode.srcIn),
                   ),
                 ),
-                label: 'Cart',
+                label: '카트',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
@@ -112,7 +112,7 @@ class BottomNavigation extends StatelessWidget {
                         BlendMode.srcIn),
                   ),
                 ),
-                label: 'Profile',
+                label: '개인페이지',
               ),
             ],
             selectedItemColor: Colors.black,
