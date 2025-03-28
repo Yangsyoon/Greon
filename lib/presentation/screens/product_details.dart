@@ -2,17 +2,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/application/notifications_cubit/notifications_cubit.dart';
-import 'package:piiicks/application/share_cubit/share_cubit.dart';
-import 'package:piiicks/configs/app.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/assets.dart';
-import 'package:piiicks/core/constant/colors.dart';
+import 'package:greon/application/notifications_cubit/notifications_cubit.dart';
+import 'package:greon/application/share_cubit/share_cubit.dart';
+import 'package:greon/configs/app.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/assets.dart';
+import 'package:greon/core/constant/colors.dart';
 
-import 'package:piiicks/domain/entities/product/product.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
-import 'package:piiicks/presentation/widgets/photo_view_dialog.dart';
-import 'package:piiicks/presentation/widgets/quantity_row.dart';
+import 'package:greon/domain/entities/product/product.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
+import 'package:greon/presentation/widgets/photo_view_dialog.dart';
+import 'package:greon/presentation/widgets/quantity_row.dart';
 import 'package:screenshot/screenshot.dart';
 
 import '../../application/cart_bloc/cart_bloc.dart';

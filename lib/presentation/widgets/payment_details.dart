@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/domain/entities/order/order_item.dart';
-import 'package:piiicks/presentation/widgets/auth_check_modalsheet.dart';
-import 'package:piiicks/presentation/widgets/payment_details_row.dart';
-import 'package:piiicks/presentation/widgets/transparent_button.dart';
+import 'package:greon/domain/entities/order/order_item.dart';
+import 'package:greon/presentation/widgets/auth_check_modalsheet.dart';
+import 'package:greon/presentation/widgets/payment_details_row.dart';
+import 'package:greon/presentation/widgets/transparent_button.dart';
 import '../../di/di.dart' as di;
 
 import '../../application/cart_bloc/cart_bloc.dart';
@@ -89,7 +89,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                             isLoading = true;
                           });
                         } else if (state is OrderAddSuccess) {
-                       //   context.read<CartBloc>().add(const ClearCart());
+                          //   context.read<CartBloc>().add(const ClearCart());
                           Navigator.of(context)
                               .pushNamed(AppRouter.ordersuccess);
                         } else if (state is OrderAddFail) {

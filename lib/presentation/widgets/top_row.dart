@@ -14,7 +14,7 @@ Widget TopRow({required bool isFromHome, required BuildContext context}) {
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         SvgPicture.asset(
-          AppAssets.PiiicksAppBar,
+          AppAssets.greonAppBar,
           width: AppDimensions.normalize(12),
           height: AppDimensions.normalize(15),
           fit: BoxFit.fill,

@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
-import 'package:piiicks/configs/app.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/enums/enums.dart';
-import 'package:piiicks/presentation/widgets/loading_shimmer.dart';
+import 'package:greon/application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
+import 'package:greon/configs/app.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/enums/enums.dart';
+import 'package:greon/presentation/widgets/loading_shimmer.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../application/filter_cubit/filter_cubit.dart';

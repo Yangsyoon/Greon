@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/space.dart';
-import 'package:piiicks/core/constant/assets.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/core/router/app_router.dart';
-import 'package:piiicks/presentation/widgets/adress_card.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
-import 'package:piiicks/presentation/widgets/payment_details.dart';
-import 'package:piiicks/presentation/widgets/transparent_button.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/core/constant/assets.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/core/router/app_router.dart';
+import 'package:greon/presentation/widgets/adress_card.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
+import 'package:greon/presentation/widgets/payment_details.dart';
+import 'package:greon/presentation/widgets/transparent_button.dart';
 
 import '../../application/delivery_info_fetch_cubit/delivery_info_fetch_cubit.dart';
 import '../../core/enums/enums.dart';

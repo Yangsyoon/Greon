@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/application/share_cubit/share_cubit.dart';
+import 'package:greon/application/share_cubit/share_cubit.dart';
 
-import 'package:piiicks/application/wishlist_cubit/wishlist_cubit.dart';
+import 'package:greon/application/wishlist_cubit/wishlist_cubit.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../application/cart_bloc/cart_bloc.dart';

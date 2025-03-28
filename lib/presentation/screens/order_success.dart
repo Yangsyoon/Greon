@@ -2,12 +2,12 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/space.dart';
-import 'package:piiicks/core/constant/assets.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/presentation/widgets/bottom_nav_container.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/core/constant/assets.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/presentation/widgets/bottom_nav_container.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../application/cart_bloc/cart_bloc.dart';
@@ -25,11 +25,11 @@ class OrderSuccessScreen extends StatefulWidget {
 class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   @override
   void initState() {
-    context.read<NotificationsCubit>().showAndSaveNotification(
-        "Orders Update",
+    context.read<NotificationsCubit>().showAndSaveNotification("Orders Update",
         "Congratulations, You have successfully Placed a New Order.");
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -44,7 +44,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                     padding: Space.all(4, 4),
                     child: Center(
                       child: SvgPicture.asset(
-                        AppAssets.PiiicksAppBar,
+                        AppAssets.greonAppBar,
                         height: AppDimensions.normalize(20),
                       ),
                     ),

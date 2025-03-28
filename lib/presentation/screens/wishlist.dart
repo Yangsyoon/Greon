@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/presentation/screens/product_details.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/presentation/screens/product_details.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
 
 import '../../application/wishlist_cubit/wishlist_cubit.dart';
 import '../../data/models/product/product_model.dart';
@@ -28,13 +28,15 @@ class _WishListScreenState extends State<WishListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: CustomAppBar('WISHLIST', context,automaticallyImplyLeading: true),
-        floatingActionButton: FloatingActionButton(onPressed: (){
-          setState(() {
-            context.read<WishlistCubit>().clearWishlist();
-          });
-
-        },child: Icon(Icons.delete_forever_outlined)),
+        appBar:
+            CustomAppBar('WISHLIST', context, automaticallyImplyLeading: true),
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              setState(() {
+                context.read<WishlistCubit>().clearWishlist();
+              });
+            },
+            child: Icon(Icons.delete_forever_outlined)),
         body: BlocBuilder<WishlistCubit, WishlistState>(
           builder: (context, state) {
             if (state is WishlistLoadedState) {
@@ -69,9 +71,9 @@ class _WishListScreenState extends State<WishListScreen> {
                 return SizedBox(
                   child: GridView.builder(
                     padding: Space.all(1),
-                    itemCount: state.wishlist.length ,
+                    itemCount: state.wishlist.length,
                     gridDelegate:
-                    const SliverGridDelegateWithFixedCrossAxisCount(
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       childAspectRatio: 0.55,
                       crossAxisSpacing: 6,
@@ -79,14 +81,19 @@ class _WishListScreenState extends State<WishListScreen> {
                     physics: const ClampingScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (BuildContext context, int index) {
-
-                      return  RectangularProductItem(product: state.wishlist[index],isFromWishlist: true,);
+                      return RectangularProductItem(
+                        product: state.wishlist[index],
+                        isFromWishlist: true,
+                      );
                     },
                   ),
                 );
               }
             } else {
-              return const Center(child:  CircularProgressIndicator(color: AppColors.CommonCyan,));
+              return const Center(
+                  child: CircularProgressIndicator(
+                color: AppColors.CommonCyan,
+              ));
             }
           },
         ));

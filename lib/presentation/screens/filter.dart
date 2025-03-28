@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/assets.dart';
-import 'package:piiicks/core/constant/colors.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/assets.dart';
+import 'package:greon/core/constant/colors.dart';
 
 import '../../application/categories_bloc/category_bloc.dart';
 import '../../application/filter_cubit/filter_cubit.dart';
@@ -202,10 +202,10 @@ class _FilterScreenState extends State<FilterScreen> {
             Space.xf(1.2),
             Expanded(
                 child: GestureDetector(
-                  onTap: (){
-                    context.read<FilterCubit>().reset();
-                  },
-                 child: Container(
+              onTap: () {
+                context.read<FilterCubit>().reset();
+              },
+              child: Container(
                   height: AppDimensions.normalize(24),
                   decoration: BoxDecoration(
                       border: Border.all(color: AppColors.CommonCyan),
@@ -222,12 +222,10 @@ class _FilterScreenState extends State<FilterScreen> {
             Space.x!,
             Expanded(
                 child: ElevatedButton(
-                    onPressed: (){
+                    onPressed: () {
                       context
                           .read<ProductBloc>()
-                          .add(GetProducts(context
-                          .read<FilterCubit>()
-                          .state));
+                          .add(GetProducts(context.read<FilterCubit>().state));
                       Navigator.of(context).pop();
                     },
                     child: Padding(

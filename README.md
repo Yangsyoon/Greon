@@ -1,5 +1,5 @@
-# Piiicks
-Piiicks is a Flutter e-commerce app, meticulously crafted with clean architecture and powered by the efficient BLoC state management ensuring scalability, maintainability, and optimal performance. Dive into a seamless coding experience with a sleek interface and robust features designed to elevate the online shopping journey.
+# greon
+greon is a Flutter e-commerce app, meticulously crafted with clean architecture and powered by the efficient BLoC state management ensuring scalability, maintainability, and optimal performance. Dive into a seamless coding experience with a sleek interface and robust features designed to elevate the online shopping journey.
 
 ## Directory Structure.
 - **lib**
@@ -111,7 +111,7 @@ dependencies:
 ```
 
 ## Download App
-<a href="https://github.com/mo7amedaliEbaid/piiicks-ecommerce/releases/download/v3.0.0/piiicks-v3.apk"><img src="https://playerzon.com/asset/download.png" width="150"></img></a>
+<a href="https://github.com/mo7amedaliEbaid/greon-ecommerce/releases/download/v3.0.0/greon-v3.apk"><img src="https://playerzon.com/asset/download.png" width="150"></img></a>
 
 ## Screens.
 ### Done:
@@ -139,41 +139,41 @@ dependencies:
 - Orders.
 - Notifications.
 
-For more screen shots [Here](https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/ec474e822af055693058d0beb05a5e52411d8504/screenshots)
+For more screen shots [Here](https://github.com/mo7amedaliEbaid/greon-ecom/blob/ec474e822af055693058d0beb05a5e52411d8504/screenshots)
 
 <p float="left">
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/8e5f750515f9eddb7e26e90001ba9dfa1167bbd6/screenshots/allproducts.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/8e5f750515f9eddb7e26e90001ba9dfa1167bbd6/screenshots/categories.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/8e5f750515f9eddb7e26e90001ba9dfa1167bbd6/screenshots/details.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/detailsex.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/photoview.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/splash.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/home3.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/home2.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/0cd8e6506c789cd9bc8f4ae9248c30a34e64a914/screenshots/addadress.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/searchresult.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/sorting.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/filter.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/filter1.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/0cd8e6506c789cd9bc8f4ae9248c30a34e64a914/screenshots/cart.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/cart3.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/signup.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/successlog.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/profile.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/profile1.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/logged1.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/0cd8e6506c789cd9bc8f4ae9248c30a34e64a914/screenshots/adresses.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/43ccd1a70e591ebf4ecce32916eb7d3c954d0bee/screenshots/homeexit.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/checkou.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/checkout1.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/orders.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/ordersuccess.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/ordererror.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/notifications.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/3c2986dd16cb847ef9866cb9a861d3c6167edc41/screenshots/terms.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/5384c98e8609f0ca356917582dbd49e874e976b1/screenshots/wishlist.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/shimmer.jpg" width="170" />
-   <img src="https://github.com/mo7amedaliEbaid/piiicks-ecom/blob/f21a82054980e7c09ad41277770f74e87a66f857/screenshots/noconnection.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/8e5f750515f9eddb7e26e90001ba9dfa1167bbd6/screenshots/allproducts.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/8e5f750515f9eddb7e26e90001ba9dfa1167bbd6/screenshots/categories.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/8e5f750515f9eddb7e26e90001ba9dfa1167bbd6/screenshots/details.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/detailsex.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/photoview.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/splash.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/home3.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/home2.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/0cd8e6506c789cd9bc8f4ae9248c30a34e64a914/screenshots/addadress.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/searchresult.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/sorting.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/filter.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/filter1.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/0cd8e6506c789cd9bc8f4ae9248c30a34e64a914/screenshots/cart.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/cart3.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/signup.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/successlog.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/profile.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/profile1.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/b90fb5675ea83f423c3742ff949d142dd4c035ab/screenshots/logged1.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/0cd8e6506c789cd9bc8f4ae9248c30a34e64a914/screenshots/adresses.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/43ccd1a70e591ebf4ecce32916eb7d3c954d0bee/screenshots/homeexit.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/checkou.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/checkout1.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/orders.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/ordersuccess.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/ordererror.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/notifications.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/3c2986dd16cb847ef9866cb9a861d3c6167edc41/screenshots/terms.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/5384c98e8609f0ca356917582dbd49e874e976b1/screenshots/wishlist.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/310a4875e42477e73444a4f2dd0a08989b267673/screenshots/shimmer.jpg" width="170" />
+   <img src="https://github.com/mo7amedaliEbaid/greon-ecom/blob/f21a82054980e7c09ad41277770f74e87a66f857/screenshots/noconnection.jpg" width="170" />
 </p>
 
 
@@ -190,29 +190,29 @@ For more screen shots [Here](https://github.com/mo7amedaliEbaid/piiicks-ecom/blo
 
 
 
-https://github.com/mo7amedaliEbaid/piiicks-ecommerce/assets/131966482/5dc6ddd6-07dc-4c32-9eb6-1f04159997ca
+https://github.com/mo7amedaliEbaid/greon-ecommerce/assets/131966482/5dc6ddd6-07dc-4c32-9eb6-1f04159997ca
 
 
 
 
 
-https://github.com/mo7amedaliEbaid/piiicks-ecommerce/assets/131966482/a2c926a7-f8d9-4fc4-8b4a-4061f0fba880
+https://github.com/mo7amedaliEbaid/greon-ecommerce/assets/131966482/a2c926a7-f8d9-4fc4-8b4a-4061f0fba880
 
 
 
 
 
-https://github.com/mo7amedaliEbaid/piiicks-ecommerce/assets/131966482/0f01f13b-ac96-4664-8494-5163bea2b82f
+https://github.com/mo7amedaliEbaid/greon-ecommerce/assets/131966482/0f01f13b-ac96-4664-8494-5163bea2b82f
 
 
 
 
-https://github.com/mo7amedaliEbaid/piiicks-ecommerce/assets/131966482/6dfb61d2-221a-4a9a-9589-c659217099f3
+https://github.com/mo7amedaliEbaid/greon-ecommerce/assets/131966482/6dfb61d2-221a-4a9a-9589-c659217099f3
 
 
 - Usually this Case will Occur if you open the app for the first time without internet connection. If its not the first time the app will use cached data.
 
-https://github.com/mo7amedaliEbaid/piiicks-ecommerce/assets/131966482/4d83307e-2e4b-4427-bf6b-10e3f39ca835
+https://github.com/mo7amedaliEbaid/greon-ecommerce/assets/131966482/4d83307e-2e4b-4427-bf6b-10e3f39ca835
 
 
 

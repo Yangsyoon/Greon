@@ -1,4 +1,4 @@
-package com.example.piiicks
+package com.greon.dev
 
 import io.flutter.embedding.android.FlutterActivity
 

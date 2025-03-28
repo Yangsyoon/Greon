@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/configs.dart';
+import 'package:greon/configs/configs.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../configs/app_dimensions.dart';
@@ -26,7 +26,8 @@ Widget LoadingShimmer({required bool isSquare}) {
     ),
   );
 }
-Widget placeholderShimmer(){
+
+Widget placeholderShimmer() {
   return Shimmer.fromColors(
     baseColor: Colors.grey.shade300,
     highlightColor: Colors.white,

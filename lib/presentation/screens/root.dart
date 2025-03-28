@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/configs/app.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/presentation/screens/cart.dart';
-import 'package:piiicks/presentation/screens/categories.dart';
-import 'package:piiicks/presentation/screens/home.dart';
-import 'package:piiicks/presentation/screens/products_list.dart';
-import 'package:piiicks/presentation/screens/profile.dart';
-import 'package:piiicks/presentation/widgets/bottom_navbar.dart';
+import 'package:greon/configs/app.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/presentation/screens/cart.dart';
+import 'package:greon/presentation/screens/categories.dart';
+import 'package:greon/presentation/screens/home.dart';
+import 'package:greon/presentation/screens/products_list.dart';
+import 'package:greon/presentation/screens/profile.dart';
+import 'package:greon/presentation/widgets/bottom_navbar.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../core/enums/enums.dart';

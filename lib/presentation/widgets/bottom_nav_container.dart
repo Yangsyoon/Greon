@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/configs.dart';
+import 'package:greon/configs/configs.dart';
 
 import '../../core/constant/colors.dart';
 

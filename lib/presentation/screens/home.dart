@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/application/notifications_cubit/notifications_cubit.dart';
-import 'package:piiicks/application/products_bloc/product_bloc.dart';
-import 'package:piiicks/application/wishlist_cubit/wishlist_cubit.dart';
-import 'package:piiicks/configs/app.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/presentation/widgets/error_container.dart';
-import 'package:piiicks/presentation/widgets/loading_shimmer.dart';
-import 'package:piiicks/presentation/widgets/square_product_item.dart';
-import 'package:piiicks/presentation/widgets/top_row.dart';
+import 'package:greon/application/notifications_cubit/notifications_cubit.dart';
+import 'package:greon/application/products_bloc/product_bloc.dart';
+import 'package:greon/application/wishlist_cubit/wishlist_cubit.dart';
+import 'package:greon/configs/app.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/presentation/widgets/error_container.dart';
+import 'package:greon/presentation/widgets/loading_shimmer.dart';
+import 'package:greon/presentation/widgets/square_product_item.dart';
+import 'package:greon/presentation/widgets/top_row.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../application/categories_bloc/category_bloc.dart';
@@ -73,7 +73,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 itemCount: 3,
                                 itemBuilder: (context, index) {
                                   return SvgPicture.asset(
-                                    AppAssets.PiiicksIcon,
+                                    AppAssets.greonIcon,
                                     fit: BoxFit.cover,
                                   );
                                 }),

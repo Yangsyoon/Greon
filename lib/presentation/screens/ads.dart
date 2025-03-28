@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/assets.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/assets.dart';
 import '../../configs/app.dart';
 import '../../core/router/app_router.dart';
 

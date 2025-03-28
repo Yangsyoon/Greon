@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/space.dart';
-import 'package:piiicks/core/constant/assets.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
-import 'package:piiicks/presentation/widgets/custom_textfield.dart';
-import 'package:piiicks/presentation/widgets/mobile_number_textfield.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/core/constant/assets.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
+import 'package:greon/presentation/widgets/custom_textfield.dart';
+import 'package:greon/presentation/widgets/mobile_number_textfield.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 

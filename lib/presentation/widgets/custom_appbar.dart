@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/router/app_router.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/router/app_router.dart';
 
 import '../../configs/app_dimensions.dart';
 import '../../configs/app_typography.dart';

@@ -1,8 +1,8 @@
 import 'package:get_it/get_it.dart';
-import 'package:piiicks/di/cubits.dart';
-import 'package:piiicks/di/order.dart';
-import 'package:piiicks/di/product.dart';
-import 'package:piiicks/di/user.dart';
+import 'package:greon/di/cubits.dart';
+import 'package:greon/di/order.dart';
+import 'package:greon/di/product.dart';
+import 'package:greon/di/user.dart';
 import 'cart.dart';
 import 'category.dart';
 import 'common.dart';
@@ -24,5 +24,5 @@ Future<void> init() async {
   registerCubits();
 
   // Register common dependencies
-  registerCommonDependencies();
+  await registerCommonDependencies();
 }

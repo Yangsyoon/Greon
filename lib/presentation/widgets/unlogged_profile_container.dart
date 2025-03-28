@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/presentation/widgets/transparent_button.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/presentation/widgets/transparent_button.dart';
 
 import '../../core/constant/assets.dart';
 import '../../core/constant/colors.dart';

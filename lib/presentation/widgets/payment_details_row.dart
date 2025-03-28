@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/configs.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/configs.dart';
 
 Widget PaymentDetailsRow(
     String leftText, String rightText, TextStyle? textStyle) {

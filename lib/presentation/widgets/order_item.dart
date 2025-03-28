@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/presentation/widgets/dashed_separator.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/presentation/widgets/dashed_separator.dart';
 
 import '../../domain/entities/order/order_details.dart';
 import 'loading_shimmer.dart';

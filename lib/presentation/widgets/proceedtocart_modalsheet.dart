@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/presentation/widgets/transparent_button.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/presentation/widgets/transparent_button.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../core/enums/enums.dart';

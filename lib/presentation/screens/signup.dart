@@ -1,14 +1,14 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/presentation/widgets/auth_error_dialog.dart';
-import 'package:piiicks/presentation/widgets/credential_failure_dialog.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
-import 'package:piiicks/presentation/widgets/successful_auth_dialog.dart';
-import 'package:piiicks/presentation/widgets/transparent_button.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/presentation/widgets/auth_error_dialog.dart';
+import 'package:greon/presentation/widgets/credential_failure_dialog.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
+import 'package:greon/presentation/widgets/successful_auth_dialog.dart';
+import 'package:greon/presentation/widgets/transparent_button.dart';
 
 import '../../application/user_bloc/user_bloc.dart';
 import '../../core/error/failures.dart';

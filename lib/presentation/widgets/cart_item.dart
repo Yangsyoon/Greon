@@ -1,12 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/space.dart';
-import 'package:piiicks/core/constant/colors.dart';
-import 'package:piiicks/presentation/widgets/dashed_separator.dart';
-import 'package:piiicks/presentation/widgets/loading_shimmer.dart';
-import 'package:piiicks/presentation/widgets/quantity_row.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/presentation/widgets/dashed_separator.dart';
+import 'package:greon/presentation/widgets/loading_shimmer.dart';
+import 'package:greon/presentation/widgets/quantity_row.dart';
 
 import '../../core/router/app_router.dart';
 import '../../domain/entities/cart/cart_item.dart';
@@ -108,4 +108,3 @@ class CartItemCard extends StatelessWidget {
     );
   }
 }
-

@@ -6,9 +6,9 @@ import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/space.dart';
-import 'package:piiicks/core/constant/assets.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/core/constant/assets.dart';
 
 import '../../application/products_bloc/product_bloc.dart';
 import '../../core/constant/colors.dart';
@@ -47,14 +47,16 @@ class _NoConnectionColumnState extends State<NoConnectionColumn> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Space.yf(2),
-            SvgPicture.asset(AppAssets.PiiicksAppBar),
+            SvgPicture.asset(AppAssets.greonAppBar),
             Space.yf(3),
             SvgPicture.asset(AppAssets.BadConnection),
             Space.yf(3),
             Text(
               "NO INTERNET CONECTION\nServer Error".toUpperCase(),
-              style: AppText.h2b
-                  ?.copyWith(color: AppColors.CommonCyan, height: 1.7,),
+              style: AppText.h2b?.copyWith(
+                color: AppColors.CommonCyan,
+                height: 1.7,
+              ),
               textAlign: TextAlign.center,
             ),
             Space.yf(2),

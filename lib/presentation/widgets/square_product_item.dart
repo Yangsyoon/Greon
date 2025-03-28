@@ -1,10 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/app.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/domain/entities/product/product.dart';
-import 'package:piiicks/presentation/widgets/loading_shimmer.dart';
+import 'package:greon/configs/app.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/domain/entities/product/product.dart';
+import 'package:greon/presentation/widgets/loading_shimmer.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../core/constant/colors.dart';
@@ -26,15 +26,15 @@ class SquareProductItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                  onTap: (){
-                    Navigator.of(context)
-                        .pushNamed(AppRouter.productDetails, arguments: product);
+                  onTap: () {
+                    Navigator.of(context).pushNamed(AppRouter.productDetails,
+                        arguments: product);
                   },
                   child: Container(
                     decoration:
                         BoxDecoration(border: Border.all(color: Colors.grey)),
                     child: Hero(
-                      tag:product!.id ,
+                      tag: product!.id,
                       child: CachedNetworkImage(
                         height: AppDimensions.normalize(70),
                         width: AppDimensions.normalize(70),

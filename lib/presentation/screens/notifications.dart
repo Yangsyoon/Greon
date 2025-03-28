@@ -1,10 +1,10 @@
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/application/notifications_cubit/notifications_cubit.dart';
-import 'package:piiicks/configs/app_typography.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
+import 'package:greon/application/notifications_cubit/notifications_cubit.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
 
 class NotificationsScreen extends StatefulWidget {
   const NotificationsScreen({super.key});

@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 import '../core/networkchecker/network_info.dart';
 import 'di.dart';
 
-void registerCommonDependencies() async {
+Future<void> registerCommonDependencies() async {
   final sharedPreferences = await SharedPreferences.getInstance();
   const secureStorage = FlutterSecureStorage();
 

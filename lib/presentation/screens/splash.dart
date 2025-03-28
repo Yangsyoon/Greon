@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/assets.dart';
-import 'package:piiicks/core/router/app_router.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/assets.dart';
+import 'package:greon/core/router/app_router.dart';
 import '../../configs/app.dart';
 
 class SplashScreen extends StatefulWidget {

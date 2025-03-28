@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:piiicks/configs/space.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
 
 import '../../core/constant/strings.dart';
 
@@ -12,7 +12,8 @@ class AppInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(screenTitle, context,automaticallyImplyLeading: true),
+      appBar:
+          CustomAppBar(screenTitle, context, automaticallyImplyLeading: true),
       body: SingleChildScrollView(
         child: Padding(
           padding: Space.all(1, .1),

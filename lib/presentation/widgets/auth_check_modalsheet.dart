@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/presentation/widgets/transparent_button.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/presentation/widgets/transparent_button.dart';
 
 import '../../core/router/app_router.dart';
 

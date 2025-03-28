@@ -1,5 +1,5 @@
 /*
-import 'package:piiicks/data/models/favourite_produt/favourit_product_model.dart';
+import 'package:greon/data/models/favourite_produt/favourit_product_model.dart';
 
 import '../../repositories/favourites_repository.dart';
 

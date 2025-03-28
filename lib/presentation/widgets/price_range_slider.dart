@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/core/constant/colors.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/core/constant/colors.dart';
 
 import '../../application/filter_cubit/filter_cubit.dart';
 

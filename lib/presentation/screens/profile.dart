@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:piiicks/configs/app_dimensions.dart';
-import 'package:piiicks/configs/configs.dart';
-import 'package:piiicks/core/constant/assets.dart';
-import 'package:piiicks/presentation/widgets/top_row.dart';
-import 'package:piiicks/presentation/widgets/unlogged_profile_container.dart';
-import 'package:piiicks/presentation/widgets/user_logged_profile_container.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/configs/configs.dart';
+import 'package:greon/core/constant/assets.dart';
+import 'package:greon/presentation/widgets/top_row.dart';
+import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
+import 'package:greon/presentation/widgets/user_logged_profile_container.dart';
 
 import '../../application/user_bloc/user_bloc.dart';
 import '../../core/constant/colors.dart';

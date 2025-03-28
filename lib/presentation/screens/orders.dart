@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:piiicks/configs/space.dart';
-import 'package:piiicks/presentation/widgets/custom_appbar.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/presentation/widgets/custom_appbar.dart';
 
 import '../../application/order_fetch_cubit/order_fetch_cubit.dart';
 import '../widgets/loading_shimmer.dart';
