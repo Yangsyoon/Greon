@@ -1,4 +1,5 @@
 // Feature: Category
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../application/categories_bloc/category_bloc.dart';
 import '../data/data_sources/local/category_local_data_source.dart';
 import '../data/data_sources/remote/category_remote_data_source.dart';
@@ -18,16 +19,16 @@ void registerCategoryFeature() {
 
   // Category Repository and Data Sources
   sl.registerLazySingleton<CategoryRepository>(
-        () => CategoryRepositoryImpl(
+    () => CategoryRepositoryImpl(
       remoteDataSource: sl(),
       localDataSource: sl(),
       networkInfo: sl(),
     ),
   );
   sl.registerLazySingleton<CategoryRemoteDataSource>(
-        () => CategoryRemoteDataSourceImpl(client: sl()),
+    () => CategoryRemoteDataSourceImpl(firestore: FirebaseFirestore.instance),
   );
   sl.registerLazySingleton<CategoryLocalDataSource>(
-        () => CategoryLocalDataSourceImpl(sharedPreferences: sl()),
+    () => CategoryLocalDataSourceImpl(sharedPreferences: sl()),
   );
 }
