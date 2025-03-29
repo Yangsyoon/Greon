@@ -21,13 +21,31 @@ class NotificationsCubit extends Cubit<List<String>> {
             AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
 
+    const DarwinInitializationSettings initializationSettingsIOS =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
-      iOS: null,
+      iOS: initializationSettingsIOS,
     );
 
-    await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
+    try {
+      await _flutterLocalNotificationsPlugin.initialize(
+        initializationSettings,
+        onDidReceiveNotificationResponse:
+            (NotificationResponse notificationResponse) {
+          // Handle notification tap
+          emit([...state, notificationResponse.payload ?? '']);
+        },
+      );
+    } catch (e) {
+      log("Error initializing notifications: $e");
+    }
 
     _configureDidReceiveLocalNotificationSubject();
     _configureSelectNotificationSubject();
