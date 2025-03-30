@@ -7,8 +7,19 @@ import '../widgets/noconnection_column.dart';
 import '../widgets/rectangular_category_item.dart';
 import '../widgets/top_row.dart';
 
-class CategoriesScreen extends StatelessWidget {
+class CategoriesScreen extends StatefulWidget {
   const CategoriesScreen({super.key});
+
+  @override
+  State<CategoriesScreen> createState() => _CategoriesScreenState();
+}
+
+class _CategoriesScreenState extends State<CategoriesScreen> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<CategoryBloc>().add(const GetCategories());
+  }
 
   @override
   Widget build(BuildContext context) {
