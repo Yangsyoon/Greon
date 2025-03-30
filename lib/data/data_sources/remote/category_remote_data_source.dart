@@ -1,6 +1,4 @@
-import 'package:http/http.dart' as http;
-import '../../../core/constant/api.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/error/failures.dart';
 import '../../models/category/category_model.dart';
 
@@ -9,23 +7,26 @@ abstract class CategoryRemoteDataSource {
 }
 
 class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
-  final http.Client client;
-  CategoryRemoteDataSourceImpl({required this.client});
-
+  final FirebaseFirestore firestore;
+  CategoryRemoteDataSourceImpl({required this.firestore});
   @override
-  Future<List<CategoryModel>> getCategories() =>
-      _getCategoryFromUrl('$baseUrl/categories');
+  Future<List<CategoryModel>> getCategories() async {
+    try {
+      final QuerySnapshot querySnapshot =
+          await firestore.collection('categories').get();
 
-  Future<List<CategoryModel>> _getCategoryFromUrl(String url) async {
-    final response = await client.get(
-      Uri.parse(url),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-    if (response.statusCode == 200) {
-      return categoryModelListFromRemoteJson(response.body);
-    } else {
+      return querySnapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+        print(
+            'Category loaded - Name: ${data['name']}, Image URL: ${data['image']}');
+        return CategoryModel(
+          id: doc.id,
+          name: data['name'] ?? '',
+          image: data['image'] ?? '',
+        );
+      }).toList();
+    } catch (e) {
+      print('Failed to load categories: $e');
       throw ServerFailure();
     }
   }

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'core/app/app.dart';
 
@@ -15,6 +16,8 @@ Future<void> main() async {
   await GetStorage.init();
 
   await di.init();
+
+  await Firebase.initializeApp();
 
   Bloc.observer = MyBlocObserver();
 
