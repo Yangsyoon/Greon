@@ -1,20 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greon/domain/usecases/user/sign_in_usecase.dart';
-import 'package:greon/presentation/widgets/auth_error_dialog.dart';
-import 'package:greon/presentation/widgets/credential_failure_dialog.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth 추가
+import 'package:greon/presentation/widgets/auth_error_dialog.dart'; // 로그인 오류 대화상자
+import 'package:greon/presentation/widgets/successful_auth_dialog.dart'; // 로그인 성공 대화상자
 import 'package:greon/presentation/widgets/custom_appbar.dart';
-import 'package:greon/presentation/widgets/successful_auth_dialog.dart';
 import 'package:greon/presentation/widgets/transparent_button.dart';
-
-import '../../application/user_bloc/user_bloc.dart';
-import '../../configs/app_dimensions.dart';
-import '../../configs/app_typography.dart';
-import '../../configs/space.dart';
-import '../../core/constant/colors.dart';
-import '../../core/error/failures.dart';
-import '../../core/router/app_router.dart';
-import '../widgets/custom_textfield.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/configs/app_typography.dart';
+import 'package:greon/configs/space.dart';
+import 'package:greon/configs/app_dimensions.dart';
+import 'package:greon/presentation/widgets/custom_textfield.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -28,24 +22,57 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-/*  bool isLoading = false;
-  void _startLoading() {
-    setState(() {
-      isLoading = true;
-    });
-
-    Future.delayed(const Duration(seconds: 10), () {
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }*/
+  bool _isLoggedIn = false;
+  String? _loggedInEmail; // nullable로 변경
 
   @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
+  void initState() {
+    super.initState();
+    // 로그인 상태가 변경될 때마다 상태 확인
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      setState(() {
+        if (user != null) {
+          _isLoggedIn = true;
+          _loggedInEmail = user.email; // 사용자 이메일 저장
+        } else {
+          _isLoggedIn = false;
+          _loggedInEmail = null; // 로그인 안 됐을 때 초기화
+        }
+      });
+    });
+  }
+
+  Future<void> _signOut() async {
+    await FirebaseAuth.instance.signOut();
+  }
+
+  Future<void> _signInWithEmailPassword() async {
+    try {
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      // Firebase 이메일 로그인
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
+      if (userCredential.user != null) {
+        setState(() {
+          _isLoggedIn = true;
+          _loggedInEmail = userCredential.user?.email;
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      // 로그인 오류 처리
+      if (e.code == 'user-not-found') {
+        showAuthErrorDialog(context, message: 'No user found for that email.');
+      } else if (e.code == 'wrong-password') {
+        showAuthErrorDialog(context, message: 'Incorrect password.');
+      } else {
+        showAuthErrorDialog(context, message: 'An error occurred. Please try again.');
+      }
+    }
   }
 
   @override
@@ -57,105 +84,100 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: Space.all(1, 1.3),
           child: Form(
             key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "LOGIN",
-                  style: AppText.h2b?.copyWith(color: AppColors.CommonCyan),
-                ),
-                Space.y!,
-                Text(
-                  "Login Into Your Account",
-                  style: AppText.h3?.copyWith(color: AppColors.GreyText),
-                ),
-                Space.y2!,
-                Text(
-                  "Email Address*",
-                  style: AppText.b1b,
-                ),
-                Space.y!,
-                buildTextFormField(_emailController, "Email Address"),
-                Space.yf(1.5),
-                Text(
-                  "Password*",
-                  style: AppText.b1b,
-                ),
-                Space.y!,
-                buildTextFormField(_passwordController, "Password",
-                    isObscure: true),
-                Space.y1!,
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Forgot Password",
-                      style: AppText.h3?.copyWith(color: AppColors.CommonCyan),
-                    )
-                  ],
-                ),
-                Space.yf(1.7),
-                BlocConsumer<UserBloc, UserState>(
-                  listener: (context, state) {
-                    if (state is UserLogged) {
-                      showSuccessfulAuthDialog(context, "logged in");
-                    } else if (state is UserLoggedFail) {
-                      if (state.failure is CredentialFailure) {
-                        showCredentialErrorDialog(context);
-                      } else {
-                        showAuthErrorDialog(context);
-                      }
-                    }
-                  },
-                  builder: (context, state) {
-                    return ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          context.read<UserBloc>().add(
-                                SignInUser(
-                                  SignInParams(
-                                    username: _emailController.text,
-                                    password: _passwordController.text,
-                                  ),
-                                ),
-                              );
-                        }
-                      },
-                      style: ButtonStyle(
-                        minimumSize: MaterialStatePropertyAll(
-                          Size(
-                            double.infinity,
-                            AppDimensions.normalize(20),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        (state is UserLoading) ? "Wait..." : "Login",
-                        style: AppText.h3b?.copyWith(color: Colors.white),
-                      ),
-                    );
-                  },
-                ),
-                Space.yf(1.5),
-                Center(
-                  child: Text(
-                    "Don’t have an Account?",
-                    style: AppText.b1b,
-                  ),
-                ),
-                Space.y1!,
-                transparentButton(
-                  context: context,
-                  onTap: () {
-                    Navigator.of(context).pushNamed(AppRouter.signup);
-                  },
-                  buttonText: "Signup",
-                )
-              ],
-            ),
+            child: _isLoggedIn
+                ? _buildLoggedInUI() // 로그인 됐을 때
+                : _buildLoginFormUI(), // 로그인 안 됐을 때
           ),
         ),
       ),
+    );
+  }
+
+  // 로그인 후 UI
+  Widget _buildLoggedInUI() {
+    return Column(
+      children: [
+        Text("Logged in as: ${_loggedInEmail ?? ''}", style: AppText.h2b), // null-safe 처리
+        SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: _signOut,
+          child: Text("Logout", style: AppText.h3b?.copyWith(color: Colors.white)),
+        ),
+      ],
+    );
+  }
+
+  // 로그인 폼 UI
+  Widget _buildLoginFormUI() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "LOGIN",
+          style: AppText.h2b?.copyWith(color: AppColors.CommonCyan),
+        ),
+        Space.y!,
+        Text(
+          "Login Into Your Account",
+          style: AppText.h3?.copyWith(color: AppColors.GreyText),
+        ),
+        Space.y2!,
+        Text(
+          "Email Address*",
+          style: AppText.b1b,
+        ),
+        Space.y!,
+        buildTextFormField(_emailController, "Email Address"),
+        Space.yf(1.5),
+        Text(
+          "Password*",
+          style: AppText.b1b,
+        ),
+        Space.y!,
+        buildTextFormField(_passwordController, "Password", isObscure: true),
+        Space.y1!,
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Text(
+              "Forgot Password",
+              style: AppText.h3?.copyWith(color: AppColors.CommonCyan),
+            )
+          ],
+        ),
+        Space.yf(1.7),
+        ElevatedButton(
+          onPressed: () {
+            if (_formKey.currentState!.validate()) {
+              _signInWithEmailPassword();  // 로그인 처리 함수 호출
+            }
+          },
+          style: ButtonStyle(
+            minimumSize: MaterialStatePropertyAll(
+              Size(double.infinity, AppDimensions.normalize(20)),
+            ),
+          ),
+          child: Text(
+            "Login",
+            style: AppText.h3b?.copyWith(color: Colors.white),
+          ),
+        ),
+        Space.yf(1.5),
+        Center(
+          child: Text(
+            "Don’t have an Account?",
+            style: AppText.b1b,
+          ),
+        ),
+        Space.y1!,
+        transparentButton(
+          context: context,
+          onTap: () {
+            Navigator.of(context).pushNamed('/signup');
+          },
+          buttonText: "Signup",
+        ),
+      ],
     );
   }
 }

@@ -3,7 +3,7 @@ import 'package:greon/configs/configs.dart';
 
 import '../../core/constant/colors.dart';
 
-Future<void> showAuthErrorDialog(BuildContext context) async {
+Future<void> showAuthErrorDialog(BuildContext context, {required String message}) async {
   return showDialog(
       context: context,
       barrierDismissible: false,
@@ -22,7 +22,7 @@ Future<void> showAuthErrorDialog(BuildContext context) async {
                   ),
                   Space.yf(.5),
                   Text(
-                    "Try Again!",
+                    message,  // 전달된 message를 텍스트로 표시
                     style: AppText.b1,
                   ),
                   Row(

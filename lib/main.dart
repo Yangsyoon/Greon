@@ -9,6 +9,13 @@ import 'core/app/app.dart';
 
 import 'core/observer/bloc_observer.dart';
 import 'di/di.dart' as di;
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:greon/presentation/screens/home.dart';
+import 'package:greon/presentation/screens/login.dart';
+import 'package:provider/provider.dart';
+
+
+
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,5 +33,8 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  runApp(Phoenix(child: const MyApp()));
+  runApp(MyApp());
 }
+
+
+
