@@ -145,7 +145,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       if (state.failure is CredentialFailure) {
                         showCredentialErrorDialog(context);
                       } else {
-                        showAuthErrorDialog(context);
+                        showAuthErrorDialog(context, message: '');
                       }
                     }
                   },

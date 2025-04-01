@@ -7,6 +7,10 @@ plugins {
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+repositories {
+    google() // Firebase는 Google repository에서 제공됨
+    mavenCentral() // Maven Central Repository 추가
+}
 
 android {
     namespace = "com.greon.devapps"
@@ -51,7 +55,22 @@ flutter {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21")
     implementation("com.android.support:multidex:1.0.3")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("androidx.window:window:1.0.0")
     implementation("androidx.window:window-java:1.0.0")
+
+
+    // Firebase Authentication
+    implementation("com.google.firebase:firebase-auth:21.1.0") // Firebase Auth 라이브러리
+
+    // Firebase Core
+    implementation("com.google.firebase:firebase-core:21.1.0") // Firebase Core 라이브러리
+
+    // Google Play services for authentication
+    implementation("com.google.android.gms:play-services-auth:19.2.0") // Google Play 서비스 인증 라이브러리
+
+    // Firebase Firestore (Optional, 만약 Firestore를 사용한다면)
+    implementation("com.google.firebase:firebase-firestore:24.5.0")
+
+
 }

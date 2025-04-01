@@ -30,6 +30,10 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+        <!-- 앱 자동 확인 비활성화 -->
+        <meta-data
+            android:name="com.google.firebase.auth.FirebaseAuth"
+            android:value="no_auto_verify_phone_number" />
     </application>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
