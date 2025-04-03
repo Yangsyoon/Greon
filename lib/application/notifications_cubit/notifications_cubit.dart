@@ -28,10 +28,18 @@ class NotificationsCubit extends Cubit<List<String>> {
       requestSoundPermission: true,
     );
 
+    const DarwinInitializationSettings initializationSettingsMacOS =
+        DarwinInitializationSettings(
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
+    );
+
     const InitializationSettings initializationSettings =
         InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsIOS,
+      macOS: initializationSettingsMacOS,
     );
 
     try {
