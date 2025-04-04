@@ -14,8 +14,11 @@ String productResponseModelToJson(ProductResponseModel data) =>
 class ProductResponseModel extends ProductResponse {
   ProductResponseModel({
     required PaginationMetaData meta,
-    required List<ProductEntity> data,
-  }) : super(products: data, paginationMetaData: meta);
+    required List<ProductModel> data,
+  }) : super(
+    products: data.map((product) => product.toEntity()).toList(),
+    paginationMetaData: meta,
+  );
 
   factory ProductResponseModel.fromJson(Map<String, dynamic> json) =>
       ProductResponseModel(
@@ -25,7 +28,9 @@ class ProductResponseModel extends ProductResponse {
       );
 
   Map<String, dynamic> toJson() => {
-        "meta": (paginationMetaData as PaginationMetaDataModel).toJson(),
-        "data": List<dynamic>.from((products as List<ProductModel>).map((x) => x.toJson())),
-      };
+    "meta": PaginationMetaDataModel.fromEntity(paginationMetaData).toJson(),
+    "data": products.map((x) => ProductModel.fromEntity(x).toJson()).toList(),
+  };
+
 }
+

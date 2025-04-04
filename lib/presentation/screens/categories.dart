@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../application/categories_bloc/category_bloc.dart';
 import '../../configs/configs.dart';
+import '../../data/models/category/category_model.dart';
 import '../widgets/noconnection_column.dart';
 import '../widgets/rectangular_category_item.dart';
 import '../widgets/top_row.dart';
@@ -25,22 +26,26 @@ class CategoriesScreen extends StatelessWidget {
                 builder: (context, state) {
                   return (state is CategoryError)
                       ? const NoConnectionColumn(
-                          isFromCategories: true,
-                        )
+                    isFromCategories: true,
+                  )
                       : Expanded(
-                          child: ListView.builder(
-                            itemCount: (state is CategoryLoading)
-                                ? 7
-                                : state.categories.length,
-                            physics: const ClampingScrollPhysics(),
-                            itemBuilder: (context, index) =>
-                                (state is CategoryLoading)
-                                    ? const RectangularCategoryItem()
-                                    : RectangularCategoryItem(
-                                        category: state.categories[index],
-                                      ),
-                          ),
+                    child: ListView.builder(
+                      itemCount: (state is CategoryLoading)
+                          ? 7
+                          : state.categories.length,
+                      physics: const ClampingScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        // Category를 CategoryModel로 변환
+                        final categoryModel = CategoryModel.fromEntity(state.categories[index]);
+
+                        return (state is CategoryLoading)
+                            ? const RectangularCategoryItem()
+                            : RectangularCategoryItem(
+                          category: categoryModel, // CategoryModel을 전달
                         );
+                      },
+                    ),
+                  );
                 },
               ),
             ],

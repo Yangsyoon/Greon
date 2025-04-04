@@ -4,12 +4,11 @@ import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/configs/app_typography.dart';
 import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/colors.dart';
-import 'package:greon/presentation/screens/product_details.dart';
 import 'package:greon/presentation/widgets/custom_appbar.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../data/models/product/product_model.dart';
 import '../../application/wishlist_cubit/wishlist_cubit.dart';
-import '../../data/models/product/product_model.dart';
-import '../widgets/rectangular_product_item.dart';
+import '../widgets/rectangular_product_item.dart'; // RectangularProductItem import
 
 class WishListScreen extends StatefulWidget {
   const WishListScreen({super.key});
@@ -28,101 +27,119 @@ class _WishListScreenState extends State<WishListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar:
-            CustomAppBar('WISHLIST', context, automaticallyImplyLeading: true),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-              setState(() {
-                context.read<WishlistCubit>().clearWishlist();
-              });
-            },
-            child: Icon(Icons.delete_forever_outlined)),
-        body: BlocBuilder<WishlistCubit, WishlistState>(
-          builder: (context, state) {
-            if (state is WishlistLoadedState) {
-              if (state.wishlist.isEmpty) {
-                return Container(
-                  margin: EdgeInsets.only(
-                      top: AppDimensions.normalize(90),
-                      bottom: AppDimensions.normalize(120),
-                      left: AppDimensions.normalize(10),
-                      right: AppDimensions.normalize(10)),
-                  padding: Space.all(1, 1.5),
-                  color: AppColors.LightGrey,
-                  // height: AppDimensions.normalize(70),
-                  child: Center(
-                    child: Column(
-                      //crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "NO FAVORITES",
-                          style: AppText.h3b
-                              ?.copyWith(color: AppColors.CommonCyan),
-                        ),
-                        const Text(
-                          "There Is No Saved Products.\n Please Add New Products!",
-                          style: TextStyle(height: 2),
-                        )
-                      ],
-                    ),
+      appBar: CustomAppBar('WISHLIST', context, automaticallyImplyLeading: true),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text("정말 삭제하시겠습니까?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text("취소"),
+                ),
+                TextButton(
+                  onPressed: () {
+                    context.read<WishlistCubit>().clearWishlist();
+                    Navigator.pop(context);
+                  },
+                  child: Text("삭제"),
+                ),
+              ],
+            ),
+          );
+        },
+        child: Icon(Icons.delete_forever_outlined),
+      ),
+      body: BlocBuilder<WishlistCubit, WishlistState>(
+        builder: (context, state) {
+          if (state is WishlistLoadedState) {
+            if (state.wishlist.isEmpty) {
+              return Container(
+                margin: EdgeInsets.only(
+                    top: AppDimensions.normalize(90),
+                    bottom: AppDimensions.normalize(120),
+                    left: AppDimensions.normalize(10),
+                    right: AppDimensions.normalize(10)),
+                padding: Space.all(1, 1.5),
+                color: AppColors.LightGrey,
+                child: Center(
+                  child: Column(
+                    children: [
+                      Text(
+                        "NO FAVORITES",
+                        style:
+                        AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+                      ),
+                      const Text(
+                        "There Is No Saved Products.\n Please Add New Products!",
+                        style: TextStyle(height: 2),
+                      )
+                    ],
                   ),
-                );
-              } else {
-                return SizedBox(
-                  child: GridView.builder(
+                ),
+              );
+            } else {
+              return StreamBuilder<QuerySnapshot>(
+                stream: FirebaseFirestore.instance
+                    .collection('products')
+                    .where(FieldPath.documentId,
+                    whereIn: state.wishlist.map((e) => e.id).toList())
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasError) {
+                    return Center(child: Text('에러 발생: ${snapshot.error}'));
+                  }
+
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.CommonCyan,
+                        ));
+                  }
+
+                  final products = snapshot.data!.docs.map((doc) {
+                    try {
+                      final data = doc.data() as Map<String, dynamic>;
+                      data["id"] = doc.id;
+                      return ProductModel.fromJson(data);
+                    } catch (e) {
+                      print('ProductModel 변환 오류: $e');
+                      return null;
+                    }
+                  }).whereType<ProductModel>().toList();
+
+
+                  return GridView.builder(
                     padding: Space.all(1),
-                    itemCount: state.wishlist.length,
+                    itemCount: products.length,
                     gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.55,
+                      childAspectRatio: 0.7, // 값 조정
                       crossAxisSpacing: 6,
                     ),
                     physics: const ClampingScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (BuildContext context, int index) {
                       return RectangularProductItem(
-                        product: state.wishlist[index],
+                        product: products[index],
                         isFromWishlist: true,
                       );
                     },
-                  ),
-                );
-              }
-            } else {
-              return const Center(
-                  child: CircularProgressIndicator(
-                color: AppColors.CommonCyan,
-              ));
+                  );
+                },
+              );
             }
-          },
-        ));
-  }
-}
-
-class YourWishlistWidget extends StatelessWidget {
-  final List<ProductModel> wishlist;
-
-  YourWishlistWidget({required this.wishlist});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      itemCount: wishlist.length,
-      itemBuilder: (context, index) {
-        return ListTile(
-          title: Text(wishlist[index].name),
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) =>
-                    ProductDetailsScreen(product: wishlist[index]),
-              ),
-            );
-          },
-          // Add more UI components as needed
-        );
-      },
+          } else {
+            return const Center(
+                child: CircularProgressIndicator(
+                  color: AppColors.CommonCyan,
+                ));
+          }
+        },
+      ),
     );
   }
 }

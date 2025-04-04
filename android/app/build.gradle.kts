@@ -42,6 +42,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    ndkVersion = "27.0.12077973"
 }
 
 flutter {
@@ -51,7 +52,12 @@ flutter {
 dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21")
     implementation("com.android.support:multidex:1.0.3")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
     implementation("androidx.window:window:1.0.0")
     implementation("androidx.window:window-java:1.0.0")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    implementation("com.google.android.gms:play-services-maps:19.1.0")
+    implementation("com.google.android.gms:play-services-base:16.1.0")
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-firestore")
 }

@@ -17,6 +17,7 @@ import '../../application/filter_cubit/filter_cubit.dart';
 import '../../core/constant/assets.dart';
 import '../../core/constant/colors.dart';
 import '../../core/enums/enums.dart';
+import '../../data/models/category/category_model.dart';
 import '../widgets/dots_indicator.dart';
 import '../widgets/square_category_item.dart';
 
@@ -133,21 +134,22 @@ class _HomeScreenState extends State<HomeScreen> {
                             height: AppDimensions.normalize(100),
                             child: ListView.builder(
                               scrollDirection: Axis.horizontal,
-                              itemCount: 3,
+                              itemCount: state.categories.length,
                               physics: const ClampingScrollPhysics(),
-                              itemBuilder: (context, index) =>
-                                  (state is CategoryLoading)
-                                      ? const SquareCategoryItem()
-                                      : (state is CategoryError)
-                                          ? Center(
-                                              child: Padding(
-                                                  padding: Space.hf(2),
-                                                  child: errorContainer(
-                                                      context, false)),
-                                            )
-                                          : SquareCategoryItem(
-                                              category: state.categories[index],
-                                            ),
+                              itemBuilder: (context, index) {
+                                // Category를 CategoryModel로 변환
+                                final categoryModel = CategoryModel.fromEntity(state.categories[index]);
+
+                                return (state is CategoryLoading)
+                                    ? const SquareCategoryItem()
+                                    : (state is CategoryError)
+                                    ? Center(
+                                  child: Padding(
+                                      padding: Space.hf(2),
+                                      child: errorContainer(context, false)),
+                                )
+                                    : SquareCategoryItem(category: categoryModel);
+                              },
                             ),
                           );
                         },
@@ -194,26 +196,26 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: (state is ProductError)
                                 ? Center(child: errorContainer(context, false))
                                 : (state is ProductEmpty)
-                                    ? Text(
-                                        "No Featured Products Available",
-                                        style: AppText.b1b,
-                                        overflow: TextOverflow.ellipsis,
-                                      )
-                                    : ListView.builder(
-                                        scrollDirection: Axis.horizontal,
-                                        itemCount: 3,
-                                        physics: const ClampingScrollPhysics(),
-                                        itemBuilder: (context, index) => (state
-                                                is ProductLoading)
-                                            ? const SquareProductItem()
-                                            : state.products.isNotEmpty
-                                                ? SquareProductItem(
-                                                    product:
-                                                        state.products[index],
-                                                  )
-                                                : LoadingShimmer(
-                                                    isSquare: true),
-                                      ),
+                                ? Text(
+                              "No Featured Products Available",
+                              style: AppText.b1b,
+                              overflow: TextOverflow.ellipsis,
+                            )
+                                : ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: 3,
+                              physics: const ClampingScrollPhysics(),
+                              itemBuilder: (context, index) => (state
+                              is ProductLoading)
+                                  ? const SquareProductItem()
+                                  : state.products.isNotEmpty
+                                  ? SquareProductItem(
+                                product:
+                                state.products[index],
+                              )
+                                  : LoadingShimmer(
+                                  isSquare: true),
+                            ),
                           );
                         },
                       ),
@@ -231,3 +233,4 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
