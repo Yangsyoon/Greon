@@ -60,7 +60,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   Widget build(BuildContext context) {
     App.init(context);
     bool isProductInWishlist =
-        context.read<WishlistCubit>().isInWishlist(widget.product.id);
+    context.read<WishlistCubit>().isInWishlist(widget.product.id);
     return Screenshot(
       controller: context.read<ShareCubit>().screenshotController,
       child: Scaffold(
@@ -172,7 +172,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             border: Border.all(
                               color: _selectedPageIndex == index
                                   ? AppColors
-                                      .CommonCyan // Change this to your desired color
+                                  .CommonCyan // Change this to your desired color
                                   : Colors.transparent,
                               width: 5.0,
                             ),
@@ -196,27 +196,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         children: [
                           isProductInWishlist
                               ? GestureDetector(
-                                  onTap: () {
-                                    /*setState(() {
+                              onTap: () {
+                                /*setState(() {
                                       context
                                           .read<WishlistCubit>()
                                           .removeFromWishlist(
                                               ProductModel.fromEntity(
                                                   widget.product));
                                     });*/
-                                  },
-                                  child: const Icon(Icons.favorite))
+                              },
+                              child: const Icon(Icons.favorite))
                               : GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      context
-                                          .read<WishlistCubit>()
-                                          .addToWishlist(
-                                              ProductModel.fromEntity(
-                                                  widget.product));
-                                    });
-                                  },
-                                  child: const Icon(Icons.favorite_border)),
+                              onTap: () {
+                                setState(() {
+                                  context
+                                      .read<WishlistCubit>()
+                                      .addToWishlist(
+                                      ProductModel.fromEntity(
+                                          widget.product));
+                                });
+                              },
+                              child: const Icon(Icons.favorite_border)),
                           Space.xf(.3),
                           Text(
                             "Add to wishlist",
@@ -261,7 +261,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 Text(
                   widget.product.description,
                   style:
-                      AppText.b2?.copyWith(height: AppDimensions.normalize(.6)),
+                  AppText.b2?.copyWith(height: AppDimensions.normalize(.6)),
                 ),
                 Space.yf(1.2),
                 Text(
@@ -272,33 +272,33 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 Wrap(
                   children: widget.product.priceTags
                       .map((priceTag) => GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedPriceTag = priceTag;
-                              });
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  width: _selectedPriceTag.id == priceTag.id
-                                      ? 2.7
-                                      : 1.0,
-                                  color: AppColors.CommonCyan,
-                                ),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(5.0)),
-                              ),
-                              padding: const EdgeInsets.all(8),
-                              margin:
-                                  const EdgeInsets.only(right: 7, bottom: 5),
-                              child: Column(
-                                children: [
-                                  Text(priceTag.name),
-                                  Text("${priceTag.price} \$"),
-                                ],
-                              ),
-                            ),
-                          ))
+                    onTap: () {
+                      setState(() {
+                        _selectedPriceTag = priceTag;
+                      });
+                    },
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: _selectedPriceTag.id == priceTag.id
+                              ? 2.7
+                              : 1.0,
+                          color: AppColors.CommonCyan,
+                        ),
+                        borderRadius: const BorderRadius.all(
+                            Radius.circular(5.0)),
+                      ),
+                      padding: const EdgeInsets.all(8),
+                      margin:
+                      const EdgeInsets.only(right: 7, bottom: 5),
+                      child: Column(
+                        children: [
+                          Text(priceTag.name),
+                          Text("${priceTag.price} \$"),
+                        ],
+                      ),
+                    ),
+                  ))
                       .toList(),
                 ),
               ],
@@ -320,12 +320,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 child: ElevatedButton(
                   onPressed: () {
                     context.read<CartBloc>().add(
-                          AddProduct(
-                            cartItem: CartItem(
-                                product: widget.product,
-                                priceTag: _selectedPriceTag),
-                          ),
-                        );
+                      AddProduct(
+                        cartItem: CartItem(
+                            product: widget.product,
+                            priceTag: _selectedPriceTag),
+                      ),
+                    );
                     context.read<NotificationsCubit>().showAndSaveNotification(
                         "Cart Update",
                         "Congratulations, You have successfully added ${widget.product.name} to your cart.");

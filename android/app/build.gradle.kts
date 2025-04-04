@@ -33,7 +33,7 @@ android {
         applicationId = "com.greon.devapps"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = flutter.minSdkVersion
+        minSdk = 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -46,6 +46,7 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+    ndkVersion = "27.0.12077973"
 }
 
 flutter {
@@ -56,21 +57,18 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21")
     implementation("com.android.support:multidex:1.0.3")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("androidx.window:window:1.0.0")
+    implementation("androidx.window:window:1.0.0") 
     implementation("androidx.window:window-java:1.0.0")
 
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+    implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("com.google.firebase:firebase-core:21.1.1")
 
-    // Firebase Authentication
-    implementation("com.google.firebase:firebase-auth:21.1.0") // Firebase Auth 라이브러리
-
-    // Firebase Core
-    implementation("com.google.firebase:firebase-core:21.1.0") // Firebase Core 라이브러리
-
-    // Google Play services for authentication
-    implementation("com.google.android.gms:play-services-auth:19.2.0") // Google Play 서비스 인증 라이브러리
-
-    // Firebase Firestore (Optional, 만약 Firestore를 사용한다면)
-    implementation("com.google.firebase:firebase-firestore:24.5.0")
-
-
+    // Google Play Services
+    implementation("com.google.android.gms:play-services-auth:19.2.0")
+    implementation("com.google.android.gms:play-services-maps:19.1.0")
+    implementation("com.google.android.gms:play-services-base:16.1.0")
 }

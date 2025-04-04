@@ -3,6 +3,8 @@ import 'package:equatable/equatable.dart';
 import '../category/category.dart';
 import 'price_tag.dart';
 
+import 'package:equatable/equatable.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductEntity extends Equatable {
   final String id;
@@ -13,6 +15,7 @@ class ProductEntity extends Equatable {
   final List<String> images;
   final DateTime createdAt;
   final DateTime updatedAt;
+  final bool isActive;
 
   const ProductEntity({
     required this.id,
@@ -23,6 +26,7 @@ class ProductEntity extends Equatable {
     required this.images,
     required this.createdAt,
     required this.updatedAt,
+    required this.isActive,
   });
 
   @override

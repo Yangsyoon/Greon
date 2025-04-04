@@ -9,4 +9,15 @@ class PaginationMetaData {
     required this.total,
   });
 
+  PaginationMetaData copyWith({
+    int? pageSize,
+    int? limit,
+    int? total,
+  }) {
+    return PaginationMetaData(
+      pageSize: pageSize ?? this.pageSize,
+      limit: limit ?? this.limit,
+      total: total ?? this.total,
+    );
+  }
 }

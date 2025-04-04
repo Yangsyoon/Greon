@@ -18,20 +18,26 @@ class FilterProductParams {
   });
 
   FilterProductParams copyWith({
-    int? skip,
     String? keyword,
     List<Category>? categories,
     double? minPrice,
     double? maxPrice,
     int? limit,
     int? pageSize,
-  }) =>
-      FilterProductParams(
-        keyword: keyword ?? this.keyword,
-        categories: categories ?? this.categories,
-        minPrice: minPrice ?? this.minPrice,
-        maxPrice: maxPrice ?? this.maxPrice,
-        limit: skip ?? this.limit,
-        pageSize: pageSize ?? this.pageSize,
-      );
+  }) {
+    return FilterProductParams(
+      keyword: keyword ?? this.keyword,
+      categories: categories ?? this.categories,
+      minPrice: minPrice ?? this.minPrice,
+      maxPrice: maxPrice ?? this.maxPrice,
+      limit: limit ?? this.limit, // ✅ 여기서 limit을 그대로 유지
+      pageSize: pageSize ?? this.pageSize,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'FilterProductParams(keyword: $keyword, categories: $categories, minPrice: $minPrice, maxPrice: $maxPrice, limit: $limit, pageSize: $pageSize)';
+  }
 }
+

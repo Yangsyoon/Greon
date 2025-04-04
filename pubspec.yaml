@@ -27,7 +27,7 @@ dependencies:
   flutter_bloc:
   get_it:
   shimmer:
-  cached_network_image:
+  cached_network_image: ^3.4.1
   flutter_svg:
   dots_indicator:
   flutter_secure_storage:
@@ -40,10 +40,11 @@ dependencies:
   path_provider:
   url_launcher:
   flutter_phoenix:
-  firebase_core: ^2.26.0
-  cloud_firestore: ^4.14.0
-  firebase_auth: ^4.17.7
-
+  # Firebase Core: Firebase 앱을 초기화하고 다른 Firebase 플러그인을 사용하기 위한 필수 패키지
+  firebase_core: ^3.13.0
+  cloud_firestore: ^5.6.6
+  firebase_auth: ^5.5.2
+  firebase_core_web: ^2.22.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -20,8 +20,10 @@ class WishlistCubit extends Cubit<WishlistState> {
       return;
     }
 
-    final List<ProductModel> wishlist =
-        wishlistData.map((jsonMap) => ProductModel.fromJson(jsonMap)).toList();
+    List<ProductModel> wishlist = wishlistData
+        .whereType<Map<String, dynamic>>()
+        .map((jsonMap) => ProductModel.fromJson(jsonMap))
+        .toList();
 
     emit(WishlistLoadedState(wishlist));
   }
@@ -31,7 +33,7 @@ class WishlistCubit extends Cubit<WishlistState> {
     final List<dynamic>? wishlistData = box.read('wishlist');
 
     final List<Map<String, dynamic>> updatedWishlist =
-        List<Map<String, dynamic>>.from(wishlistData ?? []);
+    List<Map<String, dynamic>>.from(wishlistData ?? []);
 
     updatedWishlist.add(product.toJson());
 
@@ -59,19 +61,11 @@ class WishlistCubit extends Cubit<WishlistState> {
       return false;
     }
 
-    // Ensure the list contains only maps
-    List<Map<String, dynamic>> mapWishlistData = wishlistData
-        .whereType<Map<String, dynamic>>() // Filter out non-Map elements
+    List<String> wishlistIds = wishlistData
+        .whereType<Map<String, dynamic>>()
+        .map((map) => map['id'].toString())
         .toList();
 
-    // Extract 'id' from each map and convert it to a string
-    List<String> stringWishlistIds = mapWishlistData
-        .map((map) => map['_id'].toString()) // Use '_id' instead of 'id'
-        .toList();
-
- //   log('mapWishlistData: $mapWishlistData');
-
- //   log(stringWishlistIds.contains(productId).toString());
-    return stringWishlistIds.contains(productId);
+    return wishlistIds.contains(productId);
   }
 }
