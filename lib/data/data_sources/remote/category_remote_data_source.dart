@@ -20,9 +20,13 @@ class CategoryRemoteDataSourceImpl implements CategoryRemoteDataSource {
         print(
             'Category loaded - Name: ${data['name']}, Image URL: ${data['image']}');
         return CategoryModel(
-          id: doc.id,
           name: data['name'] ?? '',
           image: data['image'] ?? '',
+          createdAt:
+              (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          updatedAt:
+              (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+          isActive: data['isActive'] ?? true,
         );
       }).toList();
     } catch (e) {
