@@ -1,20 +1,5 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greon/configs/app_typography.dart';
-import 'package:greon/configs/configs.dart';
-import 'package:greon/core/constant/colors.dart';
-import 'package:greon/presentation/widgets/auth_error_dialog.dart';
-import 'package:greon/presentation/widgets/credential_failure_dialog.dart';
-import 'package:greon/presentation/widgets/custom_appbar.dart';
-import 'package:greon/presentation/widgets/successful_auth_dialog.dart';
-import 'package:greon/presentation/widgets/transparent_button.dart';
-
-import '../../application/user_bloc/user_bloc.dart';
-import '../../core/error/failures.dart';
-import '../../core/router/app_router.dart';
-import '../../domain/usecases/user/sign_up_usecase.dart';
-import '../widgets/custom_textfield.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -27,24 +12,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
 
-//  bool isLoading = false;
+  bool isLoading = false;
   bool isChecked = false;
 
-  /* void _startLoading() {
-    setState(() {
-      isLoading = true;
-    });
-
-    Future.delayed(const Duration(seconds: 15), () {
-      setState(() {
-        isLoading = false;
-      });
-    });
-  }*/
   @override
   void dispose() {
     _nameController.dispose();
@@ -54,151 +27,113 @@ class _SignUpScreenState extends State<SignUpScreen> {
     super.dispose();
   }
 
+  Future<void> _signUp() async {
+    if (!_formKey.currentState!.validate()) return;
+    if (_passwordController.text != _confirmPasswordController.text) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Passwords do not match")),
+      );
+      return;
+    }
+    if (!isChecked) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("You must accept the terms and conditions")),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final credential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Successfully registered")),
+      );
+
+      Navigator.of(context).pop(); // or go to login page
+    } on FirebaseAuthException catch (e) {
+      String message = "An error occurred";
+      if (e.code == 'email-already-in-use') {
+        message = "Email already in use";
+      } else if (e.code == 'weak-password') {
+        message = "Weak password";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Widget buildTextFormField(TextEditingController controller, String hint,
+      {bool isObscure = false}) {
+    return TextFormField(
+      controller: controller,
+      obscureText: isObscure,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: const OutlineInputBorder(),
+      ),
+      validator: (value) => value == null || value.isEmpty ? "Required field" : null,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar("SIGNUP", context, automaticallyImplyLeading: true),
+      appBar: AppBar(title: const Text("Signup")),
       body: SingleChildScrollView(
-        child: Padding(
-          padding: Space.all(1, 1.3),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "SIGNUP",
-                  style: AppText.h2b?.copyWith(color: AppColors.CommonCyan),
-                ),
-                Space.y!,
-                Text(
-                  "Create New Account",
-                  style: AppText.h3?.copyWith(color: AppColors.GreyText),
-                ),
-                Space.y2!,
-                Text(
-                  "Full Name*",
-                  style: AppText.b1b,
-                ),
-                Space.y!,
-                buildTextFormField(_nameController, "Full Name"),
-                Space.yf(1.5),
-                Text(
-                  "Email Address*",
-                  style: AppText.b1b,
-                ),
-                Space.y!,
-                buildTextFormField(_emailController, "Email Address"),
-                Space.yf(1.5),
-                Text(
-                  "Password*",
-                  style: AppText.b1b,
-                ),
-                Space.y!,
-                buildTextFormField(_passwordController, "Password",
-                    isObscure: true),
-                Space.yf(1.5),
-                Text(
-                  "Confirm Password*",
-                  style: AppText.b1b,
-                ),
-                Space.y!,
-                buildTextFormField(_confirmPasswordController, "Password",
-                    isObscure: true),
-                Space.yf(1.5),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          isChecked = !isChecked;
-                        });
-                      },
-                      child: isChecked
-                          ? const Icon(
-                              Icons.check_box,
-                              color: Colors.black,
-                            )
-                          : const Icon(
-                              Icons.check_box_outline_blank_outlined,
-                              color: Colors.black,
-                            ),
-                    ),
-                    Space.x!,
-                    Text(
-                      "I Accept All Privacy Policies And Terms & Conditions Of ",
-                      style: AppText.l1,
-                    ),
-                    Text(
-                      "Piicks!",
-                      style: AppText.b2b,
-                    )
-                  ],
-                ),
-                Space.yf(1.5),
-                BlocConsumer<UserBloc, UserState>(
-                  listener: (context, state) {
-                    if (state is UserLogged) {
-                      showSuccessfulAuthDialog(context, "Registered");
-                    } else if (state is UserLoggedFail) {
-                      if (state.failure is CredentialFailure) {
-                        showCredentialErrorDialog(context);
-                      } else {
-                        showAuthErrorDialog(context, message: '');
-                      }
-                    }
-                  },
-                  builder: (context, state) {
-                    return ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (_passwordController.text !=
-                              _confirmPasswordController.text) {
-                          } else {
-                            context.read<UserBloc>().add(
-                                  SignUpUser(
-                                    SignUpParams(
-                                      firstName: _nameController.text,
-                                      lastName: _nameController.text,
-                                      email: _emailController.text,
-                                      password: _passwordController.text,
-                                    ),
-                                  ),
-                                );
-                          }
-                        }
-                      },
-                      style: ButtonStyle(
-                        minimumSize: MaterialStatePropertyAll(
-                          Size(
-                            double.infinity,
-                            AppDimensions.normalize(20),
-                          ),
-                        ),
-                      ),
-                      child: Text(
-                        (state is UserLoading) ? "Wait..." : "Signup",
-                        style: AppText.h3b?.copyWith(color: Colors.white),
-                      ),
-                    );
-                  },
-                ),
-                Space.yf(1.5),
-                Center(
-                    child: Text(
-                  "Already Have an Account?",
-                  style: AppText.b1b,
-                )),
-                Space.y1!,
-                transparentButton(
-                    context: context,
-                    onTap: () {
-                      Navigator.of(context).pushNamed(AppRouter.login);
+        padding: const EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              buildTextFormField(_nameController, "Full Name"),
+              const SizedBox(height: 12),
+              buildTextFormField(_emailController, "Email"),
+              const SizedBox(height: 12),
+              buildTextFormField(_passwordController, "Password", isObscure: true),
+              const SizedBox(height: 12),
+              buildTextFormField(_confirmPasswordController, "Confirm Password", isObscure: true),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Checkbox(
+                    value: isChecked,
+                    onChanged: (value) {
+                      setState(() {
+                        isChecked = value ?? false;
+                      });
                     },
-                    buttonText: "Login")
-              ],
-            ),
+                  ),
+                  const Expanded(
+                    child: Text("I accept the Privacy Policy and Terms & Conditions."),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: isLoading ? null : _signUp,
+                child: isLoading
+                    ? const CircularProgressIndicator()
+                    : const Text("Sign Up"),
+              ),
+              const SizedBox(height: 12),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // 로그인 화면으로 이동
+                },
+                child: const Text("Already have an account? Login"),
+              ),
+            ],
           ),
         ),
       ),
