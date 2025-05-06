@@ -7,6 +7,8 @@ import 'package:greon/core/constant/assets.dart';
 import 'package:greon/presentation/widgets/top_row.dart';
 import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
 import 'package:greon/presentation/widgets/user_logged_profile_container.dart';
+import 'package:greon/presentation/screens/user_info_input_page.dart';
+
 
 import '../../application/user_bloc/user_bloc.dart';
 import '../../core/constant/colors.dart';
@@ -40,8 +42,9 @@ class ProfileScreen extends StatelessWidget {
                       BlocBuilder<UserBloc, UserState>(
                         builder: (context, state) {
                           if (state is UserLogged) {
+                            // Firestore에서 imageUrl을 잘 받아왔는지 확인
                             return userLoggedProfileContainer(context,
-                                "${state.user.firstName}!", state.user.email);
+                                "${state.user.fullName}", state.user.email, state.user.image,);
                           } else {
                             return unloggedProfileContainer(context);
                           }
@@ -149,6 +152,31 @@ class ProfileScreen extends StatelessWidget {
                                   _arrowforward
                                 ],
                               ),
+                              Space.yf(1.1),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (_) => UserInfoInputPage()),
+                                  );
+                                },
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Icon(Icons.info_outline, color: AppColors.CommonCyan),
+                                        Space.xf(),
+                                        Text(
+                                          "회원 정보 입력",
+                                          style: AppText.b1b,
+                                        )
+                                      ],
+                                    ),
+                                    _arrowforward
+                                  ],
+                                ),
+                              ),
+
                             ],
                           );
                         } else {

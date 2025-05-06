@@ -3,7 +3,7 @@ import 'package:dartz/dartz.dart';
 import '../../../../core/error/failures.dart';
 import '../../core/networkchecker/network_info.dart';
 import '../../core/usecases/usecase.dart';
-import '../../domain/entities/user/user.dart';
+import '../../domain/entities/user/app_user.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../data_sources/local/user_local_data_source.dart';
 import '../data_sources/remote/user_remote_data_source.dart';
@@ -23,21 +23,21 @@ class UserRepositoryImpl implements UserRepository {
   });
 
   @override
-  Future<Either<Failure, User>> signIn(params) async {
+  Future<Either<Failure, AppUser>> signIn(params) async {
     return await _authenticate(() {
       return remoteDataSource.signIn(params);
     });
   }
 
   @override
-  Future<Either<Failure, User>> signUp(params) async {
+  Future<Either<Failure, AppUser>> signUp(params) async {
     return await _authenticate(() {
       return remoteDataSource.signUp(params);
     });
   }
 
   @override
-  Future<Either<Failure, User>> getCachedUser() async {
+  Future<Either<Failure, AppUser>> getCachedUser() async {
     try {
       final user = await localDataSource.getUser();
       return Right(user);
@@ -56,7 +56,7 @@ class UserRepositoryImpl implements UserRepository {
     }
   }
 
-  Future<Either<Failure, User>> _authenticate(
+  Future<Either<Failure, AppUser>> _authenticate(
       _DataSourceChooser getDataSource,
       ) async {
     if (await networkInfo.isConnected) {
