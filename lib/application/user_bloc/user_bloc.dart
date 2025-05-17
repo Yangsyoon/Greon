@@ -7,7 +7,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../../../core/error/failures.dart';
 import '../../../core/usecases/usecase.dart';
-import '../../../domain/entities/user/user.dart';
+import '../../../domain/entities/user/app_user.dart';
 import '../../../domain/usecases/user/get_cached_user_usecase.dart';
 import '../../../domain/usecases/user/sign_in_usecase.dart';
 import '../../domain/usecases/user/sign_out_usecase.dart';
@@ -31,6 +31,14 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     on<SignUpUser>(_onSignUp);
     on<CheckUser>(_onCheckUser);
     on<SignOutUser>(_onSignOut);
+    on<EmitUserLogged>((event, emit) {
+      emit(UserLogged(event.appUser));
+    });
+    on<EmitUserUnlogged>((event, emit) {
+      emit(UserLoggedOut());
+    });
+
+
   }
 
   void _onSignIn(SignInUser event, Emitter<UserState> emit) async {
@@ -81,4 +89,6 @@ class UserBloc extends Bloc<UserEvent, UserState> {
       emit(UserLoggedFail(ExceptionFailure()));
     }
   }
+
+
 }

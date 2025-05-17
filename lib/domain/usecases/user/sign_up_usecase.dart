@@ -2,15 +2,15 @@ import 'package:dartz/dartz.dart';
 
 import '../../../../../core/error/failures.dart';
 import '../../../../../core/usecases/usecase.dart';
-import '../../entities/user/user.dart';
+import '../../entities/user/app_user.dart';
 import '../../repositories/user_repository.dart';
 
-class SignUpUseCase implements UseCase<User, SignUpParams> {
+class SignUpUseCase implements UseCase<AppUser, SignUpParams> {
   final UserRepository repository;
   SignUpUseCase(this.repository);
 
   @override
-  Future<Either<Failure, User>> call(SignUpParams params) async {
+  Future<Either<Failure, AppUser>> call(SignUpParams params) async {
     return await repository.signUp(params);
   }
 }

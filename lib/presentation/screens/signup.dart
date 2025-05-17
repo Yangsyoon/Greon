@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -51,6 +52,31 @@ class _SignUpScreenState extends State<SignUpScreen> {
         email: _emailController.text.trim(),
         password: _passwordController.text,
       );
+
+      try {
+        print('Firestore: 사용자 정보 저장 시작');
+
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(credential.user!.uid)
+            .set({
+          'fullName': _nameController.text.trim(),
+          'email': _emailController.text.trim(),
+          'createdAt': Timestamp.now(),
+        });
+
+        print('Firestore: 사용자 정보 저장 성공');
+      } catch (e, stackTrace) {
+        print('Firestore: 사용자 정보 저장 실패');
+        print('에러: $e');
+        print('스택트레이스: $stackTrace');
+
+        // 사용자에게도 에러 메시지 표시
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Firestore 저장 실패: $e")),
+        );
+      }
+
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Successfully registered")),

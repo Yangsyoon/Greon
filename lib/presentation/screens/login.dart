@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth 추가
+import 'package:greon/domain/entities/user/app_user.dart';
 import 'package:greon/presentation/widgets/auth_error_dialog.dart'; // 로그인 오류 대화상자
 import 'package:greon/presentation/widgets/successful_auth_dialog.dart'; // 로그인 성공 대화상자
 import 'package:greon/presentation/widgets/custom_appbar.dart';
@@ -9,6 +10,21 @@ import 'package:greon/configs/app_typography.dart';
 import 'package:greon/configs/space.dart';
 import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/presentation/widgets/custom_textfield.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greon/application/user_bloc/user_bloc.dart'; // UserBloc import 추가
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+
+
+AppUser convertFirebaseUserToAppUser(firebase_auth.User firebaseUser) {
+  return AppUser(
+    id: firebaseUser.uid,
+    fullName: firebaseUser.displayName ?? '',
+    email: firebaseUser.email ?? '',
+    image: firebaseUser.photoURL,
+    createdAt: DateTime.now(),
+    lastLogin: DateTime.now(),
+  );
+}
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -29,21 +45,29 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     // 로그인 상태가 변경될 때마다 상태 확인
-    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+    FirebaseAuth.instance.authStateChanges().listen((firebaseUser) {
       setState(() {
-        if (user != null) {
+        if (firebaseUser != null) {
           _isLoggedIn = true;
-          _loggedInEmail = user.email; // 사용자 이메일 저장
+          _loggedInEmail = firebaseUser.email; // 사용자 이메일 저장
+          // FirebaseUser를 AppUser로 변환
+          final appUser = convertFirebaseUserToAppUser(firebaseUser);
+          // UserBloc에 로그인 상태를 전달
+          context.read<UserBloc>().add(EmitUserLogged(appUser)); // AppUser 인스턴스를 전달
         } else {
           _isLoggedIn = false;
           _loggedInEmail = null; // 로그인 안 됐을 때 초기화
+          context.read<UserBloc>().add(EmitUserUnlogged()); // UserUnlogged 이벤트 전달
         }
       });
     });
   }
 
+
   Future<void> _signOut() async {
     await FirebaseAuth.instance.signOut();
+    // 로그아웃 시 UserBloc에 상태 변경
+    context.read<UserBloc>().add(EmitUserUnlogged()); // 로그아웃 시 UserUnlogged 이벤트 전달
   }
 
   Future<void> _signInWithEmailPassword() async {
@@ -57,11 +81,17 @@ class _LoginScreenState extends State<LoginScreen> {
         password: password,
       );
 
-      if (userCredential.user != null) {
+      final firebaseUser = userCredential.user;
+
+      if (firebaseUser != null) {
         setState(() {
           _isLoggedIn = true;
-          _loggedInEmail = userCredential.user?.email;
+          _loggedInEmail = firebaseUser.email;
         });
+        // FirebaseUser를 AppUser로 변환
+        final appUser = convertFirebaseUserToAppUser(firebaseUser);
+        // 로그인 후 UserBloc에 상태 전달
+        context.read<UserBloc>().add(EmitUserLogged(appUser)); // AppUser 인스턴스를 전달
       }
     } on FirebaseAuthException catch (e) {
       // 로그인 오류 처리
@@ -74,6 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
