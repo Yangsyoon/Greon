@@ -20,6 +20,8 @@ import 'package:greon/presentation/screens/splash.dart';
 import 'package:greon/presentation/screens/wishlist.dart';
 import '../../domain/entities/cart/cart_item.dart';
 import '../../domain/entities/product/product.dart';
+import '../../presentation/screens/my_plants_screen.dart';
+import '../../presentation/screens/register_plant.dart';
 import '../../presentation/screens/addresses.dart';
 import '../error/exceptions.dart';
 
@@ -43,6 +45,9 @@ sealed class AppRouter {
   static const String orderfailure = '/orderfailure';
   static const String orders = '/orders';
   static const String notifications = '/notifications';
+  static const String registerPlant = '/register-plant';
+  static const String myPlants = '/my-plants';
+
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -98,6 +103,11 @@ sealed class AppRouter {
         return MaterialPageRoute(builder: (_) => const OrdersScreen());
       case notifications:
         return MaterialPageRoute(builder: (_) => const NotificationsScreen());
+      case registerPlant:
+        return MaterialPageRoute(builder: (_) => RegisterPlant());
+      case myPlants:
+        return MaterialPageRoute(builder: (_) => const MyPlantsScreen());
+
       default:
         throw const RouteException('Route not found!');
     }

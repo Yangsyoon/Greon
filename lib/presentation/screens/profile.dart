@@ -56,7 +56,59 @@ class ProfileScreen extends StatelessWidget {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Space.yf(1.9),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pushNamed(AppRouter.myPlants);
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.only(bottom: AppDimensions.normalize(5)),
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: AppDimensions.normalize(4),
+                                    horizontal: AppDimensions.normalize(10),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
+                                  ),
+                                  child: Text(
+                                    '내 식물 보기',
+                                    style: TextStyle(
+                                      color: AppColors.CommonCyan,
+                                      fontSize: AppDimensions.normalize(8),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              // ✅ 여기에 '내 식물 추가' 버튼 추가
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pushNamed(AppRouter.registerPlant); // 라우트 이름 확인
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: AppDimensions.normalize(4),
+                                    horizontal: AppDimensions.normalize(10),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: AppColors.CommonCyan,
+                                    borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.add, color: Colors.white, size: AppDimensions.normalize(8)),
+                                      SizedBox(width: AppDimensions.normalize(3)),
+                                      Text(
+                                        "내 식물 추가",
+                                        style: AppText.b1?.copyWith(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              Space.yf(1.3), // 버튼과 "MY ACCOUNT" 사이 여백
                               Text(
                                 "MY ACCOUNT",
                                 style: AppText.h3b
@@ -389,3 +441,5 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
+
