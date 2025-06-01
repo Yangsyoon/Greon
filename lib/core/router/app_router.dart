@@ -18,11 +18,17 @@ import 'package:greon/presentation/screens/search.dart';
 import 'package:greon/presentation/screens/signup.dart';
 import 'package:greon/presentation/screens/splash.dart';
 import 'package:greon/presentation/screens/wishlist.dart';
+
+import '../../data/models/model/PostModel.dart';
 import '../../domain/entities/cart/cart_item.dart';
 import '../../domain/entities/product/product.dart';
 import '../../presentation/screens/my_plants_screen.dart';
+import '../../presentation/screens/post.dart';
+import '../../presentation/screens/post_detail.dart';
 import '../../presentation/screens/register_plant.dart';
 import '../../presentation/screens/addresses.dart';
+
+import '../../presentation/screens/write_screen.dart';
 import '../error/exceptions.dart';
 
 sealed class AppRouter {
@@ -48,6 +54,10 @@ sealed class AppRouter {
   static const String registerPlant = '/register-plant';
   static const String myPlants = '/my-plants';
 
+  // 게시판 관련 경로 추가
+  static const String bulletinBoard = '/bulletin-board';
+  static const String writePost = '/write-post';
+  static const String postDetail = '/post-detail';
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
@@ -79,20 +89,20 @@ sealed class AppRouter {
         DeliveryInfo? deliveryInfo = routeSettings.arguments as DeliveryInfo?;
         return MaterialPageRoute(
             builder: (_) => AddAddressScreen(
-                  deliveryInfo: deliveryInfo,
-                ));
+              deliveryInfo: deliveryInfo,
+            ));
       case checkout:
         List<CartItem> items = routeSettings.arguments as List<CartItem>;
         return MaterialPageRoute(
             builder: (_) => CheckOutScreen(
-                  items: items,
-                ));
+              items: items,
+            ));
       case appinfo:
         String screenTitle = routeSettings.arguments as String;
         return MaterialPageRoute(
             builder: (_) => AppInfoScreen(
-                  screenTitle: screenTitle,
-                ));
+              screenTitle: screenTitle,
+            ));
       case wishlist:
         return MaterialPageRoute(builder: (_) => const WishListScreen());
       case ordersuccess:
@@ -107,6 +117,15 @@ sealed class AppRouter {
         return MaterialPageRoute(builder: (_) => RegisterPlant());
       case myPlants:
         return MaterialPageRoute(builder: (_) => const MyPlantsScreen());
+
+    // 게시판 관련 라우팅 추가
+      case bulletinBoard:
+        return MaterialPageRoute(builder: (_) => const BulletinBoardScreen());
+      case writePost:
+        return MaterialPageRoute(builder: (_) => const WritePostScreen());
+      case postDetail:
+        final post = routeSettings.arguments as PostModel;
+        return MaterialPageRoute(builder: (_) => PostDetailScreen(post: post));
 
       default:
         throw const RouteException('Route not found!');

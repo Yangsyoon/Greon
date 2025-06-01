@@ -37,4 +37,28 @@ class PlantEntity {
       wateringCycle: data['watering_cycle'],
     );
   }
+
+  PlantEntity copyWith({
+    String? id,
+    String? name,
+    String? speciesId,
+    String? userId,
+    String? lastWateredDate,
+    int? nutrientFrequency,
+    int? repottingCycle,
+    int? wateringCycle,
+    String? sunlightLevel,
+  }) {
+    return PlantEntity(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      speciesId: speciesId ?? this.speciesId,
+      userId: userId ?? this.userId,
+      lastWateredDate: lastWateredDate ?? this.lastWateredDate,
+      nutrientFrequency: nutrientFrequency ?? this.nutrientFrequency,
+      repottingCycle: repottingCycle ?? this.repottingCycle,
+      wateringCycle: wateringCycle ?? this.wateringCycle,
+      sunlightLevel: sunlightLevel ?? this.sunlightLevel,
+    );
+  }
 }

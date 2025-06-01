@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/configs/app.dart';
 import 'package:greon/core/constant/colors.dart';
 import 'package:greon/presentation/screens/cart.dart';
-import 'package:greon/presentation/screens/categories.dart';
+import 'package:greon/presentation/screens/post.dart';
 import 'package:greon/presentation/screens/home.dart';
 import 'package:greon/presentation/screens/products_list.dart';
 import 'package:greon/presentation/screens/profile.dart';
@@ -68,7 +68,7 @@ class RootScreen extends StatelessWidget {
                 case NavigationTab.homeTab:
                   return const HomeScreen();
                 case NavigationTab.categoriesTab:
-                  return const CategoriesScreen();
+                  return const BulletinBoardScreen();
                 case NavigationTab.productsTap:
                   return const ProductsListScreen();
                 case NavigationTab.cartTab:

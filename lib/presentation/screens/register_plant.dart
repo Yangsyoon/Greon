@@ -3,7 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 // import 'package:greon/presentation/screens/interest_survey.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:greon/presentation/screens/user_info_input_page.dart';
-
+import 'dart:io';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'interest_survey.dart';
 
 class RegisterPlant extends StatefulWidget {
@@ -117,6 +119,31 @@ class _RegisterPlantState extends State<RegisterPlant> {
     }
   }
 
+  File? _selectedImage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<String?> _uploadImage(String plantId, String uid) async {
+    if (_selectedImage == null) return null;
+
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child('user_plant')
+        .child(uid)
+        .child('$plantId.jpg');
+
+    await ref.putFile(_selectedImage!);
+    return await ref.getDownloadURL();
+  }
+
   Future<void> _submitPlantData() async {
     if (_selectedSpeciesId == null || _plantNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -148,6 +175,11 @@ class _RegisterPlantState extends State<RegisterPlant> {
 
     final newDoc = FirebaseFirestore.instance.collection('plant').doc();
 
+    String? imageUrl;
+    if (_selectedImage != null && uid != null) {
+      imageUrl = await _uploadImage(newDoc.id, uid);
+    }
+
     await newDoc.set({
       "name": name,
       "watering_cycle": _watering,
@@ -157,6 +189,7 @@ class _RegisterPlantState extends State<RegisterPlant> {
       "sunlight_level": _getSunlightLevelLabel(_sunlightLevel),
       "species_id": _selectedSpeciesId,
       "user_id": uid, // ✅ 사용자 ID 추가
+      if (imageUrl != null) "image_url": imageUrl,
     });
 
     if (uid != null) {
@@ -192,6 +225,20 @@ class _RegisterPlantState extends State<RegisterPlant> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
+            Text("식물 이미지"),
+            SizedBox(height: 8),
+            GestureDetector(
+              onTap: _pickImage,
+              child: _selectedImage != null
+                  ? Image.file(_selectedImage!, height: 150)
+                  : Container(
+                height: 150,
+                width: double.infinity,
+                color: Colors.grey[300],
+                child: Icon(Icons.add_a_photo, size: 50, color: Colors.grey[700]),
+              ),
+            ),
+            SizedBox(height: 16),
             // 식물 종 선택
             DropdownButton<String>(
               hint: Text("식물 종 선택"),
