@@ -107,7 +107,35 @@ class ProfileScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
+                              SizedBox(height: AppDimensions.normalize(10)), // 버튼 간 간격
 
+                              // ✅ 새로 추가된 "식물 캘린더" 버튼
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).pushNamed(AppRouter.calendar); // 👉 calendar 라우트 등록 필요
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: AppDimensions.normalize(4),
+                                    horizontal: AppDimensions.normalize(10),
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.teal,
+                                    borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.calendar_month, color: Colors.white, size: AppDimensions.normalize(8)),
+                                      SizedBox(width: AppDimensions.normalize(3)),
+                                      Text(
+                                        "식물 캘린더",
+                                        style: AppText.b1?.copyWith(color: Colors.white),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                               Space.yf(1.3), // 버튼과 "MY ACCOUNT" 사이 여백
                               Text(
                                 "MY ACCOUNT",
