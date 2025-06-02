@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:greon/domain/entities/delivery/delivery_info.dart';
 import 'package:greon/presentation/screens/add_edit_address.dart';
@@ -20,10 +21,13 @@ import 'package:greon/presentation/screens/splash.dart';
 import 'package:greon/presentation/screens/wishlist.dart';
 import '../../domain/entities/cart/cart_item.dart';
 import '../../domain/entities/product/product.dart';
+import '../../presentation/screens/add_schedule_screen.dart';
+import '../../presentation/screens/calendar_screen.dart';
 import '../../presentation/screens/my_plants_screen.dart';
 import '../../presentation/screens/register_plant.dart';
 import '../../presentation/screens/addresses.dart';
 import '../error/exceptions.dart';
+import 'package:flutter/material.dart';
 
 sealed class AppRouter {
   static const String splash = '/';
@@ -47,6 +51,8 @@ sealed class AppRouter {
   static const String notifications = '/notifications';
   static const String registerPlant = '/register-plant';
   static const String myPlants = '/my-plants';
+  static const calendar = '/calendar';
+  static const String addSchedule = '/addSchedule';
 
 
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
@@ -107,9 +113,53 @@ sealed class AppRouter {
         return MaterialPageRoute(builder: (_) => RegisterPlant());
       case myPlants:
         return MaterialPageRoute(builder: (_) => const MyPlantsScreen());
+      case calendar:
+        final userId = FirebaseAuth.instance.currentUser!.uid;
+        return MaterialPageRoute(builder: (_) => CalendarScreen(userId: userId));
+      case addSchedule:
+        final args = routeSettings.arguments;
+        if (args is Map<String, dynamic>) {
+          final userId = args['userId'] as String?;
+          final selectedDate = args['selectedDate'] as DateTime?;
+
+          if (userId != null && selectedDate != null) {
+            return MaterialPageRoute(
+              builder: (_) => AddScheduleScreen(
+                userId: userId,
+                selectedDate: selectedDate,
+              ),
+            );
+          }
+        }
+        // args가 없거나 타입이 안 맞으면 기본 화면이나 에러 처리
+        return MaterialPageRoute(
+          builder: (_) => ErrorScreen(message: "Invalid arguments for addSchedule"),
+        );
+
 
       default:
         throw const RouteException('Route not found!');
     }
   }
 }
+
+class ErrorScreen extends StatelessWidget {
+  final String message;
+
+  const ErrorScreen({Key? key, required this.message}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Error')),
+      body: Center(
+        child: Text(
+          message,
+          style: const TextStyle(fontSize: 18, color: Colors.red),
+          textAlign: TextAlign.center,
+        ),
+      ),
+    );
+  }
+}
+
