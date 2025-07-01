@@ -11,24 +11,43 @@ import '../domain/usecases/category/get_remote_category_usecase.dart';
 import 'di.dart';
 
 void registerCategoryFeature() {
-  // Category BLoC and Use Cases
-  sl.registerFactory(() => CategoryBloc(sl(), sl(), sl()));
-  sl.registerLazySingleton(() => GetRemoteCategoryUseCase(sl()));
-  sl.registerLazySingleton(() => GetCachedCategoryUseCase(sl()));
-  sl.registerLazySingleton(() => FilterCategoryUseCase(sl()));
+  // ✅ BLoC 중복 등록 방지
+  if (!sl.isRegistered<CategoryBloc>()) {
+    sl.registerFactory(() => CategoryBloc(sl(), sl(), sl()));
+  }
 
-  // Category Repository and Data Sources
-  sl.registerLazySingleton<CategoryRepository>(
-    () => CategoryRepositoryImpl(
-      remoteDataSource: sl(),
-      localDataSource: sl(),
-      networkInfo: sl(),
-    ),
-  );
-  sl.registerLazySingleton<CategoryRemoteDataSource>(
-    () => CategoryRemoteDataSourceImpl(firestore: FirebaseFirestore.instance),
-  );
-  sl.registerLazySingleton<CategoryLocalDataSource>(
-    () => CategoryLocalDataSourceImpl(sharedPreferences: sl()),
-  );
+  // ✅ UseCase 등록 중복 방지
+  if (!sl.isRegistered<GetRemoteCategoryUseCase>()) {
+    sl.registerLazySingleton(() => GetRemoteCategoryUseCase(sl()));
+  }
+  if (!sl.isRegistered<GetCachedCategoryUseCase>()) {
+    sl.registerLazySingleton(() => GetCachedCategoryUseCase(sl()));
+  }
+  if (!sl.isRegistered<FilterCategoryUseCase>()) {
+    sl.registerLazySingleton(() => FilterCategoryUseCase(sl()));
+  }
+
+  // ✅ Repository 등록 중복 방지
+  if (!sl.isRegistered<CategoryRepository>()) {
+    sl.registerLazySingleton<CategoryRepository>(
+          () => CategoryRepositoryImpl(
+        remoteDataSource: sl(),
+        localDataSource: sl(),
+        networkInfo: sl(),
+      ),
+    );
+  }
+
+  // ✅ DataSource 등록 중복 방지
+  if (!sl.isRegistered<CategoryRemoteDataSource>()) {
+    sl.registerLazySingleton<CategoryRemoteDataSource>(
+          () => CategoryRemoteDataSourceImpl(firestore: FirebaseFirestore.instance),
+    );
+  }
+
+  if (!sl.isRegistered<CategoryLocalDataSource>()) {
+    sl.registerLazySingleton<CategoryLocalDataSource>(
+          () => CategoryLocalDataSourceImpl(sharedPreferences: sl()),
+    );
+  }
 }
