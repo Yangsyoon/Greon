@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:greon/presentation/screens/window_distance_survey.dart';
+import 'package:greon/presentation/screens/survey/window_distance_survey.dart';
 import 'package:light/light.dart';
 
 class LightExposureSurveyPage extends StatefulWidget {

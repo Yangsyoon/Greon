@@ -23,12 +23,12 @@ import '../../data/models/model/PostModel.dart';
 import '../../domain/entities/cart/cart_item.dart';
 import '../../domain/entities/product/product.dart';
 import '../../presentation/screens/my_plants_screen.dart';
-import '../../presentation/screens/post.dart';
-import '../../presentation/screens/post_detail.dart';
+import '../../presentation/screens/post/post.dart';
+import '../../presentation/screens/post/post_detail.dart';
 import '../../presentation/screens/register_plant.dart';
 import '../../presentation/screens/addresses.dart';
 
-import '../../presentation/screens/write_screen.dart';
+import '../../presentation/screens/post/write_post.dart';
 import '../error/exceptions.dart';
 
 sealed class AppRouter {

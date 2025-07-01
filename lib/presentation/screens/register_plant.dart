@@ -6,7 +6,7 @@ import 'package:greon/presentation/screens/user_info_input_page.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'interest_survey.dart';
+import 'survey/interest_survey.dart';
 
 class RegisterPlant extends StatefulWidget {
   @override

@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:greon/application/post_bloc/post_bloc.dart';
 import 'package:greon/application/post_bloc/post_event.dart';
 import 'package:greon/application/post_bloc/post_state.dart';
@@ -19,8 +24,40 @@ class _WritePostScreenState extends State<WritePostScreen> {
   final _contentController = TextEditingController();
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  void _submit() {
+  File? _selectedImage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<String?> _uploadImage(File image) async {
+    try {
+      final user = _auth.currentUser;
+      if (user == null) return null;
+
+      final filePath =
+          'post_images/${user.uid}_${DateTime.now().millisecondsSinceEpoch}.jpg';
+
+      final ref = _storage.ref().child(filePath);
+      final uploadTask = ref.putFile(image);
+
+      final snapshot = await uploadTask;
+      return await snapshot.ref.getDownloadURL();
+    } catch (e) {
+      return null;
+    }
+  }
+
+  void _submit() async {
     if (_formKey.currentState!.validate()) {
       final user = _auth.currentUser;
       if (user == null) {
@@ -30,16 +67,27 @@ class _WritePostScreenState extends State<WritePostScreen> {
         return;
       }
 
+      String? imageUrl;
+      if (_selectedImage != null) {
+        imageUrl = await _uploadImage(_selectedImage!);
+        if (imageUrl == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('이미지 업로드에 실패했습니다.')),
+          );
+          return;
+        }
+      }
+
       final newPost = PostModel(
         id: '',
         title: _titleController.text,
         content: _contentController.text,
-        uid: user.uid,  // 여기 uid 넣기
+        uid: user.uid,
         createdAt: DateTime.now(),
         commentsCount: 0,
+        imageUrl: imageUrl,
       );
 
-      // 이벤트로 게시글 추가 요청
       context.read<PostBloc>().add(AddPost(newPost));
     }
   }
@@ -53,22 +101,22 @@ class _WritePostScreenState extends State<WritePostScreen> {
         child: BlocListener<PostBloc, PostState>(
           listener: (context, state) {
             if (state is PostAddSuccess) {
-              // 성공하면 게시판 화면으로 이동
               Navigator.pushNamedAndRemoveUntil(
                 context,
                 '/bulletin-board',
                     (route) => false,
               );
             } else if (state is PostAddFailure) {
-              // 실패하면 에러 토스트 또는 다이얼로그 보여주기
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('게시글 등록에 실패했습니다: ${state.errorMessage}')),
+                SnackBar(
+                    content:
+                    Text('게시글 등록에 실패했습니다: ${state.errorMessage}')),
               );
             }
           },
           child: Form(
             key: _formKey,
-            child: Column(
+            child: ListView(
               children: [
                 TextFormField(
                   controller: _titleController,
@@ -84,11 +132,25 @@ class _WritePostScreenState extends State<WritePostScreen> {
                   validator: (value) =>
                   value == null || value.isEmpty ? '내용을 입력하세요' : null,
                 ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  onTap: _pickImage,
+                  child: Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      color: Colors.grey.shade200,
+                    ),
+                    child: _selectedImage != null
+                        ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                        : const Center(child: Text('이미지 선택 (클릭)')),
+                  ),
+                ),
                 const SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _submit,
                   child: const Text("등록하기"),
-                )
+                ),
               ],
             ),
           ),

@@ -11,6 +11,7 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
@@ -22,6 +23,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _nicknameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -61,6 +63,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             .doc(credential.user!.uid)
             .set({
           'fullName': _nameController.text.trim(),
+          'nickname': _nicknameController.text.trim(), // 추가된 부분
           'email': _emailController.text.trim(),
           'createdAt': Timestamp.now(),
         });
@@ -123,6 +126,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           child: Column(
             children: [
               buildTextFormField(_nameController, "Full Name"),
+              const SizedBox(height: 12),
+              buildTextFormField(_nicknameController, "Nickname"), // 👈 추가
               const SizedBox(height: 12),
               buildTextFormField(_emailController, "Email"),
               const SizedBox(height: 12),

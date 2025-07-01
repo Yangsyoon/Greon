@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:greon/presentation/screens/plant_location_survey.dart';
+import 'package:greon/presentation/screens/survey/plant_location_survey.dart';
 
 class LocationSurveyPage extends StatefulWidget {
   final Map<String, dynamic> surveyData;

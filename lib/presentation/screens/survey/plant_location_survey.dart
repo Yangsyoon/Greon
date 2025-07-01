@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:greon/presentation/screens/plant_placement_survey.dart';
+import 'package:greon/presentation/screens/survey/plant_placement_survey.dart';
 
 class PlantLocationSurveyPage extends StatefulWidget {
   final Map<String, dynamic> surveyData;
