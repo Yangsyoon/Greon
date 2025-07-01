@@ -26,12 +26,12 @@ import '../../domain/entities/product/product.dart';
 import '../../presentation/screens/add_schedule_screen.dart';
 import '../../presentation/screens/calendar_screen.dart';
 import '../../presentation/screens/my_plants_screen.dart';
-import '../../presentation/screens/post.dart';
-import '../../presentation/screens/post_detail.dart';
+import '../../presentation/screens/post/post.dart';
+import '../../presentation/screens/post/post_detail.dart';
 import '../../presentation/screens/register_plant.dart';
 import '../../presentation/screens/addresses.dart';
 
-import '../../presentation/screens/write_screen.dart';
+import '../../presentation/screens/post/write_post.dart';
 import '../error/exceptions.dart';
 import 'package:flutter/material.dart';
 

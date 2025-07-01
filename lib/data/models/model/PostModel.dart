@@ -1,4 +1,3 @@
-// lib/data/models/model/PostModel.dart
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class PostModel {
@@ -8,6 +7,7 @@ class PostModel {
   final String uid;
   final DateTime createdAt;
   final int commentsCount;
+  final String? imageUrl;  // nullable 처리
 
   PostModel({
     required this.uid,
@@ -16,6 +16,7 @@ class PostModel {
     required this.content,
     required this.createdAt,
     required this.commentsCount,
+    this.imageUrl,
   });
 
   factory PostModel.fromDocument(Map<String, dynamic> doc, String id) {
@@ -26,9 +27,9 @@ class PostModel {
       uid: doc['uid'] ?? '',
       createdAt: (doc['createdAt'] as Timestamp).toDate(),
       commentsCount: doc['commentsCount'] ?? 0,
+      imageUrl: doc['imageUrl'] as String?, // 안전하게 캐스팅
     );
   }
-
 
   Map<String, dynamic> toJson() {
     return {
@@ -37,7 +38,7 @@ class PostModel {
       'uid': uid,
       'createdAt': Timestamp.fromDate(createdAt),
       'commentsCount': commentsCount,
+      if (imageUrl != null) 'imageUrl': imageUrl,  // null이면 필드 아예 안 넣음
     };
   }
-
 }

@@ -1,11 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
-import '../../application/post_bloc/post_bloc.dart';
-import '../../application/post_bloc/post_event.dart';
-import '../../application/post_bloc/post_state.dart';
-import '../widgets/noconnection_column.dart';
+import '../../../application/post_bloc/post_bloc.dart';
+import '../../../application/post_bloc/post_event.dart';
+import '../../../application/post_bloc/post_state.dart';
+import '../../widgets/noconnection_column.dart';
 
 class BulletinBoardScreen extends StatefulWidget {
   const BulletinBoardScreen({super.key});
@@ -15,10 +16,27 @@ class BulletinBoardScreen extends StatefulWidget {
 }
 
 class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
+  final Map<String, String> nicknameCache = {};
   @override
   void initState() {
     super.initState();
     context.read<PostBloc>().add(LoadPosts());
+  }
+
+  Future<String> getNickname(String uid) async {
+    if (nicknameCache.containsKey(uid)) return nicknameCache[uid]!;
+
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      final nickname = snapshot.data()?['nickname'] ?? '알 수 없음';
+      nicknameCache[uid] = nickname;
+      return nickname;
+    } catch (e) {
+      return '알 수 없음';
+    }
   }
 
   @override
@@ -64,9 +82,17 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             const SizedBox(height: 4),
-                            Text(post.uid, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                            Text(DateFormat('yyyy-MM-dd HH:mm').format(post.createdAt),
-                                style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                            FutureBuilder<String>(
+                              future: getNickname(post.uid),
+                              builder: (context, snapshot) {
+                                final nickname = snapshot.data ?? '로딩 중...';
+                                return Text(nickname, style: const TextStyle(fontSize: 12, color: Colors.grey));
+                              },
+                            ),
+                            Text(
+                              DateFormat('yyyy-MM-dd HH:mm').format(post.createdAt),
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
                           ],
                         ),
                         trailing: Column(
