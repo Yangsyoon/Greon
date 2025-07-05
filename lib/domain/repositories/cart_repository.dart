@@ -9,4 +9,5 @@ abstract class CartRepository {
   Future<Either<Failure, CartItem>> addToCart(CartItem params);
   Future<Either<Failure, bool>> deleteFormCart();
   Future<Either<Failure, bool>> clearCart();
+  Future<Either<Failure, List<CartItem>>> getCartFromFirestore();
 }

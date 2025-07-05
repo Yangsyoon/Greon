@@ -8,20 +8,24 @@ import '../../../domain/usecases/cart/add_cart_item_usecase.dart';
 import '../../../domain/usecases/cart/clear_cart_usecase.dart';
 import '../../../domain/usecases/cart/get_cached_cart_usecase.dart';
 import '../../../domain/usecases/cart/sync_cart_usecase.dart';
+import '../../domain/repositories/cart_repository.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';
 
 class CartBloc extends Bloc<CartEvent, CartState> {
+  final CartRepository _cartRepository; // ← 추가
   final GetCachedCartUseCase _getCachedCartUseCase;
   final AddCartUseCase _addCartUseCase;
   final SyncCartUseCase _syncCartUseCase;
   final ClearCartUseCase _clearCartUseCase;
+
   CartBloc(
     this._getCachedCartUseCase,
     this._addCartUseCase,
     this._syncCartUseCase,
     this._clearCartUseCase,
+      this._cartRepository,
   ) : super(const CartInitial(cart: [])) {
     on<GetCart>(_onGetCart);
     on<AddProduct>(_onAddToCart);
@@ -31,16 +35,10 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   void _onGetCart(GetCart event, Emitter<CartState> emit) async {
     try {
       emit(CartLoading(cart: state.cart));
-      final result = await _getCachedCartUseCase(NoParams());
+      final result = await _cartRepository.getCartFromFirestore();
       result.fold(
-        (failure) => emit(CartError(cart: state.cart, failure: failure)),
-        (cart) => emit(CartLoaded(cart: cart)),
-      );
-      final syncResult = await _syncCartUseCase(NoParams());
-      emit(CartLoading(cart: state.cart));
-      syncResult.fold(
-        (failure) => emit(CartError(cart: state.cart, failure: failure)),
-        (cart) => emit(CartLoaded(cart: cart)),
+            (failure) => emit(CartError(cart: state.cart, failure: failure)),
+            (cart) => emit(CartLoaded(cart: cart)),
       );
     } catch (e) {
       emit(CartError(failure: ExceptionFailure(), cart: state.cart));

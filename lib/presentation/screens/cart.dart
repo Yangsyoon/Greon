@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/colors.dart';
@@ -9,12 +8,9 @@ import 'package:greon/presentation/widgets/empty_cart_container.dart';
 import 'package:greon/presentation/widgets/error_container.dart';
 import 'package:greon/presentation/widgets/payment_details.dart';
 
-import '../../../../core/error/failures.dart';
 import '../../../../domain/entities/cart/cart_item.dart';
-import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../application/cart_bloc/cart_bloc.dart';
 import '../../application/user_bloc/user_bloc.dart';
-import '../../core/enums/enums.dart';
 import '../widgets/cart_item.dart';
 
 class CartScreen extends StatefulWidget {
@@ -26,7 +22,13 @@ class CartScreen extends StatefulWidget {
 
 class _CartScreenState extends State<CartScreen> {
   List<CartItem> selectedCartItems = [];
-  bool isCartError = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // 화면이 열릴 때 cart를 Firestore에서 불러오는 이벤트 실행
+    context.read<CartBloc>().add(GetCart());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -38,12 +40,8 @@ class _CartScreenState extends State<CartScreen> {
             padding: Space.all(1, 0),
             child: Column(
               children: [
-                BlocConsumer<CartBloc, CartState>(
-                  listener: (context, state) {
-                    /*setState(() {
-                      isCartError = true;
-                    });*/
-                  },
+                // BlocBuilder로 cart 상태 감시
+                BlocBuilder<CartBloc, CartState>(
                   builder: (context, state) {
                     if (state is CartError) {
                       return errorContainer(context, true);
@@ -51,65 +49,57 @@ class _CartScreenState extends State<CartScreen> {
                     if (state is CartLoaded && state.cart.isEmpty) {
                       return emptyCartContainer(context);
                     }
-                    return Expanded(
-                      child: ListView.builder(
-                        itemCount: (state is CartLoading)
-                            ? 10
-                            : (state.cart.length +
-                                ((state is CartLoading) ? 10 : 0)),
-                        padding: EdgeInsets.only(
-                            bottom: AppDimensions.normalize(127)),
-                        physics: const BouncingScrollPhysics(),
-                        shrinkWrap: true,
-                        itemBuilder: (BuildContext context, int index) {
-                          if (state is CartLoading) {
-                            return const CartItemCard();
-                          } else {
-                            if (state.cart.length < index) {
-                              return const CartItemCard();
-                            }
+                    if (state is CartLoading) {
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: 5,
+                          padding: EdgeInsets.only(
+                              bottom: AppDimensions.normalize(127)),
+                          itemBuilder: (context, index) =>
+                          const CartItemCard(), // 로딩용 카드
+                        ),
+                      );
+                    }
+                    if (state is CartLoaded) {
+                      return Expanded(
+                        child: ListView.builder(
+                          itemCount: state.cart.length,
+                          padding: EdgeInsets.only(
+                              bottom: AppDimensions.normalize(127)),
+                          itemBuilder: (context, index) {
+                            final item = state.cart[index];
                             return CartItemCard(
-                              cartItem: state.cart[index],
-                              isSelected: selectedCartItems.any(
-                                  (element) => element == state.cart[index]),
+                              cartItem: item,
+                              isSelected: selectedCartItems.contains(item),
                               onLongClick: () {
                                 setState(() {
-                                  if (selectedCartItems.any((element) =>
-                                      element == state.cart[index])) {
-                                    selectedCartItems.remove(state.cart[index]);
+                                  if (selectedCartItems.contains(item)) {
+                                    selectedCartItems.remove(item);
                                   } else {
-                                    selectedCartItems.add(state.cart[index]);
+                                    selectedCartItems.add(item);
                                   }
                                 });
                               },
                             );
-                          }
-                        },
-                      ),
-                    );
+                          },
+                        ),
+                      );
+                    }
+                    // 초기상태 등
+                    return const SizedBox.shrink();
                   },
                 ),
               ],
             ),
           ),
-          /*  isCartError
-              ? const SizedBox.shrink()
-              :*/
+          // 결제/로그인 정보
           BlocBuilder<UserBloc, UserState>(
             builder: (context, state) {
-              if (state is UserLogged) {
-                return const PaymentDetails(
-                  buttonText: "Proceed To Checkout",
-                  isFromCheckout: false,
-                  isLogged: true,
-                );
-              } else {
-                return const PaymentDetails(
-                  buttonText: "Proceed To Checkout",
-                  isFromCheckout: false,
-                  isLogged: false,
-                );
-              }
+              return PaymentDetails(
+                buttonText: "Proceed To Checkout",
+                isFromCheckout: false,
+                isLogged: state is UserLogged,
+              );
             },
           ),
         ],

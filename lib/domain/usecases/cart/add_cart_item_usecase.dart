@@ -5,6 +5,7 @@ import '../../../../../core/usecases/usecase.dart';
 import '../../entities/cart/cart_item.dart';
 import '../../repositories/cart_repository.dart';
 
+
 class AddCartUseCase implements UseCase<void, CartItem> {
   final CartRepository repository;
   AddCartUseCase(this.repository);
