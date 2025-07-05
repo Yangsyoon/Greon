@@ -1,14 +1,13 @@
 import 'package:equatable/equatable.dart';
 
-import '../product/price_tag.dart';
 import '../product/product.dart';
 
 class CartItem extends Equatable {
   final String? id;
   final ProductEntity product;
-  final PriceTag priceTag;
+  final int price;
 
-  const CartItem({this.id, required this.product, required this.priceTag});
+  const CartItem({this.id, required this.product, required this.price});
 
   @override
   List<Object?> get props => [id];

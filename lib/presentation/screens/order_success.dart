@@ -160,7 +160,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                                       ),
                                       Space.yf(.8),
                                       Text(
-                                        "${state.cart.fold(0.0, (previousValue, element) => (element.priceTag.price + previousValue)) + 5}",
+                                        "${state.cart.fold(0.0, (previousValue, element) => (element.price + previousValue)) + 5}",
                                         style: AppText.h3b,
                                       ),
                                     ],

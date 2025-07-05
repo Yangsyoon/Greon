@@ -1,7 +1,6 @@
 import 'package:equatable/equatable.dart';
 
 import '../category/category.dart';
-import 'price_tag.dart';
 
 import 'package:equatable/equatable.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -10,7 +9,7 @@ class ProductEntity extends Equatable {
   final String id;
   final String name;
   final String description;
-  final List<PriceTag> priceTags;
+  final int price;
   final List<Category> categories;
   final List<String> images;
   final DateTime createdAt;
@@ -21,7 +20,7 @@ class ProductEntity extends Equatable {
     required this.id,
     required this.name,
     required this.description,
-    required this.priceTags,
+    required this.price,
     required this.categories,
     required this.images,
     required this.createdAt,

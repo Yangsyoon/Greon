@@ -7,10 +7,6 @@ import '../../../domain/usecases/product/get_product_usecase.dart';
 import '../../core/enums/enums.dart';
 import '../../core/error/failures.dart';
 import '../../data/models/product/filter_params_model.dart';
-import '../../domain/entities/product/price_tag.dart';
-import '../../data/models/product/product_model.dart';
-
-import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 
 part 'product_event.dart';
@@ -81,15 +77,13 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     if (event.sortOrder != null) {
       List<ProductEntity> sortedProducts = List.from(state.products);
       sortedProducts.sort((a, b) {
-        int getPrice(PriceTag priceTag) => priceTag.price.toInt();
-
         switch (event.sortOrder!) {
           case SortOrder.newest:
             return b.createdAt.compareTo(a.createdAt);
           case SortOrder.highToLow:
-            return getPrice(b.priceTags.first).compareTo(getPrice(a.priceTags.first));
+            return b.price.compareTo(a.price);
           case SortOrder.lowToHigh:
-            return getPrice(a.priceTags.first).compareTo(getPrice(b.priceTags.first));
+            return a.price.compareTo(b.price);
           case SortOrder.aToZ:
             return a.name.compareTo(b.name);
           case SortOrder.zToA:
@@ -105,6 +99,7 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       ));
     }
   }
+
 
   void _onLoadMoreProducts(GetMoreProducts event, Emitter<ProductState> emit) async {
     var limit = state.metaData.limit;

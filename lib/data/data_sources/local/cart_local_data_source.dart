@@ -33,9 +33,10 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
     }
     if (!cart.any((element) =>
         element.product.id == cartItem.product.id &&
-        element.priceTag.id == cartItem.priceTag.id)) {
+        element.price == cartItem.price)) {
       cart.add(cartItem);
     }
+
     return sharedPreferences.setString(
       cachedCart,
       cartItemModelToJson(cart),

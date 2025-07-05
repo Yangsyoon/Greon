@@ -1,22 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:greon/data/models/product/price_tag_model.dart';
 
-import 'package:greon/domain/entities/category/category.dart';
-import 'package:greon/domain/entities/product/price_tag.dart';
-
-import '../../../core/constant/notifications.dart';
-import '../../../domain/entities/product/product.dart'; // 기존 ProductEntity 임포트
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../../domain/entities/category/category.dart';
+import '../../../domain/entities/product/product.dart'; // ProductEntity 임포트
 
 class ProductModel {
   final String id;
   final String name;
   final String description;
-  final List<PriceTag> priceTags;
+  final int price;
   final List<Category> categories;
   final List<String> images;
   final DateTime createdAt;
@@ -27,7 +19,7 @@ class ProductModel {
     required this.id,
     required this.name,
     required this.description,
-    required this.priceTags,
+    required this.price,
     required this.categories,
     required this.images,
     required this.createdAt,
@@ -40,7 +32,7 @@ class ProductModel {
       id: docId ?? "error",
       name: "오류 발생",
       description: "데이터 변환 중 오류 발생",
-      priceTags: [],
+      price: 0,
       categories: [],
       images: [],
       createdAt: DateTime.now(),
@@ -49,13 +41,13 @@ class ProductModel {
     );
   }
 
-  /// **Entity 변환 메서드**
+  /// Entity 변환 메서드
   ProductEntity toEntity() {
     return ProductEntity(
       id: id,
       name: name,
       description: description,
-      priceTags: priceTags,
+      price: price,
       categories: categories,
       images: images,
       createdAt: createdAt,
@@ -64,7 +56,7 @@ class ProductModel {
     );
   }
 
-  /// **Firestore에서 데이터 변환**
+  /// Firestore에서 데이터 변환
   static Future<ProductModel> fromDocumentAsync(DocumentSnapshot doc) async {
     try {
       final rawData = doc.data();
@@ -75,30 +67,7 @@ class ProductModel {
 
       final data = rawData as Map<String, dynamic>;
 
-      // 🔹 priceTags 변환 (DocumentReference → Map 변환)
-      List<PriceTag> priceTags = await Future.wait(
-        (data["priceTags"] as List<dynamic>? ?? []).map((e) async {
-          try {
-            if (e is DocumentReference || e.runtimeType.toString() == "_JsonDocumentReference") {
-              final snapshot = await e.get();
-              final r = snapshot.data();
-              if (r is! Map<String, dynamic>) return PriceTag.defaultTag();
-              return PriceTag(
-                id: e.id,
-                name: r["name"] ?? "기본 가격 태그",
-                price: r["price"] ?? 0,
-              );
-            } else if (e is Map<String, dynamic>) {
-              return PriceTag.fromJson(e);
-            }
-          } catch (error) {
-            debugPrint("🔥 priceTags 변환 오류: $error");
-          }
-          return PriceTag.defaultTag();
-        }).toList(),
-      );
-
-      // 🔹 categories 변환 (DocumentReference → Map 변환)
+      // categories 변환 (DocumentReference → Category 객체 변환)
       List<Category> categories = await Future.wait(
         (data["categories"] as List<dynamic>? ?? []).map((e) async {
           try {
@@ -127,7 +96,7 @@ class ProductModel {
         id: doc.id,
         name: data["name"] ?? "상품명 없음",
         description: data["description"] ?? "설명 없음",
-        priceTags: priceTags,
+        price: data["price"] ?? 0,
         categories: categories,
         images: (data["images"] as List<dynamic>?)?.map((e) => e.toString()).toList() ?? [],
         createdAt: (data["createdAt"] as Timestamp?)?.toDate() ?? DateTime.now(),
@@ -137,28 +106,16 @@ class ProductModel {
     } catch (e, stackTrace) {
       debugPrint("🔥 ProductModel 변환 오류: $e");
       debugPrint("📌 StackTrace: $stackTrace");
-      return ProductModel(
-        id: "error",
-        name: "오류 발생",
-        description: "데이터 변환 중 오류 발생",
-        priceTags: [],
-        categories: [],
-        images: [],
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        isActive: false,
-      );
+      return ProductModel.errorModel(doc.id);
     }
   }
 
-
-
-  /// **JSON 변환 (Firestore 저장용)**
+  /// JSON 변환 (Firestore 저장용)
   Map<String, dynamic> toJson() => {
     "id": id,
     "name": name,
     "description": description,
-    "priceTags": priceTags.map((e) => e.toJson()).toList(),
+    "price": price,
     "categories": categories.map((e) => e.toJson()).toList(),
     "images": images,
     "createdAt": createdAt.toIso8601String(),
@@ -171,9 +128,7 @@ class ProductModel {
       id: json["id"] ?? "",
       name: json["name"] ?? "상품명 없음",
       description: json["description"] ?? "설명 없음",
-      priceTags: (json["priceTags"] as List<dynamic>? ?? [])
-          .map((e) => PriceTag.fromJson(e))
-          .toList(),
+      price: json["price"] ?? 0,
       categories: (json["categories"] as List<dynamic>? ?? [])
           .map((e) => Category.fromJson(e))
           .toList(),
@@ -189,7 +144,7 @@ class ProductModel {
       id: entity.id,
       name: entity.name,
       description: entity.description,
-      priceTags: entity.priceTags,
+      price: entity.price,
       categories: entity.categories,
       images: entity.images,
       createdAt: entity.createdAt,
@@ -198,4 +153,3 @@ class ProductModel {
     );
   }
 }
-

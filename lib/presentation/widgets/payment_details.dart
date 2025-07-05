@@ -53,14 +53,14 @@ class _PaymentDetailsState extends State<PaymentDetails> {
               Space.yf(),
               PaymentDetailsRow(
                   "SUB Total",
-                  '${state.cart.fold(0.0, (previousValue, element) => (element.priceTag.price + previousValue))}',
+                  '${state.cart.fold(0.0, (previousValue, element) => (element.price + previousValue))}',
                   null),
               PaymentDetailsRow("Gift Charges", '0.000', null),
               PaymentDetailsRow("Discount", '0.000', null),
               PaymentDetailsRow("Shipping Charges", '5.000', null),
               PaymentDetailsRow(
                   "Total",
-                  '${state.cart.fold(0.0, (previousValue, element) => (element.priceTag.price + previousValue)) + 5}',
+                  '${state.cart.fold(0.0, (previousValue, element) => (element.price + previousValue)) + 5}',
                   AppText.h3b),
               const DashedSeparator(),
               Space.yf(.8),
@@ -131,8 +131,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                                             .map((item) => OrderItem(
                                                   id: '',
                                                   product: item.product,
-                                                  priceTag: item.priceTag,
-                                                  price: item.priceTag.price,
+                                                  price: item.price,
                                                   quantity: 1,
                                                 ))
                                             .toList(),

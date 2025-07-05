@@ -119,7 +119,7 @@ class OrderItemWidget extends StatelessWidget {
                                       ),
                                       Space.yf(.5),
                                       Text(
-                                        '\$${product.priceTag.price.toStringAsFixed(2)}',
+                                        '\$${product.price.toStringAsFixed(2)}',
                                         style: AppText.b1b?.copyWith(
                                             color: AppColors.CommonCyan),
                                       )

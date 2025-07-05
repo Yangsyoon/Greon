@@ -42,8 +42,7 @@ class CartRemoteDataSourceSourceImpl implements CartRemoteDataSource {
         body: jsonEncode({
           "data": cart
               .map((e) => {
-                    "product": e.product.id,
-                    "priceTag": e.priceTag.id,
+                    "product": e.product.id
                   })
               .toList()
         }));

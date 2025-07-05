@@ -19,7 +19,6 @@ import '../../application/cart_bloc/cart_bloc.dart';
 import '../../application/wishlist_cubit/wishlist_cubit.dart';
 import '../../data/models/product/product_model.dart';
 import '../../domain/entities/cart/cart_item.dart';
-import '../../domain/entities/product/price_tag.dart';
 import '../widgets/dots_indicator.dart';
 import '../widgets/loading_shimmer.dart';
 import '../widgets/proceedtocart_modalsheet.dart';
@@ -37,18 +36,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   PageController _pageController = PageController();
   ScrollController _listController = ScrollController();
   int _selectedPageIndex = 0;
-  late PriceTag _selectedPriceTag;
 
   @override
   void initState() {
     super.initState();
-    _selectedPriceTag = widget.product.priceTags.first;
     _pageController.addListener(() {
       setState(() {
         _selectedPageIndex = _pageController.page?.round() ?? 0;
         _listController.animateTo(
           _selectedPageIndex * 116.0,
-          // Adjust this value based on your item width and margin
           duration: const Duration(milliseconds: 500),
           curve: Curves.easeInOut,
         );
@@ -80,7 +76,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 Space.yf(.6),
                 Text(
-                  "${widget.product.priceTags.first.price} \$",
+                  "${widget.product.price} \$",
                   style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
                 ),
                 Space.yf(.6),
@@ -92,7 +88,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     ),
                     Text(
                       widget.product.categories.first.name.toUpperCase(),
-                      style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+                      style:
+                      AppText.h3b?.copyWith(color: AppColors.CommonCyan),
                     ),
                   ],
                 ),
@@ -171,8 +168,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             color: AppColors.LightGrey,
                             border: Border.all(
                               color: _selectedPageIndex == index
-                                  ? AppColors
-                                  .CommonCyan // Change this to your desired color
+                                  ? AppColors.CommonCyan
                                   : Colors.transparent,
                               width: 5.0,
                             ),
@@ -197,13 +193,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           isProductInWishlist
                               ? GestureDetector(
                               onTap: () {
-                                /*setState(() {
-                                      context
-                                          .read<WishlistCubit>()
-                                          .removeFromWishlist(
-                                              ProductModel.fromEntity(
-                                                  widget.product));
-                                    });*/
+                                // Remove from wishlist
                               },
                               child: const Icon(Icons.favorite))
                               : GestureDetector(
@@ -263,44 +253,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   style:
                   AppText.b2?.copyWith(height: AppDimensions.normalize(.6)),
                 ),
-                Space.yf(1.2),
-                Text(
-                  "Prices",
-                  style: AppText.h3b,
-                ),
-                Space.yf(.5),
-                Wrap(
-                  children: widget.product.priceTags
-                      .map((priceTag) => GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedPriceTag = priceTag;
-                      });
-                    },
-                    child: Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: _selectedPriceTag.id == priceTag.id
-                              ? 2.7
-                              : 1.0,
-                          color: AppColors.CommonCyan,
-                        ),
-                        borderRadius: const BorderRadius.all(
-                            Radius.circular(5.0)),
-                      ),
-                      padding: const EdgeInsets.all(8),
-                      margin:
-                      const EdgeInsets.only(right: 7, bottom: 5),
-                      child: Column(
-                        children: [
-                          Text(priceTag.name),
-                          Text("${priceTag.price} \$"),
-                        ],
-                      ),
-                    ),
-                  ))
-                      .toList(),
-                ),
               ],
             ),
           ),
@@ -322,8 +274,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     context.read<CartBloc>().add(
                       AddProduct(
                         cartItem: CartItem(
-                            product: widget.product,
-                            priceTag: _selectedPriceTag),
+                          product: widget.product,
+                          price: widget.product.price,
+                        ),
                       ),
                     );
                     context.read<NotificationsCubit>().showAndSaveNotification(

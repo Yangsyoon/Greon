@@ -15,7 +15,6 @@ import '../../core/enums/enums.dart';
 import '../../core/error/failures.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/product/filter_params_model.dart';
-import '../../data/models/product/price_tag_model.dart';
 import '../../data/models/product/product_model.dart';
 import '../../domain/entities/category/category.dart';
 import '../widgets/black_dot.dart';

@@ -75,7 +75,7 @@ class CartItemCard extends StatelessWidget {
                         )),
                     Space.yf(.5),
                     Text(
-                      "${cartItem!.product.priceTags.first.price} \$",
+                      "${cartItem!.product.price} \$",
                       style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
                     ),
                     Space.yf(),

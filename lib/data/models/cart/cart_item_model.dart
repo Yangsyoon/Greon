@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import '../../../domain/entities/cart/cart_item.dart';
 import '../../../domain/entities/product/product.dart';
-import '../product/price_tag_model.dart';
 import '../product/product_model.dart';
 
 List<CartItemModel> cartItemModelListFromLocalJson(String str) =>
@@ -24,39 +23,38 @@ class CartItemModel extends CartItem {
   CartItemModel({
     String? id,
     required ProductModel product,
-    required PriceTagModel priceTag,
+    required int price,
   }) : super(
     id: id,
     product: product.toEntity(),
-    priceTag: priceTag,
+    price: price,
   );
-
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     return CartItemModel(
       id: json["_id"],
       product: ProductModel.fromJson(json["product"]),
-      priceTag: PriceTagModel.fromJson(json["priceTag"]),
+      price: json["price"],
     );
   }
 
   Map<String, dynamic> toJson() => {
     "_id": id,
-    "product": ProductModel.fromEntity(product).toJson(), // 변환 후 호출
-    "priceTag": priceTag.toJson(),
+    "product": ProductModel.fromEntity(product).toJson(),
+    "price": price,
   };
 
   Map<String, dynamic> toBodyJson() => {
     "_id": id,
     "product": product.id,
-    "priceTag": priceTag.id,
+    "price": price,
   };
 
   factory CartItemModel.fromParent(CartItem cartItem) {
     return CartItemModel(
       id: cartItem.id,
       product: ProductModel.fromEntity(cartItem.product),
-      priceTag: cartItem.priceTag as PriceTagModel,
+      price: cartItem.price,
     );
   }
 }

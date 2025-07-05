@@ -7,16 +7,16 @@ import 'package:greon/core/constant/assets.dart';
 import 'package:greon/presentation/widgets/loading_shimmer.dart';
 import '../../core/constant/colors.dart';
 import '../../core/router/app_router.dart';
-import '../../data/models/product/product_model.dart'; // ProductModel import
+import '../../data/models/product/product_model.dart';
 
 class RectangularProductItem extends StatelessWidget {
-  final ProductModel? product; // ProductModel로 변경
+  final ProductModel? product;
   final Function? onClick;
   final bool isFromWishlist;
 
   const RectangularProductItem({
     Key? key,
-    this.product, // ProductModel로 변경
+    this.product,
     this.onClick,
     this.isFromWishlist = false,
   }) : super(key: key);
@@ -29,17 +29,14 @@ class RectangularProductItem extends StatelessWidget {
   }
 
   Widget buildBody(BuildContext context) {
-    // ProductModel에서 데이터 가져오기
     List<String> imageUrls = product!.images;
     String imageUrl = imageUrls.isNotEmpty
         ? (isFromWishlist ? imageUrls.last : imageUrls.first)
         : '';
     String name = product!.name;
-    List priceTags = product!.priceTags;
-    double price = priceTags.isNotEmpty ? priceTags.first['price'] ?? 0.0 : 0.0;
+    int price = product!.price; // 🔄 변경됨
     String id = product!.id;
 
-    // 디버깅용 URL 출력
     debugPrint("이미지 URL: $imageUrl");
     debugPrint("상품 이름: $name");
     debugPrint("가격: \$ $price");
@@ -52,7 +49,7 @@ class RectangularProductItem extends StatelessWidget {
             'id': id,
             'name': name,
             'images': imageUrls,
-            'priceTags': priceTags,
+            'price': price, // 🔄 변경됨
           },
         );
       },
@@ -87,17 +84,15 @@ class RectangularProductItem extends StatelessWidget {
                 maxLines: 1,
               ),
               Space.y!,
-              priceTags.isNotEmpty
-                  ? Text(
+              Text(
                 r'$ ' + price.toString(),
                 style: AppText.h3?.copyWith(
                   color: AppColors.CommonCyan,
                 ),
-              )
-                  : const SizedBox.shrink(),
-              // URL을 화면에 표시
+              ),
+              // URL을 화면에 표시 (필요 없으면 삭제해도 됨)
               Text(
-                '이미지 URL: $imageUrl', // URL 화면에 출력
+                '이미지 URL: $imageUrl',
                 style: AppText.b2,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -110,6 +105,6 @@ class RectangularProductItem extends StatelessWidget {
   }
 
   Widget placeholderShimmer() {
-    return Container(); // placeholder shimmer
+    return Container(); // 필요 시 shimmer 위젯 교체
   }
 }
