@@ -8,15 +8,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
 import 'application/post_bloc/post_bloc.dart';
 import 'application/post_bloc/post_event.dart';
 import 'core/app/app.dart';
 import 'core/observer/bloc_observer.dart';
+import 'data/data_sources/local/user_local_data_source.dart';
 import 'data/repositories/post_repository.dart';
 import 'di/di.dart' as di;
 import 'di/product.dart';
@@ -109,16 +112,33 @@ Future<void> _setupFCM(BuildContext context) async {
     // Navigator.pushNamed(context, '/somePage');
   });
 
+  // userLocalDataSource 인스턴스 생성
+
+
   // FCM 토큰 저장
   final token = await FirebaseMessaging.instance.getToken();
   if (token != null) {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
+
+
+
+      // userLocalDataSource 인스턴스 생성
+      final userLocalDataSource = UserLocalDataSourceImpl(
+        sharedPreferences: await SharedPreferences.getInstance(),
+        secureStorage: const FlutterSecureStorage(),
+      );
+      final idToken = await user.getIdToken();
+      if (idToken != null) {
+        await userLocalDataSource.saveToken(idToken);
+      }
+
       await FirebaseFirestore.instance
           .collection('users')
           .doc(user.uid)
           .update({'fcm_token': token});
       print('✅ FCM 토큰 저장: $token');
+
     }
   }
 
@@ -131,6 +151,11 @@ Future<void> _setupFCM(BuildContext context) async {
           .doc(user.uid)
           .update({'fcm_token': newToken});
       print('🔄 FCM 토큰 갱신: $newToken');
+      final userLocalDataSource = UserLocalDataSourceImpl(
+        sharedPreferences: await SharedPreferences.getInstance(),
+        secureStorage: const FlutterSecureStorage(),
+      );
+      await userLocalDataSource.saveToken(newToken);
     }
   });
 }

@@ -30,12 +30,14 @@ class UserLocalDataSourceImpl implements UserLocalDataSource {
   @override
   Future<String> getToken() async {
     String? token = await secureStorage.read(key: cachedToken);
-    if (token != null) {
-      return Future.value(token);
+    if (token != null && token.isNotEmpty) {
+      return token;
     } else {
+      // 반드시 예외를 던져서 호출부에서 try-catch로 처리하게!
       throw CacheException();
     }
   }
+
 
   @override
   Future<void> saveToken(String token) async {

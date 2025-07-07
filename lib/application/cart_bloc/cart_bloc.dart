@@ -46,20 +46,27 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   void _onAddToCart(AddProduct event, Emitter<CartState> emit) async {
+    print('AddProduct event received with !!!!!!');
     try {
       emit(CartLoading(cart: state.cart));
-      List<CartItem> cart = [];
-      cart.addAll(state.cart);
-      cart.add(event.cartItem);
-      var result = await _addCartUseCase(event.cartItem);
+      final result = await _addCartUseCase(event.cartItem);
       result.fold(
-            (failure) => emit(CartError(cart: state.cart, failure: failure)),
-            (_) => emit(CartLoaded(cart: cart)),
+            (failure) {
+          print('실패: $failure');
+          emit(CartError(cart: state.cart, failure: failure));
+        },
+            (savedCartItem) {
+          final updatedCart = List<CartItem>.from(state.cart)..add(savedCartItem);
+          emit(CartLoaded(cart: updatedCart));
+        },
       );
     } catch (e) {
       emit(CartError(cart: state.cart, failure: ExceptionFailure()));
     }
   }
+
+
+
 
   void _onClearCart(ClearCart event, Emitter<CartState> emit) async {
     try {

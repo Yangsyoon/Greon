@@ -1,4 +1,8 @@
 import 'package:equatable/equatable.dart';
+class AuthFailure extends Failure {
+  AuthFailure({required String message}) : super(message: message);
+}
+
 
 abstract class Failure extends Equatable {
   final String? message;

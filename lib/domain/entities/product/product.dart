@@ -30,4 +30,19 @@ class ProductEntity extends Equatable {
 
   @override
   List<Object?> get props => [id];
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'description': description,
+      'price': price,
+      'categories': categories.map((c) => c.toJson()).toList(), // Category도 toJson 필요
+      'images': images,
+      'createdAt': createdAt.toIso8601String(),
+      'updatedAt': updatedAt.toIso8601String(),
+      'isActive': isActive,
+    };
+  }
+
 }

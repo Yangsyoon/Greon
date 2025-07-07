@@ -30,6 +30,20 @@ class CartItemModel extends CartItem {
     price: price,
   );
 
+  /// ✅ 여기에 copyWith 메서드 추가
+  CartItemModel copyWith({
+    String? id,
+    ProductModel? product,
+    int? price,
+  }) {
+    return CartItemModel(
+      id: id ?? this.id,
+      product: product ?? ProductModel.fromEntity(this.product),
+      price: price ?? this.price,
+    );
+  }
+
+
   factory CartItemModel.fromJson(Map<String, dynamic> json) {
     return CartItemModel(
       id: json["_id"],
@@ -55,6 +69,18 @@ class CartItemModel extends CartItem {
       id: cartItem.id,
       product: ProductModel.fromEntity(cartItem.product),
       price: cartItem.price,
+    );
+  }
+
+}
+extension CartItemModelX on CartItemModel {
+  CartItem toDomain() {
+    return CartItem(
+      id: id,
+      product: product is ProductModel
+          ? (product as ProductModel).toEntity()
+          : product, // 이미 ProductEntity라면 그대로 사용
+      price: price,
     );
   }
 }
