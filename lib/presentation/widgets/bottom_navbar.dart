@@ -61,7 +61,7 @@ class BottomNavigation extends StatelessWidget {
                         BlendMode.srcIn),
                   ),
                 ),
-                label: '뉴스피드',
+                label: '게시판',
               ),
               BottomNavigationBarItem(
                 icon: Padding(
@@ -78,7 +78,7 @@ class BottomNavigation extends StatelessWidget {
                         BlendMode.srcIn),
                   ),
                 ),
-                label: '모종샵',
+                label: '식물샵',
               ),
               BottomNavigationBarItem(
                 icon: Padding(

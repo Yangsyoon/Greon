@@ -76,7 +76,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 Space.yf(.6),
                 Text(
-                  "${widget.product.price} \$",
+                  "${widget.product.price} 원",
                   style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
                 ),
                 Space.yf(.6),

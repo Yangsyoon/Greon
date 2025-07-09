@@ -7,7 +7,6 @@ import 'package:greon/presentation/screens/app_info.dart';
 import 'package:greon/presentation/screens/cart.dart';
 import 'package:greon/presentation/screens/checkout.dart';
 import 'package:greon/presentation/screens/contact.dart';
-import 'package:greon/presentation/screens/filter.dart';
 import 'package:greon/presentation/screens/login.dart';
 import 'package:greon/presentation/screens/notifications.dart';
 import 'package:greon/presentation/screens/order_failure.dart';
@@ -65,6 +64,22 @@ sealed class AppRouter {
   static const String writePost = '/write-post';
   static const String postDetail = '/post-detail';
 
+  static Route<dynamic> _errorRoute() {
+    String message = "에러";
+    return MaterialPageRoute(
+      builder: (_) => Scaffold(
+        appBar: AppBar(title: const Text("오류")),
+        body: Center(
+          child: Text(
+            message,
+            style: const TextStyle(fontSize: 18, color: Colors.redAccent),
+            textAlign: TextAlign.center,
+          ),
+        ),
+      ),
+    );
+  }
+
   static Route<dynamic> onGenerateRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case splash:
@@ -75,12 +90,19 @@ sealed class AppRouter {
         return MaterialPageRoute(builder: (_) => const RootScreen());
       case search:
         return MaterialPageRoute(builder: (_) => const SearchScreen());
-      case filter:
-        return MaterialPageRoute(builder: (_) => const FilterScreen());
       case productDetails:
-        ProductEntity product = routeSettings.arguments as ProductEntity;
+        debugPrint('🔍 Route arguments type: ${routeSettings.arguments.runtimeType}');
+        debugPrint('🔍 Route arguments: ${routeSettings.arguments}');
+        final args = routeSettings.arguments;
+        if (args is! ProductEntity) {
+          debugPrint("❌ 잘못된 arguments 타입: ${args.runtimeType}");
+          return _errorRoute(); // 에러 페이지로 유도
+        }
+
         return MaterialPageRoute(
-            builder: (_) => ProductDetailsScreen(product: product));
+          builder: (_) => ProductDetailsScreen(product: args),
+        );
+
       case signup:
         return MaterialPageRoute(builder: (_) => const SignUpScreen());
       case login:

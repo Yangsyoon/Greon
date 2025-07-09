@@ -8,6 +8,7 @@ import 'package:greon/presentation/widgets/loading_shimmer.dart';
 import '../../core/constant/colors.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/product/product_model.dart';
+import '../../domain/entities/category/category.dart';
 
 class RectangularProductItem extends StatelessWidget {
   final ProductModel? product;
@@ -34,25 +35,12 @@ class RectangularProductItem extends StatelessWidget {
         ? (isFromWishlist ? imageUrls.last : imageUrls.first)
         : '';
     String name = product!.name;
-    int price = product!.price; // 🔄 변경됨
+    int price = product!.price;
     String id = product!.id;
-
-    debugPrint("이미지 URL: $imageUrl");
-    debugPrint("상품 이름: $name");
-    debugPrint("가격: \$ $price");
+    List<Category> category = product!.categories;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushNamed(
-          AppRouter.productDetails,
-          arguments: {
-            'id': id,
-            'name': name,
-            'images': imageUrls,
-            'price': price, // 🔄 변경됨
-          },
-        );
-      },
+      onTap: onClick != null ? () => onClick!() : null,
       child: Card(
         elevation: 3,
         margin: EdgeInsets.only(bottom: AppDimensions.normalize(10.8)),
@@ -85,17 +73,16 @@ class RectangularProductItem extends StatelessWidget {
               ),
               Space.y!,
               Text(
-                r'$ ' + price.toString(),
+                category[0].name,
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
+              Space.y!,
+              Text(
+                price.toString() + r'원',
                 style: AppText.h3?.copyWith(
                   color: AppColors.CommonCyan,
                 ),
-              ),
-              // URL을 화면에 표시 (필요 없으면 삭제해도 됨)
-              Text(
-                '이미지 URL: $imageUrl',
-                style: AppText.b2,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

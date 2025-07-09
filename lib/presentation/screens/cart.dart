@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/configs/configs.dart';
-import 'package:greon/core/constant/colors.dart';
 import 'package:greon/presentation/widgets/custom_appbar.dart';
 import 'package:greon/presentation/widgets/empty_cart_container.dart';
 import 'package:greon/presentation/widgets/error_container.dart';

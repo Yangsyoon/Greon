@@ -28,7 +28,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   )) {
     on<GetProducts>(_onLoadProducts);
     on<GetMoreProducts>(_onLoadMoreProducts);
-    on<SortProducts>(_onSortProducts);
   }
 
   void _onLoadProducts(GetProducts event, Emitter<ProductState> emit) async {
@@ -69,33 +68,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         metaData: state.metaData,
         failure: ExceptionFailure(),
         params: event.params,
-      ));
-    }
-  }
-
-  void _onSortProducts(SortProducts event, Emitter<ProductState> emit) {
-    if (event.sortOrder != null) {
-      List<ProductEntity> sortedProducts = List.from(state.products);
-      sortedProducts.sort((a, b) {
-        switch (event.sortOrder!) {
-          case SortOrder.newest:
-            return b.createdAt.compareTo(a.createdAt);
-          case SortOrder.highToLow:
-            return b.price.compareTo(a.price);
-          case SortOrder.lowToHigh:
-            return a.price.compareTo(b.price);
-          case SortOrder.aToZ:
-            return a.name.compareTo(b.name);
-          case SortOrder.zToA:
-            return b.name.compareTo(a.name);
-        }
-      });
-
-      debugPrint('🔄 상품 정렬 완료: ${event.sortOrder}');
-      emit(ProductLoaded(
-        metaData: state.metaData,
-        products: sortedProducts,
-        params: state.params,
       ));
     }
   }

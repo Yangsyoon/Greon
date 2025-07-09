@@ -18,14 +18,28 @@ class Category {
   });
 
   factory Category.fromJson(Map<String, dynamic> json) {
+    DateTime parseDate(dynamic value) {
+      if (value == null) {
+        return DateTime.now();
+      } else if (value is Timestamp) {
+        return value.toDate();
+      } else if (value is String) {
+        return DateTime.tryParse(value) ?? DateTime.now();
+      } else if (value is DateTime) {
+        return value;
+      }
+      return DateTime.now();
+    }
+
     return Category(
       name: json['name'] as String? ?? '기본 카테고리',
       image: json['image'] as String? ?? '',
-      createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '') ?? DateTime.now(),
-      updatedAt: DateTime.tryParse(json['updatedAt'] as String? ?? '') ?? DateTime.now(),
+      createdAt: parseDate(json['createdAt']),
+      updatedAt: parseDate(json['updatedAt']),
       isActive: json['isActive'] as bool? ?? false,
     );
   }
+
 
   /// 🔹 **기본 카테고리 반환**
   static Category defaultCategory() {

@@ -15,7 +15,7 @@ Widget PaymentDetailsRow(
             style: textStyle ?? AppText.h3,
           ),
           Text(
-            "$rightText \$",
+            "$rightText 원",
             style: textStyle ?? AppText.h3,
           ),
         ],
