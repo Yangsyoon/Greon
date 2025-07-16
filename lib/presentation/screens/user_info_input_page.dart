@@ -23,6 +23,8 @@ class _UserInfoInputPageState extends State<UserInfoInputPage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _locationController = TextEditingController();
+  final TextEditingController _nicknameController = TextEditingController();
+
   int? _experienceLevel;  // experienceLevel을 int로 선언
   int? _plantPassion = 1;
   List<String> _preferredPlants = [];
@@ -39,8 +41,7 @@ class _UserInfoInputPageState extends State<UserInfoInputPage> {
         final data = doc.data();
         setState(() {
           // Firestore에서 'fullName' 가져오기
-          String fullName = data?['fullName'] ?? 'Unknown'; // 기본값은 'Unknown'
-          print("fullName: $fullName");
+          _nicknameController.text = data?['nickname'] ?? '';
           _locationController.text = data?['location'] ?? '';
           // experienceLevel을 String에서 int로 변환
           _experienceLevel = data?['experienceLevel'] != null
@@ -62,43 +63,38 @@ class _UserInfoInputPageState extends State<UserInfoInputPage> {
     final firebase.User? fbUser = firebase.FirebaseAuth.instance.currentUser;
 
     if (fbUser == null) {
-      // 로그인 안 된 경우 처리
-      // 이 메시지가 뜨는지 로그 확인
       print("사용자 로그인 정보가 없음");
       return;
     }
 
-
     if (_formKey.currentState?.validate() ?? false) {
-      final AppUser user = AppUser(
-        id: fbUser.uid,
-        fullName: fbUser.displayName ?? "",
-        email: fbUser.email ?? '',
-        image: fbUser.photoURL,
-        createdAt: fbUser.metadata.creationTime,
-        lastLogin: fbUser.metadata.lastSignInTime,
-        plantPassion: _plantPassion,
-        location: _locationController.text.isNotEmpty ? _locationController.text : null,
-        experienceLevel: _experienceLevel != null ? _experienceLevel.toString() : null,
-        preferredPlants: _preferredPlants.isNotEmpty ? _preferredPlants : null,
-        hasPet: _hasPet,
-        timezone: _timezone,
-        language: 'ko', // 기본 언어 설정
-      );
-
-      // Firestore 저장 (기존 데이터 병합)
       try {
         await FirebaseFirestore.instance
             .collection('users')
-            .doc(user.id)
-            .set(user.toJson(), SetOptions(merge: true));
+            .doc(fbUser.uid)
+            .set({
+          'nickname': _nicknameController.text.trim(),
+          'email': fbUser.email ?? '',
+          'image': fbUser.photoURL,
+          'createdAt': fbUser.metadata.creationTime?.toIso8601String(),
+          'lastLogin': fbUser.metadata.lastSignInTime?.toIso8601String(),
+          'plantPassion': _plantPassion,
+          'location': _locationController.text.isNotEmpty ? _locationController.text : null,
+          'experienceLevel': _experienceLevel,
+          'preferredPlants': _preferredPlants.isNotEmpty ? _preferredPlants : null,
+          'hasPet': _hasPet,
+          'timezone': _timezone,
+          'language': 'ko',
+        }, SetOptions(merge: true));
+
         print("저장 완료");
         Navigator.pop(context);
-      }catch (e) {
+      } catch (e) {
         print("Firestore 저장 오류: $e");
       }
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +110,17 @@ class _UserInfoInputPageState extends State<UserInfoInputPage> {
                 onPressed: _pickAndUploadImage,
                 child: const Text("프로필 이미지 선택"),
               ),
+              TextFormField(
+                controller: _nicknameController,
+                decoration: InputDecoration(labelText: "닉네임"),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return '닉네임을 입력해주세요';
+                  }
+                  return null;
+                },
+              ),
+
               TextFormField(
                 decoration: InputDecoration(labelText: "거주지"),
                 controller: _locationController,

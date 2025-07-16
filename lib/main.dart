@@ -21,6 +21,7 @@ import 'core/app/app.dart';
 import 'core/observer/bloc_observer.dart';
 import 'data/data_sources/local/user_local_data_source.dart';
 import 'data/repositories/post_repository.dart';
+import 'di/cubits.dart';
 import 'di/di.dart' as di;
 import 'di/product.dart';
 import 'firebase_options.dart';
@@ -120,9 +121,6 @@ Future<void> _setupFCM(BuildContext context) async {
   if (token != null) {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-
-
-
       // userLocalDataSource 인스턴스 생성
       final userLocalDataSource = UserLocalDataSourceImpl(
         sharedPreferences: await SharedPreferences.getInstance(),
@@ -140,7 +138,13 @@ Future<void> _setupFCM(BuildContext context) async {
       print('✅ FCM 토큰 저장: $token');
 
     }
+
+    //wishlist 때문에 추가
+    if (user != null) {
+      registerCubits(userId: user.uid);
+    }
   }
+
 
   // 토큰 갱신 모니터링
   FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
@@ -167,11 +171,16 @@ void main() async {
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+
   // 1. 백그라운드 핸들러 등록 (main 함수 내에서 반드시 등록)
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   di.sl.registerLazySingleton<FirebaseFirestore>(() => FirebaseFirestore.instance);
-  await di.init();
+  final currentUser = FirebaseAuth.instance.currentUser;
+
+  if (currentUser != null) {
+    await di.init(userId: currentUser.uid);
+  }
   registerProductFeature();
 
   Bloc.observer = MyBlocObserver();

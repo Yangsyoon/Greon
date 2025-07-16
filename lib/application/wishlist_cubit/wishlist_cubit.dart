@@ -1,71 +1,99 @@
-import 'dart:developer';
-
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_storage/get_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../data/models/product/product_model.dart';
 
 part 'wishlist_state.dart';
 
 class WishlistCubit extends Cubit<WishlistState> {
-  WishlistCubit() : super(WishlistInitialState());
+  final FirebaseFirestore firestore;
+  final String userId;
+
+  WishlistCubit({required this.firestore, required this.userId}) : super(WishlistInitialState());
 
   Future<void> loadWishlist() async {
-    final box = GetStorage();
-    final List<dynamic>? wishlistData = box.read('wishlist');
+    try {
+      final userDoc = await firestore.collection('users').doc(userId).get();
+      final wishlistRefs = userDoc.data()?['wishlist'] as List<dynamic>?;
 
-    if (wishlistData == null) {
+      if (wishlistRefs == null || wishlistRefs.isEmpty) {
+        emit(const WishlistLoadedState([]));
+        return;
+      }
+
+      List<ProductModel> wishlist = [];
+
+      for (final ref in wishlistRefs) {
+        if (ref is DocumentReference) {
+          final doc = await ref.get();
+          if (doc.exists) {
+            try {
+              final product = await ProductModel.fromDocumentAsync(doc);
+              wishlist.add(product);
+            } catch (e) {
+              print("❌ 변환 실패: ${doc.id} - $e");
+            }
+          }
+        }
+      }
+
+      emit(WishlistLoadedState(wishlist));
+    } catch (e) {
+      print("❌ Wishlist 로딩 오류: $e");
       emit(const WishlistLoadedState([]));
-      return;
     }
-
-    List<ProductModel> wishlist = wishlistData
-        .whereType<Map<String, dynamic>>()
-        .map((jsonMap) => ProductModel.fromJson(jsonMap))
-        .toList();
-
-    emit(WishlistLoadedState(wishlist));
   }
 
   Future<void> addToWishlist(ProductModel product) async {
-    final box = GetStorage();
-    final List<dynamic>? wishlistData = box.read('wishlist');
+    final productRef = firestore.collection('products').doc(product.id);
+    try {
+      await firestore.collection('users').doc(userId).update({
+        'wishlist': FieldValue.arrayUnion([productRef])
+      });
 
-    final List<Map<String, dynamic>> updatedWishlist =
-    List<Map<String, dynamic>>.from(wishlistData ?? []);
+      if (state is WishlistLoadedState) {
+        emit(WishlistLoadedState((state as WishlistLoadedState).wishlist + [product]));
+      } else {
+        emit(WishlistLoadedState([product]));
+      }
+    } catch (e) {
+      print("❌ 위시리스트 추가 오류: $e");
+    }
+  }
 
-    updatedWishlist.add(product.toJson());
+  Future<void> removeFromWishlist(ProductModel product) async {
+    final productRef = firestore.collection('products').doc(product.id);
+    try {
+      await firestore.collection('users').doc(userId).update({
+        'wishlist': FieldValue.arrayRemove([productRef])
+      });
 
-    box.write('wishlist', updatedWishlist);
-
-    if (state is WishlistLoadedState) {
-      emit(WishlistLoadedState(
-          (state as WishlistLoadedState).wishlist + [product]));
-    } else {
-      emit(WishlistLoadedState([product]));
+      if (state is WishlistLoadedState) {
+        final updatedList = List<ProductModel>.from((state as WishlistLoadedState).wishlist)
+          ..removeWhere((item) => item.id == product.id);
+        emit(WishlistLoadedState(updatedList));
+      }
+    } catch (e) {
+      print("❌ 위시리스트 제거 오류: $e");
     }
   }
 
   Future<void> clearWishlist() async {
-    final box = GetStorage();
-    await box.remove('wishlist');
-    emit(const WishlistLoadedState([]));
+    try {
+      await firestore.collection('users').doc(userId).update({'wishlist': []});
+      emit(const WishlistLoadedState([]));
+    } catch (e) {
+      print("❌ 위시리스트 초기화 오류: $e");
+    }
   }
 
   bool isInWishlist(String productId) {
-    final box = GetStorage();
-    List<dynamic>? wishlistData = box.read<List<dynamic>>('wishlist');
-
-    if (wishlistData == null) {
-      return false;
+    if (state is WishlistLoadedState) {
+      return (state as WishlistLoadedState)
+          .wishlist
+          .any((product) => product.id == productId);
     }
-
-    List<String> wishlistIds = wishlistData
-        .whereType<Map<String, dynamic>>()
-        .map((map) => map['id'].toString())
-        .toList();
-
-    return wishlistIds.contains(productId);
+    return false;
   }
 }

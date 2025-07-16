@@ -1,30 +1,42 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/assets.dart';
+import 'package:greon/core/constant/colors.dart';
+import 'package:greon/core/router/app_router.dart';
 import 'package:greon/presentation/widgets/top_row.dart';
-import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
 import 'package:greon/presentation/widgets/user_logged_profile_container.dart';
+import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
 import 'package:greon/presentation/screens/user_info_input_page.dart';
 
-
 import '../../application/user_bloc/user_bloc.dart';
-import '../../core/constant/colors.dart';
-import '../../core/router/app_router.dart';
-
-//TODO refactor and minimize code of this screen
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
+  Future<String> getMyNickname(String uid) async {
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .get();
+      return snapshot.data()?['nickname'] ?? '알 수 없음';
+    } catch (e) {
+      return '알 수 없음';
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    SvgPicture _arrowforward = SvgPicture.asset(
+    SvgPicture arrowForward = SvgPicture.asset(
       AppAssets.LeftArrow,
       width: AppDimensions.normalize(6),
     );
+
     return Scaffold(
       body: Padding(
         padding: Space.hf(1.1),
@@ -35,302 +47,47 @@ class ProfileScreen extends StatelessWidget {
               TopRow(isFromHome: false, context: context),
               Expanded(
                 child: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Space.y!,
-                      BlocBuilder<UserBloc, UserState>(
-                        builder: (context, state) {
-                          if (state is UserLogged) {
-                            // Firestore에서 imageUrl을 잘 받아왔는지 확인
-                            return userLoggedProfileContainer(context,
-                                "${state.user.fullName}", state.user.email, state.user.image,);
-                          } else {
-                            return unloggedProfileContainer(context);
-                          }
-                        },
-                      ),
-                      BlocBuilder<UserBloc, UserState>(
-                          builder: (context, state) {
-                        if (state is UserLogged) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushNamed(AppRouter.myPlants);
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.only(bottom: AppDimensions.normalize(5)),
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: AppDimensions.normalize(4),
-                                    horizontal: AppDimensions.normalize(10),
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
-                                  ),
-                                  child: Text(
-                                    '내 식물 보기',
-                                    style: TextStyle(
-                                      color: AppColors.CommonCyan,
-                                      fontSize: AppDimensions.normalize(8),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // ✅ 여기에 '내 식물 추가' 버튼 추가
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushNamed(AppRouter.registerPlant); // 라우트 이름 확인
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: AppDimensions.normalize(4),
-                                    horizontal: AppDimensions.normalize(10),
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.CommonCyan,
-                                    borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.add, color: Colors.white, size: AppDimensions.normalize(8)),
-                                      SizedBox(width: AppDimensions.normalize(3)),
-                                      Text(
-                                        "내 식물 추가",
-                                        style: AppText.b1?.copyWith(color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              SizedBox(height: AppDimensions.normalize(10)), // 버튼 간 간격
+                  child: BlocBuilder<UserBloc, UserState>(
+                    builder: (context, state) {
+                      if (state is UserLogged) {
+                        final user = firebase.FirebaseAuth.instance.currentUser;
+                        final email = user?.email ?? '이메일 없음';
+                        final image = user?.photoURL;
 
-                              // ✅ 새로 추가된 "식물 캘린더" 버튼
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).pushNamed(AppRouter.calendar); // 👉 calendar 라우트 등록 필요
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                    vertical: AppDimensions.normalize(4),
-                                    horizontal: AppDimensions.normalize(10),
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.teal,
-                                    borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(Icons.calendar_month, color: Colors.white, size: AppDimensions.normalize(8)),
-                                      SizedBox(width: AppDimensions.normalize(3)),
-                                      Text(
-                                        "식물 캘린더",
-                                        style: AppText.b1?.copyWith(color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              Space.yf(1.3), // 버튼과 "MY ACCOUNT" 사이 여백
-                              Text(
-                                "MY ACCOUNT",
-                                style: AppText.h3b
-                                    ?.copyWith(color: AppColors.CommonCyan),
-                              ),
-                              Space.yf(.9),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context)
-                                      .pushNamed(AppRouter.orders);
-                                },
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        SvgPicture.asset(AppAssets.Archive),
-                                        Space.xf(),
-                                        Text(
-                                          "My Orders",
-                                          style: AppText.b1b,
-                                        )
-                                      ],
-                                    ),
-                                    _arrowforward
-                                  ],
-                                ),
-                              ),
-                              Space.yf(1.1),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context)
-                                      .pushNamed(AppRouter.addresses);
-                                },
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        SvgPicture.asset(AppAssets.Marker),
-                                        Space.xf(),
-                                        Text(
-                                          "Address Book",
-                                          style: AppText.b1b,
-                                        )
-                                      ],
-                                    ),
-                                    _arrowforward
-                                  ],
-                                ),
-                              ),
-                              Space.yf(1.1),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        AppAssets.Profile,
-                                        // color: AppColors.CommonCyan,
-                                        colorFilter: const ColorFilter.mode(
-                                            AppColors.CommonCyan,
-                                            BlendMode.srcIn),
-                                      ),
-                                      Space.xf(),
-                                      Text(
-                                        "Edit Account",
-                                        style: AppText.b1b,
-                                      )
-                                    ],
-                                  ),
-                                  _arrowforward
-                                ],
-                              ),
-                              Space.yf(1.1),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Row(
-                                    children: [
-                                      SvgPicture.asset(AppAssets.Lock),
-                                      Space.xf(),
-                                      Text(
-                                        "Change Password",
-                                        style: AppText.b1b,
-                                      )
-                                    ],
-                                  ),
-                                  _arrowforward
-                                ],
-                              ),
-                              Space.yf(1.1),
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(builder: (_) => UserInfoInputPage()),
-                                  );
-                                },
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Icon(Icons.info_outline, color: AppColors.CommonCyan),
-                                        Space.xf(),
-                                        Text(
-                                          "회원 정보 입력",
-                                          style: AppText.b1b,
-                                        )
-                                      ],
-                                    ),
-                                    _arrowforward
-                                  ],
-                                ),
-                              ),
+                        return StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user!.uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return Center(child: CircularProgressIndicator());
+                            }
 
-                            ],
-                          );
-                        } else {
-                          return const SizedBox.shrink();
-                        }
-                      }),
-                      Space.yf(1.9),
-                      Text(
-                        "SETTINGS",
-                        style:
-                            AppText.h3b?.copyWith(color: AppColors.CommonCyan),
-                      ),
-                      Space.yf(.9),
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.of(context)
-                              .pushNamed(AppRouter.notifications);
-                        },
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
+                            final data = snapshot.data!.data() as Map<String, dynamic>?;
+                            final nickname = data?['nickname'] ?? '닉네임 없음';
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                SvgPicture.asset(AppAssets.Bell),
-                                Space.xf(),
-                                Text(
-                                  "Notifications",
-                                  style: AppText.b1b,
-                                )
+                                Space.y!,
+                                userLoggedProfileContainer(context, nickname, email, image),
+                                Space.yf(1),
+                                _buildLoggedInSection(context, arrowForward),
                               ],
-                            ),
-                            SizedBox(
-                              height: AppDimensions.normalize(10),
-                              child: Switch(
-                                value: true,
-                                onChanged: null,
-                                activeTrackColor: AppColors.CommonCyan,
-                                thumbColor:
-                                    MaterialStateProperty.all(Colors.white),
-                              ),
-                            )
+                            );
+                          },
+                        );
+
+                      } else {
+                        return Column(
+                          children: [
+                            Space.y!,
+                            unLoggedProfileContainer(context),
                           ],
-                        ),
-                      ),
-                      Space.yf(2.9),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "V.1.0",
-                            style: AppText.b1b,
-                          )
-                        ],
-                      ),
-                      Space.yf(.3),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SvgPicture.asset(
-                            AppAssets.Whats,
-                            height: AppDimensions.normalize(15),
-                          ),
-                          SvgPicture.asset(
-                            AppAssets.Noti,
-                            height: AppDimensions.normalize(15),
-                          ),
-                          SvgPicture.asset(
-                            AppAssets.Music,
-                            height: AppDimensions.normalize(15),
-                          ),
-                        ],
-                      ),
-                      Space.yf(1.3),
-                    ],
+                        );
+                      }
+                    },
                   ),
                 ),
               )
@@ -340,6 +97,209 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildLoggedInSection(BuildContext context, SvgPicture arrowForward) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _profileButton(context, "내 식물 보기", AppColors.CommonCyan, () {
+          Navigator.of(context).pushNamed(AppRouter.myPlants);
+        }),
+        _iconButton(context, "내 식물 추가", Icons.add, AppColors.CommonCyan, () {
+          Navigator.of(context).pushNamed(AppRouter.registerPlant);
+        }),
+        _iconButton(context, "식물 캘린더", Icons.calendar_month, Colors.teal, () {
+          Navigator.of(context).pushNamed(AppRouter.calendar);
+        }),
+        // 👉 위시리스트 버튼 추가
+        _iconButton(
+          context,
+          "위시리스트",
+          Icons.favorite,
+          Colors.pink,
+              () {
+            Navigator.of(context).pushNamed(AppRouter.wishlist);
+          },
+        ),
+        Space.yf(1.3),
+        _sectionTitle("MY ACCOUNT"),
+        _iconRow(context, "My Orders", AppAssets.Archive, AppRouter.orders, arrowForward),
+        _iconRow(context, "Address Book", AppAssets.Marker, AppRouter.addresses, arrowForward),
+        _iconRow(context, "Edit Account", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
+        _iconRow(context, "Change Password", AppAssets.Lock, null, arrowForward),
+        GestureDetector(
+          onTap: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => UserInfoInputPage()));
+          },
+          child: _customIconRow(Icons.info_outline, "회원 정보 입력", arrowForward),
+        ),
+        Space.yf(1.9),
+        _sectionTitle("SETTINGS"),
+        _notificationSwitch(),
+        Space.yf(2.9),
+        Center(child: Text("V.1.0", style: AppText.b1b)),
+        Space.yf(.3),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(AppAssets.Whats, height: AppDimensions.normalize(15)),
+            SvgPicture.asset(AppAssets.Noti, height: AppDimensions.normalize(15)),
+            SvgPicture.asset(AppAssets.Music, height: AppDimensions.normalize(15)),
+          ],
+        ),
+        Space.yf(1.3),
+      ],
+    );
+  }
+
+  Widget _profileButton(BuildContext context, String text, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: AppDimensions.normalize(5)),
+        padding: EdgeInsets.symmetric(
+          vertical: AppDimensions.normalize(4),
+          horizontal: AppDimensions.normalize(20),
+        ),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
+          border: Border.all(color: color),
+        ),
+        child: Text(
+          text,
+          style: TextStyle(
+            color: color,
+            fontSize: AppDimensions.normalize(8),
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _iconButton(BuildContext context, String label, IconData icon, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(bottom: AppDimensions.normalize(5)),
+        padding: EdgeInsets.symmetric(
+          vertical: AppDimensions.normalize(4),
+          horizontal: AppDimensions.normalize(20),
+        ),
+        decoration: BoxDecoration(
+          color: color,
+          borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: Colors.white, size: AppDimensions.normalize(8)),
+            SizedBox(width: AppDimensions.normalize(3)),
+            Text(label, style: AppText.b1?.copyWith(color: Colors.white)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _iconRow(BuildContext context, String title, String iconAsset, String? route, Widget arrow, {Color? iconColor}) {
+    return GestureDetector(
+      onTap: () {
+        if (route != null) {
+          Navigator.of(context).pushNamed(route);
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: AppDimensions.normalize(5)), // ← 여기!
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
+              children: [
+                SvgPicture.asset(
+                  iconAsset,
+                  colorFilter: iconColor != null
+                      ? ColorFilter.mode(iconColor, BlendMode.srcIn)
+                      : null,
+                ),
+                Space.xf(),
+                Text(title, style: AppText.b1b),
+              ],
+            ),
+            arrow
+          ],
+        ),
+      ),
+    );
+  }
+
+
+  Widget _customIconRow(IconData icon, String label, SvgPicture arrow) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Icon(icon, color: AppColors.CommonCyan),
+            Space.xf(),
+            Text(label, style: AppText.b1b),
+          ],
+        ),
+        arrow,
+      ],
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Text(title, style: AppText.h3b?.copyWith(color: AppColors.CommonCyan));
+  }
+
+  Widget _notificationSwitch() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            SvgPicture.asset(AppAssets.Bell),
+            Space.xf(),
+            Text("Notifications", style: AppText.b1b),
+          ],
+        ),
+        SizedBox(
+          height: AppDimensions.normalize(10),
+          child: Switch(
+            value: true,
+            onChanged: null,
+            activeTrackColor: AppColors.CommonCyan,
+            thumbColor: MaterialStateProperty.all(Colors.white),
+          ),
+        ),
+      ],
+    );
+  }
 }
-
-
+Widget unLoggedProfileContainer(BuildContext context) {
+  return Column(
+    children: [
+      CircleAvatar(
+        radius: 40,
+        backgroundColor: Colors.grey.shade300,
+        child: Icon(Icons.person, size: 40, color: Colors.white),
+      ),
+      SizedBox(height: 12),
+      Text(
+        "로그인이 필요합니다.",
+        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+      SizedBox(height: 12),
+      ElevatedButton(
+        onPressed: () {
+          // 로그인 화면으로 이동
+          Navigator.pushNamed(context, '/login');
+        },
+        child: Text("로그인하러 가기"),
+      ),
+    ],
+  );
+}

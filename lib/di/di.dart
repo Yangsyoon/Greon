@@ -11,7 +11,7 @@ import 'delivery.dart';
 final sl = GetIt.instance;
 
 // Main Initialization
-Future<void> init() async {
+Future<void> init({required String userId}) async {
   // Register features
   registerCategoryFeature();
   registerProductFeature();
@@ -20,9 +20,10 @@ Future<void> init() async {
   registerCartFeature();
   registerOrderFeature();
 
-  // Register Cubits
-  registerCubits();
+  // Register Cubits (userId 필요)
+  registerCubits(userId: userId);
 
   // Register common dependencies
   await registerCommonDependencies();
 }
+
