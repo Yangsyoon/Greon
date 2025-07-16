@@ -55,7 +55,7 @@ class BottomNavigation extends StatelessWidget {
                     width: width,
                     fit: BoxFit.fill,
                     colorFilter: ColorFilter.mode(
-                        activeTab == NavigationTab.categoriesTab
+                        activeTab == NavigationTab.boardTab
                             ? Colors.black
                             : Colors.white,
                         BlendMode.srcIn),

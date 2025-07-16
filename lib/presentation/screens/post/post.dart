@@ -50,8 +50,11 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.green,
-        onPressed: () {
-          Navigator.pushNamed(context, '/write-post');
+        onPressed: () async {
+          final result = await Navigator.pushNamed(context, '/write-post');
+          if (result == true) {
+            context.read<PostBloc>().add(LoadPosts());
+          }
         },
         child: const Icon(Icons.add),
       ),
@@ -102,12 +105,15 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                             Text('${post.commentsCount}', style: const TextStyle(fontSize: 12)),
                           ],
                         ),
-                        onTap: () {
-                          Navigator.pushNamed(
+                        onTap: () async {
+                          final result = await Navigator.pushNamed(
                             context,
                             '/post-detail',
                             arguments: post,
                           );
+                          if (result == true) {
+                            context.read<PostBloc>().add(LoadPosts());
+                          }
                         },
                       ),
                     );

@@ -9,6 +9,7 @@ import 'package:greon/presentation/widgets/error_container.dart';
 import 'package:greon/presentation/widgets/loading_shimmer.dart';
 import 'package:greon/presentation/widgets/square_product_item.dart';
 import 'package:greon/presentation/widgets/top_row.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../application/filter_cubit/filter_cubit.dart';
@@ -20,6 +21,7 @@ import '../../core/constant/colors.dart';
 import '../../core/enums/enums.dart';
 import '../../core/router/app_router.dart';
 import '../widgets/dots_indicator.dart';
+import 'package:flutter/services.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -42,6 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .read<ProductBloc>()
         .add(GetProducts(context.read<FilterCubit>().state));
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   }
 
   @override
@@ -65,20 +68,38 @@ class _HomeScreenState extends State<HomeScreen> {
                         height: AppDimensions.normalize(110),
                         child: Stack(
                           children: [
+
                             PageView.builder(
-                                controller: _pageController,
-                                onPageChanged: (pos) {
-                                  setState(() {
-                                    currentPage = pos;
-                                  });
-                                },
-                                itemCount: 3,
-                                itemBuilder: (context, index) {
-                                  return SvgPicture.asset(
-                                    AppAssets.greonIcon,
+                              controller: _pageController,
+                              onPageChanged: (pos) {
+                                setState(() {
+                                  currentPage = pos;
+                                });
+                              },
+                              itemCount: AppAssets.bannerImages.length,
+                              itemBuilder: (context, index) {
+                                return GestureDetector(
+                                  onTap: () async {
+                                    final uri = Uri.parse(AppAssets.bannerUrls[index]);
+                                    print(uri.toString());
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(
+                                        uri,
+                                        mode: LaunchMode.platformDefault,
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text('URL을 열 수 없습니다.')),
+                                      );
+                                    }
+                                  },
+                                  child: Image.asset(
+                                    AppAssets.bannerImages[index],
                                     fit: BoxFit.cover,
-                                  );
-                                }),
+                                  ),
+                                );
+                              },
+                            ),
                             Positioned(
                               bottom: AppDimensions.normalize(2),
                               left: 0,
@@ -213,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     style: AppText.b2b
                                         ?.copyWith(color: AppColors.CommonCyan),
                                   ),
-                                  Icon(
+                                  const Icon(
                                     Icons.double_arrow,
                                     size: 15,
                                   )

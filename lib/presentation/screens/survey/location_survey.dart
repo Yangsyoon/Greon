@@ -17,42 +17,47 @@ class _LocationSurveyPageState extends State<LocationSurveyPage> {
   Future<void> _requestLocationPermissionAndContinue() async {
     setState(() => _isLoading = true);
 
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      setState(() => _isLoading = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('위치 서비스가 비활성화되어 있습니다.')),
-      );
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
-        setState(() => _isLoading = false);
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('위치 권한이 필요합니다.')),
+          SnackBar(content: Text('위치 서비스가 비활성화되어 있습니다.')),
         );
         return;
       }
+
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+        permission = await Geolocator.requestPermission();
+        if (permission != LocationPermission.whileInUse && permission != LocationPermission.always) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('위치 권한이 필요합니다.')),
+          );
+          return;
+        }
+      }
+
+      Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+
+      widget.surveyData['location'] = {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+      };
+
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => PlantLocationSurveyPage(surveyData: widget.surveyData),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('위치 정보를 가져오는 데 실패했습니다: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-
-    Position position = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
-
-    // 위치 정보를 surveyData에 추가
-    widget.surveyData['location'] = {
-      'latitude': position.latitude,
-      'longitude': position.longitude,
-    };
-
-    // 다음 페이지로 이동
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => PlantLocationSurveyPage(surveyData: widget.surveyData),
-      ),
-    );
   }
 
   @override

@@ -1,3 +1,3 @@
 enum PaymentMethod {knet, visa}
 
-enum NavigationTab { homeTab, categoriesTab, productsTap, cartTab, profileTab, boardTab }
+enum NavigationTab { homeTab, boardTab, productsTap, cartTab, profileTab }
