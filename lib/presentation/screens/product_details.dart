@@ -57,10 +57,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     App.init(context);
     bool isProductInWishlist =
     context.read<WishlistCubit>().isInWishlist(widget.product.id);
-    return Screenshot(
-      controller: context.read<ShareCubit>().screenshotController,
-      child: Scaffold(
-        appBar: CustomAppBar("PRODUCT DETAILS", context,
+    return Scaffold(
+        appBar: CustomAppBar("제품 상세 정보", context,
             doesHasCartIcom: true, automaticallyImplyLeading: true),
         body: Padding(
           padding: Space.all(.9, .7),
@@ -83,7 +81,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 Row(
                   children: [
                     Text(
-                      "Category Name : ",
+                      "카테고리 : ",
                       style: AppText.h3,
                     ),
                     Text(
@@ -209,7 +207,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               child: const Icon(Icons.favorite_border)),
                           Space.xf(.3),
                           Text(
-                            "Add to wishlist",
+                            "위시리스트에 추가",
                             style: AppText.h3,
                           )
                         ],
@@ -223,7 +221,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       Space.xf(2.5),
                       GestureDetector(
                         onTap: () async {
-                          context.read<ShareCubit>().shareScreenshot();
+                          context.read<ShareCubit>().shareStoreLink();
                         },
                         child: Row(
                           children: [
@@ -233,7 +231,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
                             Space.xf(.7),
                             Text(
-                              "Share",
+                              "공유",
                               style: AppText.h3,
                             )
                           ],
@@ -244,7 +242,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
                 Space.yf(1.2),
                 Text(
-                  "Description",
+                  "상세 설명",
                   style: AppText.h3b,
                 ),
                 Space.yf(.5),
@@ -280,12 +278,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       ),
                     );
                     context.read<NotificationsCubit>().showAndSaveNotification(
-                        "Cart Update",
-                        "Congratulations, You have successfully added ${widget.product.name} to your cart.");
+                        "카트 업데이트",
+                        "${widget.product.name}가 카트에 추가되었습니다.");
                     showPoceedtoCartBottomSheet(context);
                   },
                   child: Text(
-                    "Add to cart",
+                    "카트에 추가",
                     style: AppText.h3b?.copyWith(color: Colors.white),
                   ),
                 ),
@@ -293,7 +291,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             ],
           ),
         ),
-      ),
     );
   }
 }

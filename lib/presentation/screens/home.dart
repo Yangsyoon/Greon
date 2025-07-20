@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:greon/application/products_bloc/product_bloc.dart';
 import 'package:greon/application/wishlist_cubit/wishlist_cubit.dart';
 import 'package:greon/configs/app.dart';
@@ -44,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
         .read<ProductBloc>()
         .add(GetProducts(context.read<FilterCubit>().state));
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
   }
 
   @override
@@ -286,4 +285,5 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
+
 

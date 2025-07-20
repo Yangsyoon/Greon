@@ -66,7 +66,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar("ADD NEW ADDRESS", context,
+      appBar: CustomAppBar("새로운 주소 추가", context,
           automaticallyImplyLeading: true),
       body: BlocListener<DeliveryInfoActionCubit, DeliveryInfoActionState>(
         listener: (context, state) {
@@ -91,20 +91,20 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  TextFieldTopText("First Name*"),
-                  buildTextFormField(_firstName, 'First name'),
-                  TextFieldTopText("Last name*"),
-                  buildTextFormField(_lastName, 'Last name'),
-                  TextFieldTopText("Line One*"),
-                  buildTextFormField(_addressLineOne, 'Address line one'),
-                  TextFieldTopText("Line Two*"),
-                  buildTextFormField(_addressLineTwo, 'Address line two'),
-                  TextFieldTopText("City*"),
-                  buildTextFormField(_city, 'City'),
-                  TextFieldTopText("Zip Code*"),
-                  buildTextFormField(_zipCode, 'Zip code'),
-                  TextFieldTopText("Contact number*"),
-                  MobileNumberTextField(_contactNumber, 'Contact number'),
+                  TextFieldTopText("성*"),
+                  buildTextFormField(_firstName, '성'),
+                  TextFieldTopText("이름*"),
+                  buildTextFormField(_lastName, '이름'),
+                  TextFieldTopText("도로명 주소*"),
+                  buildTextFormField(_addressLineOne, '도로명 주소'),
+                  TextFieldTopText("상세주소*"),
+                  buildTextFormField(_addressLineTwo, '상세주소'),
+                  TextFieldTopText("도시*"),
+                  buildTextFormField(_city, '도시'),
+                  TextFieldTopText("우편번호*"),
+                  buildTextFormField(_zipCode, '우편번호'),
+                  TextFieldTopText("전화번호*"),
+                  MobileNumberTextField(_contactNumber, '전화번호'),
                   Space.yf(2),
                   SizedBox(
                     width: double.infinity,
@@ -164,8 +164,8 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                       },
                       child: Text(
                         widget.deliveryInfo == null
-                            ? 'Add Address'
-                            : 'Edit Address',
+                            ? '주소 추가'
+                            : '주소 수정',
                         style: AppText.h3b?.copyWith(color: Colors.white),
                       ),
                     ),

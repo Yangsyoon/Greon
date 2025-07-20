@@ -44,8 +44,8 @@ Widget userLoggedProfileContainer(
                   context.read<NavigationCubit>().updateTab(NavigationTab.homeTab);
                 },
                 child: Text(
-                  "Logout",
-                  style: AppText.h3b?.copyWith(color: Colors.white),
+                  "로그아웃",
+                  style: AppText.b1?.copyWith(color: Colors.white),
                 ),
               ),
             )

@@ -42,7 +42,7 @@ Widget buildTextFormField(TextEditingController controller, String labelText,
     obscureText: isObscure,
     validator: (String? val) {
       if (val == null || val.isEmpty) {
-        return 'This field can\'t be empty';
+        return '필수 입력란입니다.';
       }
       return null;
     },
@@ -50,7 +50,7 @@ Widget buildTextFormField(TextEditingController controller, String labelText,
     decoration: InputDecoration(
       contentPadding: Space.all(),
       border: const OutlineInputBorder(borderRadius: BorderRadius.zero),
-      hintText: "Enter your $labelText",
+      hintText: "$labelText을 입력해주세요",
       hintStyle: const TextStyle(
         fontSize: 12,
         color: AppColors.GreyText,

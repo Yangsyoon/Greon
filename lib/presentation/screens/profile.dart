@@ -138,7 +138,7 @@ class ProfileScreen extends StatelessWidget {
                               ),
                               Space.yf(1.3), // 버튼과 "MY ACCOUNT" 사이 여백
                               Text(
-                                "MY ACCOUNT",
+                                "내 정보",
                                 style: AppText.h3b
                                     ?.copyWith(color: AppColors.CommonCyan),
                               ),
@@ -157,7 +157,7 @@ class ProfileScreen extends StatelessWidget {
                                         SvgPicture.asset(AppAssets.Archive),
                                         Space.xf(),
                                         Text(
-                                          "My Orders",
+                                          "주문 내역",
                                           style: AppText.b1b,
                                         )
                                       ],
@@ -181,7 +181,7 @@ class ProfileScreen extends StatelessWidget {
                                         SvgPicture.asset(AppAssets.Marker),
                                         Space.xf(),
                                         Text(
-                                          "Address Book",
+                                          "주소록",
                                           style: AppText.b1b,
                                         )
                                       ],
@@ -206,7 +206,7 @@ class ProfileScreen extends StatelessWidget {
                                       ),
                                       Space.xf(),
                                       Text(
-                                        "Edit Account",
+                                        "개인 정보 변경",
                                         style: AppText.b1b,
                                       )
                                     ],
@@ -224,7 +224,7 @@ class ProfileScreen extends StatelessWidget {
                                       SvgPicture.asset(AppAssets.Lock),
                                       Space.xf(),
                                       Text(
-                                        "Change Password",
+                                        "비밀번호 변경",
                                         style: AppText.b1b,
                                       )
                                     ],
@@ -265,7 +265,7 @@ class ProfileScreen extends StatelessWidget {
                       }),
                       Space.yf(1.9),
                       Text(
-                        "SETTINGS",
+                        "설정",
                         style:
                             AppText.h3b?.copyWith(color: AppColors.CommonCyan),
                       ),
@@ -283,21 +283,12 @@ class ProfileScreen extends StatelessWidget {
                                 SvgPicture.asset(AppAssets.Bell),
                                 Space.xf(),
                                 Text(
-                                  "Notifications",
+                                  "알림",
                                   style: AppText.b1b,
                                 )
                               ],
                             ),
-                            SizedBox(
-                              height: AppDimensions.normalize(10),
-                              child: Switch(
-                                value: true,
-                                onChanged: null,
-                                activeTrackColor: AppColors.CommonCyan,
-                                thumbColor:
-                                    MaterialStateProperty.all(Colors.white),
-                              ),
-                            )
+                            _arrowforward
                           ],
                         ),
                       ),

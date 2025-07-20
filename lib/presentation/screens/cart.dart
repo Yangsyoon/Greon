@@ -32,7 +32,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar("CART", context, automaticallyImplyLeading: true),
+      appBar: CustomAppBar("카트", context, automaticallyImplyLeading: true),
       body: Stack(
         children: [
           Padding(
@@ -95,7 +95,7 @@ class _CartScreenState extends State<CartScreen> {
           BlocBuilder<UserBloc, UserState>(
             builder: (context, state) {
               return PaymentDetails(
-                buttonText: "Proceed To Checkout",
+                buttonText: "주문하기",
                 isFromCheckout: false,
                 isLogged: state is UserLogged,
               );

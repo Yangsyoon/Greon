@@ -15,7 +15,7 @@ Widget MobileNumberTextField(
           decoration: const BoxDecoration(color: Colors.black),
           child: Center(
               child: Text(
-            "+20",
+            "+82",
             style: AppText.b1b?.copyWith(color: Colors.white),
           )),
         ),

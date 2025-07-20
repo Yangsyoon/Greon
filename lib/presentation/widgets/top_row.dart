@@ -13,10 +13,10 @@ Widget TopRow({required bool isFromHome, required BuildContext context}) {
     child: Row(
   mainAxisAlignment: MainAxisAlignment.spaceBetween,
   children: [
-  SvgPicture.asset(
+  Image.asset(
   AppAssets.greonAppBar,
-  width: AppDimensions.normalize(12),
-  height: AppDimensions.normalize(15),
+  width: AppDimensions.normalize(40),
+  height: AppDimensions.normalize(20),
           fit: BoxFit.fill,
         ),
         isFromHome
