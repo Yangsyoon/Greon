@@ -97,134 +97,160 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+  Widget _buildPlantActionButtons(BuildContext context) {
+    final buttonData = [
+      {
+        'label': '내 식물 보기',
+        'icon': Icons.local_florist,
+        'color': AppColors.CommonCyan,
+        'onTap': () => Navigator.of(context).pushNamed(AppRouter.myPlants),
+      },
+      {
+        'label': '내 식물 추가',
+        'icon': Icons.add,
+        'color': AppColors.CommonCyan,
+        'onTap': () => Navigator.of(context).pushNamed(AppRouter.registerPlant),
+      },
+      {
+        'label': '식물 캘린더',
+        'icon': Icons.calendar_month,
+        'color': Colors.teal,
+        'onTap': () => Navigator.of(context).pushNamed(AppRouter.calendar),
+      },
+      {
+        'label': '위시리스트',
+        'icon': Icons.favorite,
+        'color': Colors.pink,
+        'onTap': () => Navigator.of(context).pushNamed(AppRouter.wishlist),
+      },
+    ];
+
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: AppDimensions.normalize(6)),
+      child: GridView.count(
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        crossAxisCount: 2,
+        crossAxisSpacing: AppDimensions.normalize(6),
+        mainAxisSpacing: AppDimensions.normalize(6),
+        childAspectRatio: 3 / 2, // 가로:세로 비율 3:2
+        children: buttonData.map((btn) {
+          return GestureDetector(
+            onTap: btn['onTap'] as VoidCallback,
+            child: Container(
+              decoration: BoxDecoration(
+                color: btn['color'] as Color,
+                borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 4,
+                    offset: Offset(0, 2),
+                  ),
+                ],
+              ),
+              padding: EdgeInsets.all(AppDimensions.normalize(6)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(btn['icon'] as IconData, color: Colors.white),
+                  SizedBox(width: AppDimensions.normalize(3)),
+                  Flexible(
+                    child: Text(
+                      btn['label'] as String,
+                      style: AppText.b1?.copyWith(color: Colors.white),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
 
   Widget _buildLoggedInSection(BuildContext context, SvgPicture arrowForward) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _profileButton(context, "내 식물 보기", AppColors.CommonCyan, () {
-          Navigator.of(context).pushNamed(AppRouter.myPlants);
-        }),
-        _iconButton(context, "내 식물 추가", Icons.add, AppColors.CommonCyan, () {
-          Navigator.of(context).pushNamed(AppRouter.registerPlant);
-        }),
-        _iconButton(context, "식물 캘린더", Icons.calendar_month, Colors.teal, () {
-          Navigator.of(context).pushNamed(AppRouter.calendar);
-        }),
-        // 👉 위시리스트 버튼 추가
-        _iconButton(
+        _buildPlantActionButtons(context), // 식물 관련 4개 버튼 (2x2 그리드)
+        Space.yf(2), // 넉넉한 간격
+
+        _sectionTitle("내 계정"),
+        Space.yf(1),
+
+        _iconRow(context, "주문 내역", AppAssets.Archive, AppRouter.orders, arrowForward),
+        _iconRow(context, "배송지 관리", AppAssets.Marker, AppRouter.addresses, arrowForward),
+        _iconRow(context, "계정 정보 수정", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
+        _iconRow(context, "비밀번호 변경", AppAssets.Lock, null, arrowForward),
+        _iconRowWithSystemIcon(
           context,
-          "위시리스트",
-          Icons.favorite,
-          Colors.pink,
-              () {
-            Navigator.of(context).pushNamed(AppRouter.wishlist);
-          },
-        ),
-        Space.yf(1.3),
-        _sectionTitle("MY ACCOUNT"),
-        _iconRow(context, "My Orders", AppAssets.Archive, AppRouter.orders, arrowForward),
-        _iconRow(context, "Address Book", AppAssets.Marker, AppRouter.addresses, arrowForward),
-        _iconRow(context, "Edit Account", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
-        _iconRow(context, "Change Password", AppAssets.Lock, null, arrowForward),
-        GestureDetector(
-          onTap: () {
+          "회원 정보 입력",
+          Icons.info_outline,
+          null,
+          arrowForward,
+          iconColor: AppColors.CommonCyan,
+          onTapOverride: () {
             Navigator.of(context).push(MaterialPageRoute(builder: (_) => UserInfoInputPage()));
           },
-          child: _customIconRow(Icons.info_outline, "회원 정보 입력", arrowForward),
         ),
-        Space.yf(1.9),
-        _sectionTitle("SETTINGS"),
+
+
+        Space.yf(2),
+        _sectionTitle("설정"),
+        Space.yf(1),
         _notificationSwitch(),
-        Space.yf(2.9),
-        Center(child: Text("V.1.0", style: AppText.b1b)),
-        Space.yf(.3),
+
+        Space.yf(3),
+
+        Center(child: Text("버전 1.0", style: AppText.b1b)),
+        Space.yf(1),
+
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SvgPicture.asset(AppAssets.Whats, height: AppDimensions.normalize(15)),
+            SizedBox(width: AppDimensions.normalize(6)),
             SvgPicture.asset(AppAssets.Noti, height: AppDimensions.normalize(15)),
+            SizedBox(width: AppDimensions.normalize(6)),
             SvgPicture.asset(AppAssets.Music, height: AppDimensions.normalize(15)),
           ],
         ),
-        Space.yf(1.3),
+        Space.yf(2),
       ],
     );
   }
-
-  Widget _profileButton(BuildContext context, String text, Color color, VoidCallback onTap) {
+  Widget _iconRowWithSystemIcon(
+      BuildContext context,
+      String title,
+      IconData iconData,
+      String? route,
+      Widget arrow, {
+        Color? iconColor,
+        VoidCallback? onTapOverride,
+      }) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: AppDimensions.normalize(5)),
-        padding: EdgeInsets.symmetric(
-          vertical: AppDimensions.normalize(4),
-          horizontal: AppDimensions.normalize(20),
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
-          border: Border.all(color: color),
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: color,
-            fontSize: AppDimensions.normalize(8),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _iconButton(BuildContext context, String label, IconData icon, Color color, VoidCallback onTap) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        margin: EdgeInsets.only(bottom: AppDimensions.normalize(5)),
-        padding: EdgeInsets.symmetric(
-          vertical: AppDimensions.normalize(4),
-          horizontal: AppDimensions.normalize(20),
-        ),
-        decoration: BoxDecoration(
-          color: color,
-          borderRadius: BorderRadius.circular(AppDimensions.normalize(5)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: Colors.white, size: AppDimensions.normalize(8)),
-            SizedBox(width: AppDimensions.normalize(3)),
-            Text(label, style: AppText.b1?.copyWith(color: Colors.white)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _iconRow(BuildContext context, String title, String iconAsset, String? route, Widget arrow, {Color? iconColor}) {
-    return GestureDetector(
-      onTap: () {
-        if (route != null) {
-          Navigator.of(context).pushNamed(route);
-        }
-      },
+      onTap: onTapOverride ??
+              () {
+            if (route != null) {
+              Navigator.of(context).pushNamed(route);
+            }
+          },
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: AppDimensions.normalize(5)), // ← 여기!
+        padding: EdgeInsets.symmetric(vertical: AppDimensions.normalize(5)),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Row(
               children: [
-                SvgPicture.asset(
-                  iconAsset,
-                  colorFilter: iconColor != null
-                      ? ColorFilter.mode(iconColor, BlendMode.srcIn)
-                      : null,
-                ),
+                Icon(iconData, color: iconColor ?? Colors.black),
                 Space.xf(),
-                Text(title, style: AppText.b1b),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0), // ← 텍스트만 오른쪽으로 1칸
+                  child: Text(title, style: AppText.b1b),
+                ),
               ],
             ),
             arrow
@@ -233,6 +259,132 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+
+
+
+  Widget _profileButton(BuildContext context, String text, Color color, VoidCallback onTap) {
+    return Center(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.66, // 화면의 2/3 너비
+          margin: EdgeInsets.only(bottom: AppDimensions.normalize(10)), // 수직 간격 2배
+          padding: EdgeInsets.symmetric(
+            vertical: AppDimensions.normalize(6),
+            horizontal: AppDimensions.normalize(6),
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(AppDimensions.normalize(4)),
+            border: Border.all(color: color, width: 1.5),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Align(
+            alignment: Alignment.centerLeft, // 왼쪽 정렬
+            child: Text(
+              text,
+              style: TextStyle(
+                color: color,
+                fontSize: AppDimensions.normalize(7.5),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _iconButton(BuildContext context, String label, IconData icon, Color color, VoidCallback onTap) {
+    return Center(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: MediaQuery.of(context).size.width * 0.66, // 2/3 너비
+          margin: EdgeInsets.only(bottom: AppDimensions.normalize(10)), // 간격 2배
+          padding: EdgeInsets.symmetric(
+            vertical: AppDimensions.normalize(6),
+            horizontal: AppDimensions.normalize(6),
+          ),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(AppDimensions.normalize(4)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: AppDimensions.normalize(7.5),
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(width: AppDimensions.normalize(4)),
+              Icon(icon, color: Colors.white, size: AppDimensions.normalize(8)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+
+  Widget _iconRow(
+      BuildContext context,
+      String title,
+      String iconPath,
+      String? route,
+      Widget arrow, {
+        Color? iconColor,
+      }) {
+    return GestureDetector(
+      onTap: () {
+        if (route != null) {
+          Navigator.of(context).pushNamed(route);
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: AppDimensions.normalize(5)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 2.0), // 🔹 여기가 핵심
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    iconPath,
+                    height: AppDimensions.normalize(14),
+                    color: iconColor,
+                  ),
+                  Space.xf(),
+                  Text(title, style: AppText.b1b),
+                ],
+              ),
+            ),
+            arrow,
+          ],
+        ),
+      ),
+    );
+  }
+
 
 
   Widget _customIconRow(IconData icon, String label, SvgPicture arrow) {
@@ -263,7 +415,7 @@ class ProfileScreen extends StatelessWidget {
           children: [
             SvgPicture.asset(AppAssets.Bell),
             Space.xf(),
-            Text("Notifications", style: AppText.b1b),
+            Text("알림", style: AppText.b1b),
           ],
         ),
         SizedBox(
