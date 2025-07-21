@@ -8,13 +8,10 @@ import 'package:greon/configs/app.dart';
 import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/assets.dart';
 import 'package:greon/core/constant/colors.dart';
-
 import 'package:greon/domain/entities/product/product.dart';
 import 'package:greon/presentation/widgets/custom_appbar.dart';
 import 'package:greon/presentation/widgets/photo_view_dialog.dart';
-import 'package:greon/presentation/widgets/quantity_row.dart';
 import 'package:screenshot/screenshot.dart';
-
 import '../../application/cart_bloc/cart_bloc.dart';
 import '../../application/wishlist_cubit/wishlist_cubit.dart';
 import '../../data/models/product/product_model.dart';
@@ -33,14 +30,18 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  PageController _pageController = PageController();
-  ScrollController _listController = ScrollController();
+  final PageController _pageController = PageController();
+  final ScrollController _listController = ScrollController();
+
   int _selectedPageIndex = 0;
   int _quantity = 1;
+  bool? _isInWishlist;
 
   @override
   void initState() {
     super.initState();
+    _loadWishlistStatus();
+
     _pageController.addListener(() {
       setState(() {
         _selectedPageIndex = _pageController.page?.round() ?? 0;
@@ -50,6 +51,14 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           curve: Curves.easeInOut,
         );
       });
+    });
+  }
+
+  Future<void> _loadWishlistStatus() async {
+    final isInWishlist =
+    await context.read<WishlistCubit>().isInWishlist(widget.product.id);
+    setState(() {
+      _isInWishlist = isInWishlist;
     });
   }
 
@@ -63,8 +72,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     App.init(context);
-    bool isProductInWishlist =
-    context.read<WishlistCubit>().isInWishlist(widget.product.id);
 
     return Scaffold(
       appBar: CustomAppBar("제품 상세 정보", context,
@@ -75,32 +82,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                widget.product.name.toUpperCase(),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: AppText.h2b,
-              ),
+              Text(widget.product.name.toUpperCase(),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: AppText.h2b),
               Space.yf(.6),
-              Text(
-                "${widget.product.price} 원",
-                style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
-              ),
+              Text("${widget.product.price} 원",
+                  style: AppText.h3b?.copyWith(color: AppColors.CommonCyan)),
               Space.yf(.6),
               Row(
                 children: [
-                  Text(
-                    "카테고리 : ",
-                    style: AppText.h3,
-                  ),
-                  Text(
-                    widget.product.categories.first.name.toUpperCase(),
-                    style:
-                    AppText.h3b?.copyWith(color: AppColors.CommonCyan),
-                  ),
+                  Text("카테고리 : ", style: AppText.h3),
+                  Text(widget.product.categories.first.name.toUpperCase(),
+                      style: AppText.h3b?.copyWith(color: AppColors.CommonCyan)),
                 ],
               ),
               Space.yf(1.1),
+              // 이미지 뷰
               Stack(
                 children: [
                   Container(
@@ -152,6 +150,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                 ],
               ),
+              // 썸네일 리스트
               Container(
                 height: AppDimensions.normalize(50),
                 color: AppColors.LightGrey,
@@ -159,7 +158,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   scrollDirection: Axis.horizontal,
                   controller: _listController,
                   itemCount: widget.product.images.length,
-                  physics: const ClampingScrollPhysics(),
                   itemBuilder: (context, index) {
                     return GestureDetector(
                       onTap: () {
@@ -172,7 +170,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       child: Container(
                         padding: Space.all(.2, .2),
                         decoration: BoxDecoration(
-                          color: AppColors.LightGrey,
                           border: Border.all(
                             color: _selectedPageIndex == index
                                 ? AppColors.CommonCyan
@@ -189,6 +186,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   },
                 ),
               ),
+              // 위시리스트 & 공유
               Container(
                 color: AppColors.LightGrey,
                 margin: Space.v,
@@ -197,28 +195,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   children: [
                     Row(
                       children: [
-                        isProductInWishlist
-                            ? GestureDetector(
-                            onTap: () {
-                              // TODO: 위시리스트에서 제거하는 로직 추가 필요
+                        if (_isInWishlist == null)
+                          const CircularProgressIndicator()
+                        else
+                          GestureDetector(
+                            onTap: () async {
+                              final cubit = context.read<WishlistCubit>();
+                              final model =
+                              ProductModel.fromEntity(widget.product);
+                              if (_isInWishlist!) {
+                                await cubit.removeFromWishlist(model.id);
+                              } else {
+                                await cubit.addToWishlist(model);
+                              }
+                              await _loadWishlistStatus();
                             },
-                            child: const Icon(Icons.favorite))
-                            : GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                context
-                                    .read<WishlistCubit>()
-                                    .addToWishlist(
-                                    ProductModel.fromEntity(
-                                        widget.product));
-                              });
-                            },
-                            child: const Icon(Icons.favorite_border)),
+                            child: Icon(
+                              _isInWishlist!
+                                  ? Icons.favorite
+                                  : Icons.favorite_border,
+                            ),
+                          ),
                         Space.xf(.3),
-                        Text(
-                          "위시리스트에 추가",
-                          style: AppText.h3,
-                        )
+                        Text("위시리스트에 추가", style: AppText.h3)
                       ],
                     ),
                     Space.xf(.8),
@@ -234,15 +233,10 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       },
                       child: Row(
                         children: [
-                          SvgPicture.asset(
-                            AppAssets.Share,
-                            height: AppDimensions.normalize(10),
-                          ),
+                          SvgPicture.asset(AppAssets.Share,
+                              height: AppDimensions.normalize(10)),
                           Space.xf(.7),
-                          Text(
-                            "공유",
-                            style: AppText.h3,
-                          )
+                          Text("공유", style: AppText.h3),
                         ],
                       ),
                     )
@@ -250,15 +244,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ),
               ),
               Space.yf(1.2),
-              Text(
-                "상세 설명",
-                style: AppText.h3b,
-              ),
+              Text("상세 설명", style: AppText.h3b),
               Space.yf(.5),
               Text(
                 widget.product.description,
-                style:
-                AppText.b2?.copyWith(height: AppDimensions.normalize(.6)),
+                style: AppText.b2?.copyWith(height: AppDimensions.normalize(.6)),
               ),
             ],
           ),
@@ -281,7 +271,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                     cartItem: CartItem(
                       product: widget.product,
                       price: widget.product.price,
-                      quantity: 1, // 항상 1씩 추가
+                      quantity: 1,
                     ),
                   ),
                 );
