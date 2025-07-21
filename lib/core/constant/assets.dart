@@ -11,7 +11,6 @@ sealed class AppAssets {
     "https://www.instagram.com/greon_and_on?igsh=MXRpdTE1enFybnc4eg==",
   ];
   static const String greonIcon = "assets/svg/icon.svg";
-  static const String greonAppBar = "assets/svg/apbaricon.svg";
   static const String SortIcon = "assets/svg/sort.svg";
   static const String FilterIcon = "assets/svg/filter.svg";
   static const String Splash = "assets/svg/splash.svg";
@@ -51,4 +50,5 @@ sealed class AppAssets {
   static const String HomePng = "assets/images/homepng.png";
   static const String Profile_bg_png = "assets/images/profile-bg.png";
   static const String Curves_bg_png = "assets/images/curves-bg.png";
+  static const String greonAppBar = "assets/images/greon.png";
 }

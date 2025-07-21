@@ -47,7 +47,7 @@ class _NoConnectionColumnState extends State<NoConnectionColumn> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Space.yf(2),
-            SvgPicture.asset(AppAssets.greonAppBar),
+            Image.asset(AppAssets.greonAppBar),
             Space.yf(3),
             SvgPicture.asset(AppAssets.BadConnection),
             Space.yf(3),

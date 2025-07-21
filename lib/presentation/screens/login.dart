@@ -14,6 +14,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/application/user_bloc/user_bloc.dart'; // UserBloc import 추가
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
+import '../../di/di.dart' as di;
+
 
 AppUser convertFirebaseUserToAppUser(firebase_auth.User firebaseUser) {
   return AppUser(
@@ -109,7 +111,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar("LOGIN", context, automaticallyImplyLeading: true),
+      appBar: CustomAppBar("로그인", context, automaticallyImplyLeading: true),
       body: SingleChildScrollView(
         child: Padding(
           padding: Space.all(1, 1.3),
@@ -128,11 +130,11 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildLoggedInUI() {
     return Column(
       children: [
-        Text("Logged in as: ${_loggedInEmail ?? ''}", style: AppText.h2b), // null-safe 처리
-        SizedBox(height: 20),
+        Text("${_loggedInEmail ?? ''}로 로그인 하셨습니다.", style: AppText.b1), // null-safe 처리
+        SizedBox(height: 12),
         ElevatedButton(
           onPressed: _signOut,
-          child: Text("Logout", style: AppText.h3b?.copyWith(color: Colors.white)),
+          child: Text("로그아웃", style: AppText.h3b?.copyWith(color: Colors.white)),
         ),
       ],
     );
@@ -144,24 +146,24 @@ class _LoginScreenState extends State<LoginScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          "LOGIN",
+          "로그인",
           style: AppText.h2b?.copyWith(color: AppColors.CommonCyan),
         ),
         Space.y!,
         Text(
-          "Login Into Your Account",
+          "당신의 계정으로 로그인하세요",
           style: AppText.h3?.copyWith(color: AppColors.GreyText),
         ),
         Space.y2!,
         Text(
-          "Email Address*",
+          "메일 주소*",
           style: AppText.b1b,
         ),
         Space.y!,
         buildTextFormField(_emailController, "Email Address"),
         Space.yf(1.5),
         Text(
-          "Password*",
+          "비밀번호*",
           style: AppText.b1b,
         ),
         Space.y!,
@@ -171,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
             Text(
-              "Forgot Password",
+              "비밀번호를 잊으셨나요?",
               style: AppText.h3?.copyWith(color: AppColors.CommonCyan),
             )
           ],
@@ -189,14 +191,14 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
           child: Text(
-            "Login",
+            "로그인",
             style: AppText.h3b?.copyWith(color: Colors.white),
           ),
         ),
         Space.yf(1.5),
         Center(
           child: Text(
-            "Don’t have an Account?",
+            "계정이 없으신가요?",
             style: AppText.b1b,
           ),
         ),
@@ -206,7 +208,7 @@ class _LoginScreenState extends State<LoginScreen> {
           onTap: () {
             Navigator.of(context).pushNamed('/signup');
           },
-          buttonText: "Signup",
+          buttonText: "회원가입",
         ),
       ],
     );

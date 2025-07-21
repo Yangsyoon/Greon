@@ -78,7 +78,6 @@ class ProfileScreen extends StatelessWidget {
                             );
                           },
                         );
-
                       } else {
                         return Column(
                           children: [
@@ -97,6 +96,7 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+
   Widget _buildPlantActionButtons(BuildContext context) {
     final buttonData = [
       {
@@ -197,7 +197,6 @@ class ProfileScreen extends StatelessWidget {
           },
         ),
 
-
         Space.yf(2),
         _sectionTitle("설정"),
         Space.yf(1),
@@ -222,6 +221,7 @@ class ProfileScreen extends StatelessWidget {
       ],
     );
   }
+
   Widget _iconRowWithSystemIcon(
       BuildContext context,
       String title,
@@ -259,8 +259,6 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _profileButton(BuildContext context, String text, Color color, VoidCallback onTap) {
     return Center(
@@ -343,8 +341,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-
-
   Widget _iconRow(
       BuildContext context,
       String title,
@@ -384,8 +380,6 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
-
-
 
   Widget _customIconRow(IconData icon, String label, SvgPicture arrow) {
     return Row(
@@ -431,6 +425,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
+
 Widget unLoggedProfileContainer(BuildContext context) {
   return Column(
     children: [

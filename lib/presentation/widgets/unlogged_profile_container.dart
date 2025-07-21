@@ -32,7 +32,7 @@ Widget unloggedProfileContainer(BuildContext context) {
         ),
         Space.y1!,
         Text(
-          "Login/Signup",
+          "로그인/회원가입",
           style: AppText.h2b,
         ),
         Space.yf(.9),
@@ -48,7 +48,7 @@ Widget unloggedProfileContainer(BuildContext context) {
               Navigator.of(context).pushNamed(AppRouter.login);
             },
             child: Text(
-              "Login",
+              "로그인",
               style: AppText.h3b?.copyWith(color: Colors.white),
             ),
           ),
@@ -59,7 +59,7 @@ Widget unloggedProfileContainer(BuildContext context) {
           onTap: () {
             Navigator.of(context).pushNamed(AppRouter.signup);
           },
-          buttonText: "Signup",
+          buttonText: "회원가입",
         ),
         /* GestureDetector(
           onTap: () {

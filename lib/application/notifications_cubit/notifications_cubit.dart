@@ -122,23 +122,4 @@ class NotificationsCubit extends Cubit<List<String>> {
     box.remove('notifications');
     emit([]);
   }
-/*Future<void> showNotificationWithAudioAttributeAlarm() async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-        AndroidNotificationDetails(
-      'your alarm channel id',
-      'your alarm channel name',
-      channelDescription: 'your alarm channel description',
-      importance: Importance.max,
-      priority: Priority.high,
-      audioAttributesUsage: AudioAttributesUsage.alarm,
-    );
-    const NotificationDetails platformChannelSpecifics =
-        NotificationDetails(android: androidPlatformChannelSpecifics);
-    await _flutterLocalNotificationsPlugin.show(
-      0,
-      'notification sound controlled by alarm volume',
-      'alarm notification sound body',
-      platformChannelSpecifics,
-    );
-  }*/
 }

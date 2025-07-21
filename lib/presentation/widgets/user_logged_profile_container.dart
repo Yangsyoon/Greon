@@ -47,6 +47,8 @@ Widget userLoggedProfileContainer(
         onPressed: () async {
           await firebase.FirebaseAuth.instance.signOut();
           Navigator.of(context).popUntil((route) => route.isFirst);
+          context.read<UserBloc>().add(SignOutUser());
+          context.read<NavigationCubit>().updateTab(NavigationTab.homeTab);
         },
         child: Text("로그아웃", style: TextStyle(color: Colors.red)),
       ),

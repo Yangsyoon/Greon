@@ -32,7 +32,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
 
   void _onLoadProducts(GetProducts event, Emitter<ProductState> emit) async {
     try {
-      debugPrint('🛠 GetProducts 이벤트 발생! 필터: ${event.params}');
 
       emit(ProductLoading(
         products: state.products,
@@ -62,7 +61,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
       );
     } catch (e, stacktrace) {
       debugPrint('🔥 예외 발생: $e');
-      debugPrint('📜 스택 트레이스: $stacktrace');
       emit(ProductError(
         products: state.products,
         metaData: state.metaData,
@@ -113,7 +111,6 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
         );
       } catch (e, stacktrace) {
         debugPrint('🔥 추가 상품 로딩 중 예외 발생: $e');
-        debugPrint('📜 스택 트레이스: $stacktrace');
         emit(ProductError(
           products: state.products,
           metaData: state.metaData,

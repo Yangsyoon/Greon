@@ -1,50 +1,25 @@
 // share_cubit.dart
 
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:equatable/equatable.dart';
-import 'package:screenshot/screenshot.dart';
 import 'package:share_plus/share_plus.dart';
 
 part 'share_state.dart';
 
 class ShareCubit extends Cubit<ShareState> {
-  final ScreenshotController screenshotController = ScreenshotController();
-
   ShareCubit() : super(ShareInitialState());
 
-  Future saveAndShare(Uint8List bytes) async {
+  final String _storeUrl = 'https://m.smartstore.naver.com/greencompanion/products/10972246014';
 
-    // Save the screenshot to a temporary file
-
-    final directry = await getApplicationDocumentsDirectory();
-
-    final image = File('${directry.path}/flutter.png');
-
-    image.writeAsBytesSync(bytes);
-
-    await Share.share(image.path);
-  }
-
-  void shareScreenshot() async {
+  Future<void> shareStoreLink() async {
     try {
       emit(ShareLoadingState());
 
-      // Uint8List? imageBytes = await screenshotController.capture();
-      final image = await screenshotController.capture();
+      await Share.share('🌿 우리 스마트스토어에서 구경해보세요!\n$_storeUrl');
 
-      if (image != null) {
-
-        saveAndShare(image);
-
-        emit(ShareSuccessState());
-      } else {
-        emit(ShareErrorState('Failed to capture screenshot.'));
-      }
+      emit(ShareSuccessState());
     } catch (e) {
-      emit(ShareErrorState('Error sharing screenshot: $e'));
+      emit(ShareErrorState('링크 공유에 실패했습니다: $e'));
     }
   }
 }
