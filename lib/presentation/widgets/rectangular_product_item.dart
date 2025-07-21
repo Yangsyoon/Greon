@@ -44,54 +44,66 @@ class RectangularProductItem extends StatelessWidget {
       child: Card(
         elevation: 3,
         margin: EdgeInsets.only(bottom: AppDimensions.normalize(10.8)),
-        child: Padding(
-          padding: isFromWishlist ? Space.all(.5, .5) : Space.all(1, 1),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Hero(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Hero(
                 tag: id,
                 child: imageUrl.isNotEmpty
                     ? CachedNetworkImage(
-                  height: AppDimensions.normalize(70),
                   imageUrl: imageUrl,
-                  placeholder: (context, url) => placeholderShimmer(),
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(child: placeholderShimmer()),
                   errorWidget: (context, url, error) =>
                   const Center(child: Icon(Icons.error)),
                 )
                     : SvgPicture.asset(
                   AppAssets.greonIcon,
-                  height: AppDimensions.normalize(70),
+                  fit: BoxFit.contain,
                 ),
               ),
-              Space.y1!,
-              Text(
-                name,
-                style: AppText.h3b,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+            ),
+            Space.y1!,
+            Padding(
+              padding: isFromWishlist ? Space.all(.5, .5) : Space.all(1, 1),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name,
+                    style: AppText.h3b,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Space.y!,
+                  Text(
+                    category.isNotEmpty ? category[0].name : '',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Space.y!,
+                  Text(
+                    price.toString() + r'원',
+                    style: AppText.h3?.copyWith(
+                      color: AppColors.CommonCyan,
+                    ),
+                  ),
+                ],
               ),
-              Space.y!,
-              Text(
-                category[0].name,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
-              ),
-              Space.y!,
-              Text(
-                price.toString() + r'원',
-                style: AppText.h3?.copyWith(
-                  color: AppColors.CommonCyan,
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget placeholderShimmer() {
-    return Container(); // 필요 시 shimmer 위젯 교체
+    return Container(
+      color: Colors.grey[300],
+      height: AppDimensions.normalize(70),
+    );
   }
 }

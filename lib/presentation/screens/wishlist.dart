@@ -29,7 +29,7 @@ class _WishListScreenState extends State<WishListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar('WISHLIST', context, automaticallyImplyLeading: true),
+      appBar: CustomAppBar('위시리스트', context, automaticallyImplyLeading: true),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -74,12 +74,12 @@ class _WishListScreenState extends State<WishListScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "NO FAVORITES",
+                        "상품이 없습니다",
                         style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
                       ),
                       const SizedBox(height: 8),
                       const Text(
-                        "There Is No Saved Products.\n Please Add New Products!",
+                        "등록된 상품이 없습니다.\n 새로운 상품을 추가해보세요!",
                         textAlign: TextAlign.center,
                         style: TextStyle(height: 2),
                       ),
