@@ -1,13 +1,14 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:greon/configs/app_dimensions.dart';
-import 'package:greon/configs/app_typography.dart';
-import 'package:greon/configs/space.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+
+import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/colors.dart';
 import 'package:greon/presentation/widgets/dashed_separator.dart';
 import 'package:greon/presentation/widgets/loading_shimmer.dart';
 import 'package:greon/presentation/widgets/quantity_row.dart';
 
+import '../../application/cart_bloc/cart_bloc.dart';
 import '../../core/router/app_router.dart';
 import '../../domain/entities/cart/cart_item.dart';
 
@@ -16,6 +17,7 @@ class CartItemCard extends StatelessWidget {
   final Function? onFavoriteToggle;
   final Function? onClick;
   final Function()? onLongClick;
+  final VoidCallback? onDelete;
   final bool isSelected;
 
   const CartItemCard({
@@ -24,6 +26,7 @@ class CartItemCard extends StatelessWidget {
     this.onFavoriteToggle,
     this.onClick,
     this.onLongClick,
+    this.onDelete,
     this.isSelected = false,
   }) : super(key: key);
 
@@ -35,15 +38,16 @@ class CartItemCard extends StatelessWidget {
   }
 
   Widget buildBody(BuildContext context) {
+    final cart = cartItem!;
     return Column(
       children: [
         Space.yf(1),
         GestureDetector(
           onTap: () {
-            if (cartItem != null) {
-              Navigator.of(context).pushNamed(AppRouter.productDetails,
-                  arguments: cartItem!.product);
-            }
+            Navigator.of(context).pushNamed(
+              AppRouter.productDetails,
+              arguments: cart.product,
+            );
           },
           onLongPress: onLongClick,
           child: SizedBox(
@@ -52,42 +56,62 @@ class CartItemCard extends StatelessWidget {
             child: Row(
               children: [
                 CachedNetworkImage(
-                  imageUrl: cartItem!.product.images.last,
+                  imageUrl: (cart.product.images.isNotEmpty)
+                      ? cart.product.images.last
+                      : 'https://via.placeholder.com/150', // 또는 앱에서 지정한 기본 이미지
                   width: AppDimensions.normalize(50),
                   height: double.infinity,
                   fit: BoxFit.fill,
                   placeholder: (context, url) =>
                       LoadingShimmer(isSquare: false),
                   errorWidget: (context, url, error) =>
-                      const Center(child: Icon(Icons.error)),
+                  const Center(child: Icon(Icons.error)),
                 ),
+
                 Space.xf(),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                        width: AppDimensions.normalize(75),
-                        child: Text(
-                          cartItem!.product.name,
-                          maxLines: 2,
-                          style: AppText.h3b,
-                          overflow: TextOverflow.ellipsis,
-                        )),
+                      width: AppDimensions.normalize(75),
+                      child: Text(
+                        cart.product.name,
+                        maxLines: 2,
+                        style: AppText.h3b,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                     Space.yf(.5),
                     Text(
-                      "${cartItem!.product.price} 원",
-                      style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+                      "${cart.product.price} 원",
+                      style: AppText.h3b?.copyWith(
+                        color: AppColors.CommonCyan,
+                      ),
                     ),
                     Space.yf(),
                     Row(
                       children: [
                         SizedBox(
-                            height: AppDimensions.normalize(15),
-                            width: AppDimensions.normalize(55),
-                            child: QuantityRow(14, 1.5)),
+                          height: AppDimensions.normalize(15),
+                          width: AppDimensions.normalize(55),
+                          child: QuantityRow(
+                            quantity: cartItem?.quantity ?? 1,
+                            padding: 8,
+                            onIncrease: () {
+                              if (cartItem != null) {
+                                context.read<CartBloc>().add(IncreaseCartItemQuantity(cartItem!));
+                              }
+                            },
+                            onDecrease: () {
+                              if (cartItem != null) {
+                                context.read<CartBloc>().add(DecreaseCartItemQuantity(cartItem!));
+                              }
+                            },
+                          )
+                        ),
                         Space.xf(),
                         GestureDetector(
-                          onTap: onLongClick,
+                          onTap: onDelete,
                           child: const Icon(
                             Icons.delete_forever_outlined,
                             size: 40,

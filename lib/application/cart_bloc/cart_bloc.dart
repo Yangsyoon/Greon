@@ -8,7 +8,9 @@ import '../../../domain/usecases/cart/add_cart_item_usecase.dart';
 import '../../../domain/usecases/cart/clear_cart_usecase.dart';
 import '../../../domain/usecases/cart/get_cached_cart_usecase.dart';
 import '../../../domain/usecases/cart/sync_cart_usecase.dart';
+import '../../data/models/cart/cart_item_model.dart';
 import '../../domain/repositories/cart_repository.dart';
+import '../../domain/usecases/cart/delete_cart_item_usecase.dart';
 
 part 'cart_event.dart';
 part 'cart_state.dart';
@@ -19,17 +21,38 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   final AddCartUseCase _addCartUseCase;
   final SyncCartUseCase _syncCartUseCase;
   final ClearCartUseCase _clearCartUseCase;
+  final DeleteCartItemUseCase _deleteCartItemUseCase;
 
   CartBloc(
-    this._getCachedCartUseCase,
-    this._addCartUseCase,
-    this._syncCartUseCase,
-    this._clearCartUseCase,
+      this._getCachedCartUseCase,
+      this._addCartUseCase,
+      this._syncCartUseCase,
+      this._clearCartUseCase,
       this._cartRepository,
-  ) : super(const CartInitial(cart: [])) {
+      this._deleteCartItemUseCase,
+      ) : super(const CartInitial(cart: [])) {
     on<GetCart>(_onGetCart);
     on<AddProduct>(_onAddToCart);
     on<ClearCart>(_onClearCart);
+    on<DeleteCartItem>(_onDeleteCartItem); // 이벤트명 변경
+    on<IncreaseCartItemQuantity>(_onIncreaseCartItemQuantity);
+    on<DecreaseCartItemQuantity>(_onDecreaseCartItemQuantity);
+  }
+  void _onDeleteCartItem(DeleteCartItem event, Emitter<CartState> emit) async {
+    try {
+      emit(CartLoading(cart: state.cart));
+      final result = await _deleteCartItemUseCase(event.cartItem);
+      result.fold(
+            (failure) => emit(CartError(cart: state.cart, failure: failure)),
+            (_) {
+          final updatedCart = List<CartItem>.from(state.cart)
+            ..removeWhere((item) => item.id == event.cartItem.id);
+          emit(CartLoaded(cart: updatedCart));
+        },
+      );
+    } catch (e) {
+      emit(CartError(cart: state.cart, failure: ExceptionFailure()));
+    }
   }
 
   void _onGetCart(GetCart event, Emitter<CartState> emit) async {
@@ -77,4 +100,49 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       emit(CartError(cart: const [], failure: ExceptionFailure()));
     }
   }
+
+  void _onIncreaseCartItemQuantity(
+      IncreaseCartItemQuantity event,
+      Emitter<CartState> emit,
+      ) async {
+    try {
+      final updatedItem = CartItemModel.fromEntity(event.cartItem).copyWith(
+        quantity: event.cartItem.quantity + 1,
+      );
+      await _cartRepository.updateCartItem(updatedItem);
+      add(GetCart());
+    } catch (e) {
+      emit(CartError(cart: state.cart, failure: ExceptionFailure()));
+    }
+  }
+
+  void _onDecreaseCartItemQuantity(
+      DecreaseCartItemQuantity event,
+      Emitter<CartState> emit,
+      ) async {
+    try {
+      final newQuantity = event.cartItem.quantity - 1;
+      if (newQuantity > 0) {
+        final updatedItem = CartItemModel.fromEntity(event.cartItem).copyWith(quantity: newQuantity);
+        await _cartRepository.updateCartItem(updatedItem);
+      } else {
+        final id = event.cartItem.id;
+        if (id != null) {
+          await _cartRepository.deleteCartItem(id);
+        } else {
+          emit(CartError(cart: state.cart, failure: ExceptionFailure()));
+          return;
+        }
+      }
+      add(GetCart());
+    } catch (e) {
+      emit(CartError(cart: state.cart, failure: ExceptionFailure()));
+    }
+  }
+
+
 }
+
+
+
+

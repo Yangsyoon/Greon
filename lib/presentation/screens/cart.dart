@@ -79,6 +79,9 @@ class _CartScreenState extends State<CartScreen> {
                                   }
                                 });
                               },
+                              onDelete: () {
+                                context.read<CartBloc>().add(DeleteCartItem(item));
+                              },
                             );
                           },
                         ),

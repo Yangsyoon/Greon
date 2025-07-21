@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import '../../../../core/error/failures.dart';
 import '../../core/networkchecker/network_info.dart';
@@ -127,4 +128,29 @@ class CartRepositoryImpl implements CartRepository {
     // TODO: implement deleteFormCart
     throw UnimplementedError();
   }
+
+  @override
+  Future<void> updateCartItem(CartItem cartItem) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      throw Exception("User not authenticated");
+    }
+    final userId = user.uid;
+
+    if (cartItem.id == null) {
+      throw Exception("Cart item ID is null, can't update");
+    }
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('cart')
+        .doc(cartItem.id)
+        .update({'quantity': cartItem.quantity});
+  }
+
+  @override
+  Future<Either<Failure, void>> deleteCartItem(String itemId) {
+    return remoteDataSource.deleteCartItem(itemId);
+  }
+
 }

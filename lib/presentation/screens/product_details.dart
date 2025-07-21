@@ -36,6 +36,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   PageController _pageController = PageController();
   ScrollController _listController = ScrollController();
   int _selectedPageIndex = 0;
+  int _quantity = 1;
 
   @override
   void initState() {
@@ -57,6 +58,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     App.init(context);
     bool isProductInWishlist =
     context.read<WishlistCubit>().isInWishlist(widget.product.id);
+    // 🔧 cartItem 정의 추가
+    final cartState = context.watch<CartBloc>().state;
+    CartItem cartItem = CartItem(
+      product: widget.product,
+      price: widget.product.price,
+      quantity: _quantity,
+    );
+
+    if (cartState is CartLoaded) {
+      final existingItem = cartState.cart.firstWhere(
+            (item) => item.product.id == widget.product.id,
+        orElse: () => CartItem(
+          product: widget.product,
+          price: widget.product.price,
+          quantity: _quantity,
+        ),
+      );
+      cartItem = existingItem;
+    }
     return Screenshot(
       controller: context.read<ShareCubit>().screenshotController,
       child: Scaffold(
@@ -265,34 +285,33 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               top: AppDimensions.normalize(1),
               bottom: AppDimensions.normalize(6)),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Expanded(child: QuantityRow(17, 2)),
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    context.read<CartBloc>().add(
-                      AddProduct(
-                        cartItem: CartItem(
-                          product: widget.product,
-                          price: widget.product.price,
-                        ),
+              ElevatedButton(
+                onPressed: () {
+                  context.read<CartBloc>().add(
+                    AddProduct(
+                      cartItem: CartItem(
+                        product: widget.product,
+                        price: widget.product.price,
+                        quantity: 1, // 항상 1씩 추가
                       ),
-                    );
-                    context.read<NotificationsCubit>().showAndSaveNotification(
-                        "Cart Update",
-                        "Congratulations, You have successfully added ${widget.product.name} to your cart.");
-                    showPoceedtoCartBottomSheet(context);
-                  },
-                  child: Text(
-                    "Add to cart",
-                    style: AppText.h3b?.copyWith(color: Colors.white),
-                  ),
+                    ),
+                  );
+                  context.read<NotificationsCubit>().showAndSaveNotification(
+                      "Cart Update",
+                      "Congratulations, You have successfully added ${widget.product.name} to your cart.");
+                  showPoceedtoCartBottomSheet(context);
+                },
+                child: Text(
+                  "Add to cart",
+                  style: AppText.h3b?.copyWith(color: Colors.white),
                 ),
               )
             ],
           ),
         ),
+
       ),
     );
   }

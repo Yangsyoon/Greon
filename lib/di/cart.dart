@@ -7,6 +7,7 @@ import '../domain/repositories/cart_repository.dart';
 import '../domain/usecases/cart/add_cart_item_usecase.dart';
 import '../domain/usecases/cart/clear_cart_usecase.dart';
 import '../domain/usecases/cart/get_cached_cart_usecase.dart';
+import '../domain/usecases/cart/delete_cart_item_usecase.dart';
 import '../domain/usecases/cart/sync_cart_usecase.dart';
 import 'di.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,13 +17,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 void registerCartFeature() {
   // Cart BLoC and Use Cases
   sl.registerFactory(
-        () => CartBloc(sl(), sl(), sl(), sl(), sl()),
+        () => CartBloc(sl(), sl(), sl(), sl(), sl(), sl(),),
   );
   // Use cases
   sl.registerLazySingleton(() => GetCachedCartUseCase(sl()));
   sl.registerLazySingleton(() => AddCartUseCase(sl()));
   sl.registerLazySingleton(() => SyncCartUseCase(sl()));
   sl.registerLazySingleton(() => ClearCartUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteCartItemUseCase(sl()));
+
   if (!sl.isRegistered<FirebaseFirestore>()) {
     sl.registerLazySingleton(() => FirebaseFirestore.instance);
   }
