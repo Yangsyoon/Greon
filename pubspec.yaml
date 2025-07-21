@@ -21,7 +21,7 @@ dependencies:
   dartz:
   shared_preferences:
   http:
-  internet_connection_checker:
+  internet_connection_checker: ^1.0.0+1
   flutter_bloc:
   get_it:
   shimmer:
