@@ -22,6 +22,7 @@ class CartItem extends Equatable {
       'id': id,
       'product': product.toJson(), // ProductEntity에 toJson 필요
       'price': price,
+      'productId': product.id,
       'quantity': quantity,
     };
   }

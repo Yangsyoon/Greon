@@ -51,25 +51,53 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
   }
 
   @override
-  Future<Either<Failure, CartItemModel>> addToCart(CartItemModel cartItem,
-      String token) async {
+  Future<Either<Failure, CartItemModel>> addToCart(
+      CartItemModel cartItem, String token) async {
     final user = auth.currentUser;
-    print('firebase 용 addtocart 호출! Saving to Firestore: ${cartItem.toJson()}');
     if (user == null) {
       print('User not logged in');
       return Left(AuthenticationFailure(message: 'User not logged in'));
     }
+
     try {
-      final docRef = await firestore
+      final cartRef = firestore
           .collection('users')
           .doc(user.uid)
-          .collection('cart')
-          .add(cartItem.toJson());
-      print('Saved! Document ID: ${docRef.id}');
-      print('📝 저장될 데이터: ${cartItem.toJson()}');
+          .collection('cart');
 
-      // id를 반영해서 반환
-      return Right(cartItem.copyWith(id: docRef.id));
+      print('🧪 productId for search: ${cartItem.product.id}');
+      final allDocs = await cartRef.get();
+      print('🧪 전체 장바구니 아이템 수: ${allDocs.docs.length}');
+      // productId 기준으로 기존 아이템 있는지 확인
+      final querySnapshot = await cartRef
+          .where('productId', isEqualTo: cartItem.productId)
+          .limit(1)
+          .get();
+
+      print('Firestore 비교용 productId = ${cartItem.product.id}');
+      print('기존 장바구니 아이템 수: ${querySnapshot.docs.length}');
+
+      if (querySnapshot.docs.isNotEmpty) {
+        // 이미 장바구니에 있음 -> quantity 증가
+        final existingDoc = querySnapshot.docs.first;
+        final existingData = existingDoc.data();
+        final existingQuantity = (existingData['quantity'] ?? 1) as int;
+        final newQuantity = existingQuantity + cartItem.quantity;
+
+        await cartRef.doc(existingDoc.id).update({
+          'quantity': newQuantity,
+          // 필요시 다른 필드도 업데이트
+        });
+
+        return Right(cartItem.copyWith(
+          id: existingDoc.id,
+          quantity: newQuantity,
+        ));
+      } else {
+        // 새로 추가
+        final docRef = await cartRef.add(cartItem.toJson());
+        return Right(cartItem.copyWith(id: docRef.id));
+      }
     } on FirebaseException catch (e) {
       print('Firestore addToCart error: ${e.code} - ${e.message}');
       return Left(ServerFailure(message: e.message ?? e.code));
@@ -78,6 +106,7 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
       return Left(ExceptionFailure(message: e.toString()));
     }
   }
+
 
   @override
   Future<Either<Failure, List<CartItemModel>>> syncCart(

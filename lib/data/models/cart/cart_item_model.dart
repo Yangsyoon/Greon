@@ -96,6 +96,7 @@ class CartItemModel extends CartItem {
       {
         "_id": id,
         "product": ProductModel.fromEntity(product).toJson(),
+        "productId": product.id,
         "price": price,
         "quantity": quantity, // ✅ 추가
       };
@@ -163,3 +164,7 @@ class CartItemModel extends CartItem {
       );
     }
   }
+
+extension CartItemModelXExtra on CartItemModel {
+  String get productId => product.id;
+}

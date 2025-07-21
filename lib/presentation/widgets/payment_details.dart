@@ -52,9 +52,10 @@ class _PaymentDetailsState extends State<PaymentDetails> {
               ),
               Space.yf(),
               PaymentDetailsRow(
-                  "제품 금액",
-                  '${state.cart.fold(0, (previousValue, element) => (element.price + previousValue))}',
-                  null),
+                "제품 금액",
+                '${state.cart.fold(0, (previousValue, element) => (element.price * element.quantity + previousValue))}',
+                null,
+              ),
               PaymentDetailsRow("배송비", '4000', null),
               PaymentDetailsRow(
                   "총 결제 금액",
