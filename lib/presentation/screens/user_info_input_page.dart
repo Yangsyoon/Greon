@@ -6,6 +6,7 @@ import 'package:greon/domain/entities/user/app_user.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'profile.dart';
 
 class UserInfoInputPage extends StatefulWidget {
   @override
@@ -79,7 +80,11 @@ class _UserInfoInputPageState extends State<UserInfoInputPage> {
           'language': 'ko',
         }, SetOptions(merge: true));
 
-        Navigator.pop(context);
+        // 기존의 pop 제거하고 profile.dart로 이동
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => ProfileScreen()),
+        );
       } catch (e) {
         print("Firestore 저장 오류: $e");
       }

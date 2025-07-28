@@ -12,21 +12,41 @@ import 'package:greon/presentation/widgets/top_row.dart';
 import 'package:greon/presentation/widgets/user_logged_profile_container.dart';
 import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
 import 'package:greon/presentation/screens/user_info_input_page.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../application/user_bloc/user_bloc.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
-  Future<String> getMyNickname(String uid) async {
-    try {
-      final snapshot = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
-          .get();
-      return snapshot.data()?['nickname'] ?? '알 수 없음';
-    } catch (e) {
-      return '알 수 없음';
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  bool _isNotificationEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkNotificationPermission();
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    final status = await Permission.notification.status;
+    setState(() {
+      _isNotificationEnabled = status == PermissionStatus.granted;
+    });
+  }
+
+  Future<void> _toggleNotification(bool value) async {
+    if (value) {
+      final result = await Permission.notification.request();
+      setState(() {
+        _isNotificationEnabled = result == PermissionStatus.granted;
+      });
+    } else {
+      await openAppSettings();
     }
   }
 
@@ -82,7 +102,7 @@ class ProfileScreen extends StatelessWidget {
                         return Column(
                           children: [
                             Space.y!,
-                            unLoggedProfileContainer(context),
+                            unloggedProfileContainer(context),
                           ],
                         );
                       }
@@ -96,6 +116,77 @@ class ProfileScreen extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildLoggedInSection(BuildContext context, SvgPicture arrowForward) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildPlantActionButtons(context),
+        Space.yf(2),
+        _sectionTitle("내 계정"),
+        Space.yf(1),
+        _iconRow(context, "주문 내역", AppAssets.Archive, AppRouter.orders, arrowForward),
+        _iconRow(context, "배송지 관리", AppAssets.Marker, AppRouter.addresses, arrowForward),
+        _iconRow(context, "계정 정보 수정", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
+        _iconRow(context, "비밀번호 변경", AppAssets.Lock, null, arrowForward),
+        _iconRowWithSystemIcon(
+          context,
+          "회원 정보 입력",
+          Icons.info_outline,
+          null,
+          arrowForward,
+          iconColor: AppColors.CommonCyan,
+          onTapOverride: () {
+            Navigator.of(context).push(MaterialPageRoute(builder: (_) => UserInfoInputPage()));
+          },
+        ),
+        Space.yf(2),
+        _sectionTitle("설정"),
+        Space.yf(1),
+        _notificationSettingButton(),
+        Space.yf(3),
+        Center(child: Text("버전 1.0", style: AppText.b1b)),
+        Space.yf(1),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(AppAssets.Whats, height: AppDimensions.normalize(15)),
+            SizedBox(width: AppDimensions.normalize(6)),
+            SvgPicture.asset(AppAssets.Noti, height: AppDimensions.normalize(15)),
+            SizedBox(width: AppDimensions.normalize(6)),
+            SvgPicture.asset(AppAssets.Music, height: AppDimensions.normalize(15)),
+          ],
+        ),
+        Space.yf(2),
+      ],
+    );
+  }
+
+  Widget _notificationSettingButton() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            SvgPicture.asset(AppAssets.Bell),
+            Space.xf(),
+            Text("알림", style: AppText.b1b),
+          ],
+        ),
+        TextButton.icon(
+          onPressed: () {
+            openAppSettings(); // 시스템 설정으로 이동
+          },
+          icon: Icon(Icons.settings, color: AppColors.CommonCyan),
+          label: Text(
+            "알림 설정 열기",
+            style: AppText.b2?.copyWith(color: AppColors.CommonCyan),
+          ),
+        ),
+      ],
+    );
+  }
+
 
   Widget _buildPlantActionButtons(BuildContext context) {
     final buttonData = [
@@ -133,7 +224,7 @@ class ProfileScreen extends StatelessWidget {
         crossAxisCount: 2,
         crossAxisSpacing: AppDimensions.normalize(6),
         mainAxisSpacing: AppDimensions.normalize(6),
-        childAspectRatio: 3 / 2, // 가로:세로 비율 3:2
+        childAspectRatio: 3 / 2,
         children: buttonData.map((btn) {
           return GestureDetector(
             onTap: btn['onTap'] as VoidCallback,
@@ -171,184 +262,7 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildLoggedInSection(BuildContext context, SvgPicture arrowForward) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildPlantActionButtons(context), // 식물 관련 4개 버튼 (2x2 그리드)
-        Space.yf(2), // 넉넉한 간격
-
-        _sectionTitle("내 계정"),
-        Space.yf(1),
-
-        _iconRow(context, "주문 내역", AppAssets.Archive, AppRouter.orders, arrowForward),
-        _iconRow(context, "배송지 관리", AppAssets.Marker, AppRouter.addresses, arrowForward),
-        _iconRow(context, "계정 정보 수정", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
-        _iconRow(context, "비밀번호 변경", AppAssets.Lock, null, arrowForward),
-        _iconRowWithSystemIcon(
-          context,
-          "회원 정보 입력",
-          Icons.info_outline,
-          null,
-          arrowForward,
-          iconColor: AppColors.CommonCyan,
-          onTapOverride: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => UserInfoInputPage()));
-          },
-        ),
-
-        Space.yf(2),
-        _sectionTitle("설정"),
-        Space.yf(1),
-        _notificationSwitch(),
-
-        Space.yf(3),
-
-        Center(child: Text("버전 1.0", style: AppText.b1b)),
-        Space.yf(1),
-
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(AppAssets.Whats, height: AppDimensions.normalize(15)),
-            SizedBox(width: AppDimensions.normalize(6)),
-            SvgPicture.asset(AppAssets.Noti, height: AppDimensions.normalize(15)),
-            SizedBox(width: AppDimensions.normalize(6)),
-            SvgPicture.asset(AppAssets.Music, height: AppDimensions.normalize(15)),
-          ],
-        ),
-        Space.yf(2),
-      ],
-    );
-  }
-
-  Widget _iconRowWithSystemIcon(
-      BuildContext context,
-      String title,
-      IconData iconData,
-      String? route,
-      Widget arrow, {
-        Color? iconColor,
-        VoidCallback? onTapOverride,
-      }) {
-    return GestureDetector(
-      onTap: onTapOverride ??
-              () {
-            if (route != null) {
-              Navigator.of(context).pushNamed(route);
-            }
-          },
-      child: Padding(
-        padding: EdgeInsets.symmetric(vertical: AppDimensions.normalize(5)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                Icon(iconData, color: iconColor ?? Colors.black),
-                Space.xf(),
-                Padding(
-                  padding: const EdgeInsets.only(left: 4.0), // ← 텍스트만 오른쪽으로 1칸
-                  child: Text(title, style: AppText.b1b),
-                ),
-              ],
-            ),
-            arrow
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _profileButton(BuildContext context, String text, Color color, VoidCallback onTap) {
-    return Center(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.66, // 화면의 2/3 너비
-          margin: EdgeInsets.only(bottom: AppDimensions.normalize(10)), // 수직 간격 2배
-          padding: EdgeInsets.symmetric(
-            vertical: AppDimensions.normalize(6),
-            horizontal: AppDimensions.normalize(6),
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(AppDimensions.normalize(4)),
-            border: Border.all(color: color, width: 1.5),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Align(
-            alignment: Alignment.centerLeft, // 왼쪽 정렬
-            child: Text(
-              text,
-              style: TextStyle(
-                color: color,
-                fontSize: AppDimensions.normalize(7.5),
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _iconButton(BuildContext context, String label, IconData icon, Color color, VoidCallback onTap) {
-    return Center(
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.66, // 2/3 너비
-          margin: EdgeInsets.only(bottom: AppDimensions.normalize(10)), // 간격 2배
-          padding: EdgeInsets.symmetric(
-            vertical: AppDimensions.normalize(6),
-            horizontal: AppDimensions.normalize(6),
-          ),
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.circular(AppDimensions.normalize(4)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                label,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: AppDimensions.normalize(7.5),
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(width: AppDimensions.normalize(4)),
-              Icon(icon, color: Colors.white, size: AppDimensions.normalize(8)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _iconRow(
-      BuildContext context,
-      String title,
-      String iconPath,
-      String? route,
-      Widget arrow, {
-        Color? iconColor,
-      }) {
+  Widget _iconRow(BuildContext context, String title, String iconPath, String? route, Widget arrow, {Color? iconColor}) {
     return GestureDetector(
       onTap: () {
         if (route != null) {
@@ -361,14 +275,10 @@ class ProfileScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Padding(
-              padding: const EdgeInsets.only(left: 2.0), // 🔹 여기가 핵심
+              padding: const EdgeInsets.only(left: 2.0),
               child: Row(
                 children: [
-                  SvgPicture.asset(
-                    iconPath,
-                    height: AppDimensions.normalize(14),
-                    color: iconColor,
-                  ),
+                  SvgPicture.asset(iconPath, height: AppDimensions.normalize(14), color: iconColor),
                   Space.xf(),
                   Text(title, style: AppText.b1b),
                 ],
@@ -381,72 +291,39 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _customIconRow(IconData icon, String label, SvgPicture arrow) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
+  Widget _iconRowWithSystemIcon(BuildContext context, String title, IconData iconData, String? route, Widget arrow, {
+    Color? iconColor,
+    VoidCallback? onTapOverride,
+  }) {
+    return GestureDetector(
+      onTap: onTapOverride ?? () {
+        if (route != null) {
+          Navigator.of(context).pushNamed(route);
+        }
+      },
+      child: Padding(
+        padding: EdgeInsets.symmetric(vertical: AppDimensions.normalize(5)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(icon, color: AppColors.CommonCyan),
-            Space.xf(),
-            Text(label, style: AppText.b1b),
+            Row(
+              children: [
+                Icon(iconData, color: iconColor ?? Colors.black),
+                Space.xf(),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Text(title, style: AppText.b1b),
+                ),
+              ],
+            ),
+            arrow
           ],
         ),
-        arrow,
-      ],
+      ),
     );
   }
 
   Widget _sectionTitle(String title) {
     return Text(title, style: AppText.h3b?.copyWith(color: AppColors.CommonCyan));
   }
-
-  Widget _notificationSwitch() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Row(
-          children: [
-            SvgPicture.asset(AppAssets.Bell),
-            Space.xf(),
-            Text("알림", style: AppText.b1b),
-          ],
-        ),
-        SizedBox(
-          height: AppDimensions.normalize(10),
-          child: Switch(
-            value: true,
-            onChanged: null,
-            activeTrackColor: AppColors.CommonCyan,
-            thumbColor: MaterialStateProperty.all(Colors.white),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-Widget unLoggedProfileContainer(BuildContext context) {
-  return Column(
-    children: [
-      CircleAvatar(
-        radius: 40,
-        backgroundColor: Colors.grey.shade300,
-        child: Icon(Icons.person, size: 40, color: Colors.white),
-      ),
-      SizedBox(height: 12),
-      Text(
-        "로그인이 필요합니다.",
-        style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-      ),
-      SizedBox(height: 12),
-      ElevatedButton(
-        onPressed: () {
-          // 로그인 화면으로 이동
-          Navigator.pushNamed(context, '/login');
-        },
-        child: Text("로그인하러 가기"),
-      ),
-    ],
-  );
 }
