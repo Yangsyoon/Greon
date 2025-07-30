@@ -69,24 +69,37 @@ class CartBloc extends Bloc<CartEvent, CartState> {
   }
 
   void _onAddToCart(AddProduct event, Emitter<CartState> emit) async {
-    print('AddProduct event received with !!!!!!');
     try {
       emit(CartLoading(cart: state.cart));
-      final result = await _addCartUseCase(event.cartItem);
-      result.fold(
-            (failure) {
-          print('실패: $failure');
-          emit(CartError(cart: state.cart, failure: failure));
-        },
-            (savedCartItem) {
-          final updatedCart = List<CartItem>.from(state.cart)..add(savedCartItem);
-          emit(CartLoaded(cart: updatedCart));
-        },
+
+      final existingIndex = state.cart.indexWhere(
+            (item) => item.product.id == event.cartItem.product.id,
       );
+
+      if (existingIndex != -1) {
+        // 이미 있음 → 수량 증가
+        final existingItem = state.cart[existingIndex];
+        final updatedItem = CartItemModel.fromEntity(existingItem).copyWith(
+          quantity: existingItem.quantity + event.cartItem.quantity,
+        );
+        await _cartRepository.updateCartItem(updatedItem);
+        add(GetCart());
+      } else {
+        // 새로 추가
+        final result = await _addCartUseCase(event.cartItem);
+        result.fold(
+              (failure) => emit(CartError(cart: state.cart, failure: failure)),
+              (savedCartItem) {
+            final updatedCart = List<CartItem>.from(state.cart)..add(savedCartItem);
+            emit(CartLoaded(cart: updatedCart));
+          },
+        );
+      }
     } catch (e) {
       emit(CartError(cart: state.cart, failure: ExceptionFailure()));
     }
   }
+
 
 
 

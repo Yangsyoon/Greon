@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:greon/presentation/screens/survey/home_direction_survey.dart';
 import 'package:greon/presentation/screens/survey/window_distance_survey.dart';
 import 'package:light/light.dart';
 
@@ -42,7 +43,7 @@ class _LightExposureSurveyPageState extends State<LightExposureSurveyPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => WindowDistanceSurveyPage(surveyData: widget.surveyData), // 다음 페이지로 연결
+          builder: (_) => HomeDirectionSurveyPage(surveyData: widget.surveyData), // 다음 페이지로 연결
         ),
       );
     }
@@ -121,7 +122,7 @@ class _LightExposureSurveyPageState extends State<LightExposureSurveyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("설문 5/6")),
+      appBar: AppBar(title: Text("설문 5/7")),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(

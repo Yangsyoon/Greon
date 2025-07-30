@@ -52,14 +52,16 @@ class _PaymentDetailsState extends State<PaymentDetails> {
               ),
               Space.yf(),
               PaymentDetailsRow(
-                  "제품 금액",
-                  '${state.cart.fold(0, (previousValue, element) => (element.price + previousValue))}',
-                  null),
+                "제품 금액",
+                '${state.cart.fold(0, (total, item) => total + item.price * item.quantity)}',
+                null,
+              ),
               PaymentDetailsRow("배송비", '4000', null),
               PaymentDetailsRow(
-                  "총 결제 금액",
-                  '${state.cart.fold(0, (previousValue, element) => (element.price + previousValue)) + 4000}',
-                  AppText.h3b),
+                "총 결제 금액",
+                '${state.cart.fold(0, (total, item) => total + item.price * item.quantity) + 4000}',
+                AppText.h3b,
+              ),
               const DashedSeparator(),
               Space.yf(.8),
               SizedBox(
@@ -130,7 +132,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                                                   id: '',
                                                   product: item.product,
                                                   price: item.price,
-                                                  quantity: 1,
+                                                  quantity: item.quantity,
                                                 ))
                                             .toList(),
                                         deliveryInfo: context

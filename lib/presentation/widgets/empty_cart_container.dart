@@ -17,22 +17,22 @@ Widget emptyCartContainer(BuildContext context) {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            "NO ITEMS IN CART",
+            "카트에 아이템이 없습니다",
             style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
           ),
           Space.yf(),
           Text(
-            "We Have Found No Items Added",
+            "구매하고자 하는 상품을",
             style: AppText.b1,
           ),
           Space.yf(),
           Text(
-            "In Your Cart To Checkout",
+            "카트에서 찾지 못했습니다.",
             style: AppText.b1,
           ),
           Space.yf(1.5),
           SizedBox(
-            width: AppDimensions.normalize(50),
+            width: AppDimensions.normalize(100),
             child: ElevatedButton(
               onPressed: () {
                 context
@@ -40,7 +40,7 @@ Widget emptyCartContainer(BuildContext context) {
                     .updateTab(NavigationTab.productsTap);
               },
               child: Text(
-                "Add Items",
+                "아이템 추가하러 가기",
                 style: AppText.h3b?.copyWith(color: Colors.white),
               ),
             ),
