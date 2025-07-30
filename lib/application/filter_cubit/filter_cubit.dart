@@ -1,12 +1,15 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../../../domain/entities/category/category.dart';
 import '../../data/models/product/filter_params_model.dart';
+import '../../domain/entities/product/product.dart';
 
 class FilterCubit extends Cubit<FilterProductParams> {
   final TextEditingController productsSearchController = TextEditingController();
-  FilterCubit() : super(const FilterProductParams());
+  final FirebaseFirestore firestore;
+  FilterCubit({required this.firestore}) : super(FilterProductParams.initial());
 
   bool isSelectedCategory(Category category) {
     return state.categories.contains(category);
@@ -25,7 +28,7 @@ class FilterCubit extends Cubit<FilterProductParams> {
     } else {
       updatedCategories.addAll(state.categories);
     }
-    emit(FilterProductParams(
+    emit(state.copyWith(
       keyword: keyword ?? state.keyword,
       categories: updatedCategories,
     ));
@@ -59,4 +62,33 @@ class FilterCubit extends Cubit<FilterProductParams> {
   }
 
   void reset() => emit(const FilterProductParams());
+
+  Future<void> applySearch(String keyword) async {
+    if (keyword.trim().isEmpty) {
+      emit(state.copyWith(products: [])); // 검색 초기화
+      return;
+    }
+
+    try {
+      final snapshot = await firestore.collection('products').get();
+
+      final futures = snapshot.docs.map((doc) {
+        return ProductEntity.fromMapAsync(doc.data(), docId: doc.id);
+      });
+
+      final products = await Future.wait(futures);
+
+      final filtered = products.where((product) {
+        final containsKeyword = product.name.contains(keyword);
+        return containsKeyword;
+      }).toList();
+
+      emit(state.copyWith(products: filtered));
+    } catch (e, stackTrace) {
+      debugPrint('검색 오류 발생: $e');
+      debugPrint('$stackTrace');
+      emit(state.copyWith(products: []));
+    }
+  }
+
 }

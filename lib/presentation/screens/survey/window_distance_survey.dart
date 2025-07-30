@@ -26,6 +26,7 @@ class _WindowDistanceSurveyPageState extends State<WindowDistanceSurveyPage> {
       'light_setting': widget.surveyData['light_setting'],
       'distance_from_window': _distanceFromWindow,
       'plant_id': widget.surveyData['plant_id'],
+      'direction': widget.surveyData['direction'],
     };
 
     print('Firestore 저장할 데이터:');
@@ -54,7 +55,7 @@ class _WindowDistanceSurveyPageState extends State<WindowDistanceSurveyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("설문 6/6")),
+      appBar: AppBar(title: Text("설문 7/7")),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(

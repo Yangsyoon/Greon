@@ -59,76 +59,136 @@ class MyPlantsScreen extends StatelessWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 3 / 4,
+                childAspectRatio: 2 / 3,
               ),
-              itemBuilder: (context, index) {
-                final plant = plants[index];
-                return FutureBuilder<String?>(
-                  future: getPlantImageUrl(userId, plant.id),
-                  builder: (context, snapshot) {
-                    final imageUrl = snapshot.data;
+                itemBuilder: (context, index) {
+                  final plant = plants[index];
+                  return FutureBuilder<String?>(
+                    future: getPlantImageUrl(userId, plant.id),
+                    builder: (context, imageSnapshot) {
+                      final imageUrl = imageSnapshot.data;
 
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => PlantDetailScreen(plant: plant),
-                          ),
-                        );
-                      },
-                      child: Card(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        elevation: 4,
-                        child: Padding(
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      // 종 이름을 가져오기 위한 FutureBuilder
+                      return FutureBuilder<DocumentSnapshot>(
+                        future: FirebaseFirestore.instance
+                            .collection('plant_species')
+                            .doc(plant.speciesId)
+                            .get(),
+                        builder: (context, speciesSnapshot) {
+                          String speciesName = "알 수 없음";
+                          if (speciesSnapshot.hasData && speciesSnapshot.data!.exists) {
+                            speciesName = speciesSnapshot.data!['species_name'] ?? "알 수 없음";
+                          }
+
+                          return Stack(
                             children: [
-                              Expanded(
-                                child: imageUrl != null
-                                    ? ClipRRect(
-                                  borderRadius: BorderRadius.circular(12),
-                                  child: Image.network(
-                                    imageUrl,
-                                    height: 140,
-                                    width: double.infinity,
-                                    fit: BoxFit.cover,
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => PlantDetailScreen(plant: plant),
+                                    ),
+                                  );
+                                },
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
                                   ),
-                                )
-                                    : const Icon(
-                                  Icons.eco,
-                                  size: 80,
-                                  color: Colors.green,
+                                  elevation: 4,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(12),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        ClipRRect(
+                                          borderRadius: BorderRadius.circular(12),
+                                          child: Container(
+                                            height: 140,
+                                            width: double.infinity,
+                                            color: Colors.grey[200],
+                                            child: imageUrl != null
+                                                ? Image.network(imageUrl, fit: BoxFit.cover)
+                                                : const Icon(Icons.eco, size: 64, color: Colors.green),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          plant.name,
+                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          "종: $speciesName",
+                                          style: const TextStyle(fontSize: 13, color: Colors.grey),
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                plant.name,
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
+                              // 삭제 버튼
+                              Positioned(
+                                top: 4,
+                                right: 4,
+                                child: IconButton(
+                                  icon: const Icon(Icons.delete, color: Colors.grey),
+                                  onPressed: () async {
+                                    final confirm = await showDialog<bool>(
+                                      context: context,
+                                      builder: (ctx) => AlertDialog(
+                                        title: const Text("식물 삭제"),
+                                        content: Text("정말 '${plant.name}' 식물을 삭제하시겠습니까?"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(ctx, false),
+                                            child: const Text("취소"),
+                                          ),
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(ctx, true),
+                                            child: const Text("삭제"),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+
+                                    if (confirm == true) {
+                                      try {
+                                        await FirebaseFirestore.instance.collection('plant').doc(plant.id).delete();
+                                        final ref = FirebaseStorage.instance
+                                            .ref()
+                                            .child('user_plant/$userId/${plant.id}.jpg');
+                                        await ref.delete();
+                                        await FirebaseFirestore.instance
+                                            .collection('users')
+                                            .doc(userId)
+                                            .update({
+                                          'plants': FieldValue.arrayRemove([plant.id])
+                                        });
+
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text("'${plant.name}' 삭제 완료")),
+                                        );
+                                      } catch (e) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text("삭제 실패: $e")),
+                                        );
+                                      }
+                                    }
+                                  },
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                "종: ${plant.speciesId}",
-                                style: const TextStyle(fontSize: 13, color: Colors.grey),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                );
-              },
+                          );
+                        },
+                      );
+                    },
+                  );
+                }
             ),
           );
         },

@@ -47,21 +47,21 @@ class _PaymentDetailsState extends State<PaymentDetails> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "PAYMENT DETAILS",
+                "결제 상세 내역",
                 style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
               ),
               Space.yf(),
               PaymentDetailsRow(
-                  "SUB Total",
-                  '${state.cart.fold(0.0, (previousValue, element) => (element.price + previousValue))}',
-                  null),
-              PaymentDetailsRow("Gift Charges", '0.000', null),
-              PaymentDetailsRow("Discount", '0.000', null),
-              PaymentDetailsRow("Shipping Charges", '5.000', null),
+                "제품 금액",
+                '${state.cart.fold(0, (total, item) => total + item.price * item.quantity)}',
+                null,
+              ),
+              PaymentDetailsRow("배송비", '4000', null),
               PaymentDetailsRow(
-                  "Total",
-                  '${state.cart.fold(0.0, (previousValue, element) => (element.price + previousValue)) + 5}',
-                  AppText.h3b),
+                "총 결제 금액",
+                '${state.cart.fold(0, (total, item) => total + item.price * item.quantity) + 4000}',
+                AppText.h3b,
+              ),
               const DashedSeparator(),
               Space.yf(.8),
               SizedBox(
@@ -132,7 +132,7 @@ class _PaymentDetailsState extends State<PaymentDetails> {
                                                   id: '',
                                                   product: item.product,
                                                   price: item.price,
-                                                  quantity: 1,
+                                                  quantity: item.quantity,
                                                 ))
                                             .toList(),
                                         deliveryInfo: context

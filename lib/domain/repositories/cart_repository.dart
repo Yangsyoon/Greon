@@ -10,4 +10,8 @@ abstract class CartRepository {
   Future<Either<Failure, bool>> deleteFormCart();
   Future<Either<Failure, bool>> clearCart();
   Future<Either<Failure, List<CartItem>>> getCartFromFirestore();
+  Future<Either<Failure, void>> deleteCartItem(String id);
+  Future<void> updateCartItem(CartItem cartItem);
+
+
 }

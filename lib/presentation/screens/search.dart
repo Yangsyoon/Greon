@@ -11,7 +11,7 @@ import '../../core/error/failures.dart';
 import '../../data/models/product/filter_params_model.dart';
 import '../widgets/rectangular_product_item.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../../data/models/product/product_model.dart'; // ProductModel import
+import '../../data/models/product/product_model.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});

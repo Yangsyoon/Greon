@@ -1,7 +1,16 @@
 sealed class AppAssets {
   //svg
+  static const List<String> bannerImages = [
+    "assets/images/smart_store.png",
+    "assets/images/blog.png",
+    "assets/images/instagram.png",
+  ];
+  static const List<String> bannerUrls = [
+    "https://m.smartstore.naver.com/greencompanion/products/10972246014?fbclid=PAQ0xDSwLh6c5leHRuA2FlbQIxMQABpw5RUT1uq-MKS3Iqzr0v5gnStO7REVkwG7RaPb4rYOhtbKd-pITGuRXSiWue_aem_eR34FHRPDGyXptfC8lytdg",
+    "https://m.blog.naver.com/greon_and_on?proxyReferer=https%3A%2F%2Fl.instagram.com%2F&tab=1&trackingCode=external&fbclid=PAQ0xDSwLh6edleHRuA2FlbQIxMAABp8gOBDqY_aPSQgYnPdHKRIXHKzGjkdZj7kPnd6oLxW6ulCW9YEx2Csct2m-Y_aem_g01y3g1y4scHibHGdGCbRg",
+    "https://www.instagram.com/greon_and_on?igsh=MXRpdTE1enFybnc4eg==",
+  ];
   static const String greonIcon = "assets/svg/icon.svg";
-  static const String greonAppBar = "assets/svg/apbaricon.svg";
   static const String SortIcon = "assets/svg/sort.svg";
   static const String FilterIcon = "assets/svg/filter.svg";
   static const String Splash = "assets/svg/splash.svg";
@@ -41,4 +50,5 @@ sealed class AppAssets {
   static const String HomePng = "assets/images/homepng.png";
   static const String Profile_bg_png = "assets/images/profile-bg.png";
   static const String Curves_bg_png = "assets/images/curves-bg.png";
+  static const String greonAppBar = "assets/images/greon.png";
 }

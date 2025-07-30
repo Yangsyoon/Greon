@@ -11,12 +11,12 @@ Widget TopRow({required bool isFromHome, required BuildContext context}) {
   return SizedBox(
     height: AppDimensions.normalize(20),
     child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        SvgPicture.asset(
-          AppAssets.greonAppBar,
-          width: AppDimensions.normalize(12),
-          height: AppDimensions.normalize(15),
+  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  children: [
+  Image.asset(
+  AppAssets.greonAppBar,
+  width: AppDimensions.normalize(40),
+  height: AppDimensions.normalize(20),
           fit: BoxFit.fill,
         ),
         isFromHome
@@ -27,6 +27,7 @@ Widget TopRow({required bool isFromHome, required BuildContext context}) {
                         Navigator.of(context).pushNamed(AppRouter.wishlist);
                       },
                       child: const Icon(Icons.favorite_border)),
+                  /*
                   Space.xf(),
                   GestureDetector(
                     onTap: () {
@@ -34,6 +35,7 @@ Widget TopRow({required bool isFromHome, required BuildContext context}) {
                     },
                     child: const Icon(Icons.search),
                   ),
+                   */
                 ],
               )
             : const SizedBox.shrink()

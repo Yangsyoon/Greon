@@ -24,6 +24,39 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../repositories/product_repository_impl.dart';
 import '../local/product_local_data_source.dart';
 
+Future<List<ProductModel>> getWishlistProducts(String userId) async {
+  try {
+    final userDoc = await firestore.collection('users').doc(userId).get();
+
+    final wishlistRefs = userDoc.data()?['wishlist'] as List<dynamic>?;
+
+    if (wishlistRefs == null) return [];
+
+    final List<ProductModel> wishlistProducts = [];
+
+    for (final ref in wishlistRefs) {
+      if (ref is DocumentReference) {
+        try {
+          final doc = await ref.get();
+          if (doc.exists) {
+            final model = await ProductModel.fromDocumentAsync(doc);
+            wishlistProducts.add(model);
+          }
+        } catch (e) {
+          print("❌ Product 불러오기 실패: $e");
+        }
+      } else {
+        print("❌ 잘못된 wishlist 참조 형식: $ref");
+      }
+    }
+
+    return wishlistProducts;
+  } catch (e) {
+    print("❌ wishlist 로드 중 오류: $e");
+    throw ServerFailure(message: e.toString());
+  }
+}
+
 abstract class ProductRemoteDataSource {
   Future<ProductResponseModel> getProducts(FilterProductParams params);
 }

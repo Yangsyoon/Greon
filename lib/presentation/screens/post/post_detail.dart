@@ -130,7 +130,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
                 if (confirm == true) {
                   await _firestore.collection('posts').doc(_post.id).delete();
-                  Navigator.pop(context); // 목록으로 돌아가기
+                  Navigator.pop(context, true); // 목록으로 돌아가기
                 }
               },
             ),
@@ -274,7 +274,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () =>
-                                                        Navigator.pop(context),
+                                                        Navigator.pop(context, true),
                                                     child:
                                                     const Text("취소"),
                                                   ),

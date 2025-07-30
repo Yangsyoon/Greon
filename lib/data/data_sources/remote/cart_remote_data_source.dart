@@ -9,6 +9,7 @@ abstract class CartRemoteDataSource {
   Future<Either<Failure, CartItemModel>> addToCart(CartItemModel cartItem, String token);
   Future<Either<Failure, List<CartItemModel>>> syncCart(List<CartItemModel> cart, String token);
   Future<Either<Failure, List<CartItemModel>>> getCartFromFirestore();
+  Future<Either<Failure, void>> deleteCartItem(String itemId);
 }
 
 class CartRemoteDataSourceImpl implements CartRemoteDataSource {
@@ -27,16 +28,17 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
       if (user == null) {
         return Left(AuthenticationFailure(message: 'User not logged in'));
       }
+
       final cartCollection = firestore
           .collection('users')
           .doc(user.uid)
           .collection('cart');
 
       final snapshot = await cartCollection.get();
-      final cartItems = snapshot.docs.map((doc) {
-        final data = doc.data();
-        return CartItemModel.fromJson(data).copyWith(id: doc.id); // 🔑 id 추가
-      }).toList();
+
+      final cartItems = snapshot.docs
+          .map((doc) => CartItemModel.fromDocument(doc))
+          .toList();
 
       return Right(cartItems);
     } on FirebaseException catch (e) {
@@ -64,6 +66,8 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
           .collection('cart')
           .add(cartItem.toJson());
       print('Saved! Document ID: ${docRef.id}');
+      print('📝 저장될 데이터: ${cartItem.toJson()}');
+
       // id를 반영해서 반환
       return Right(cartItem.copyWith(id: docRef.id));
     } on FirebaseException catch (e) {
@@ -115,4 +119,30 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
       return Left(ExceptionFailure(message: e.toString()));
     }
   }
+  @override
+  Future<Either<Failure, void>> deleteCartItem(String itemId) async {
+    final user = auth.currentUser;
+    if (user == null) {
+      return Left(AuthenticationFailure(message: 'User not logged in'));
+    }
+
+    try {
+      final docRef = firestore
+          .collection('users')
+          .doc(user.uid)
+          .collection('cart')
+          .doc(itemId);
+
+      await docRef.delete();
+      print('🗑️ Deleted cart item with id: $itemId');
+      return Right(null);
+    } on FirebaseException catch (e) {
+      print('Firestore delete error: ${e.code} - ${e.message}');
+      return Left(ServerFailure(message: e.message ?? e.code));
+    } catch (e) {
+      print('Unknown delete error: $e');
+      return Left(ExceptionFailure(message: e.toString()));
+    }
+  }
+
 }

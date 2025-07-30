@@ -8,6 +8,7 @@ import 'package:greon/presentation/widgets/loading_shimmer.dart';
 import '../../core/constant/colors.dart';
 import '../../core/router/app_router.dart';
 import '../../data/models/product/product_model.dart';
+import '../../domain/entities/category/category.dart';
 
 class RectangularProductItem extends StatelessWidget {
   final ProductModel? product;
@@ -34,77 +35,75 @@ class RectangularProductItem extends StatelessWidget {
         ? (isFromWishlist ? imageUrls.last : imageUrls.first)
         : '';
     String name = product!.name;
-    int price = product!.price; // 🔄 변경됨
+    int price = product!.price;
     String id = product!.id;
-
-    debugPrint("이미지 URL: $imageUrl");
-    debugPrint("상품 이름: $name");
-    debugPrint("가격: \$ $price");
+    List<Category> category = product!.categories;
 
     return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushNamed(
-          AppRouter.productDetails,
-          arguments: {
-            'id': id,
-            'name': name,
-            'images': imageUrls,
-            'price': price, // 🔄 변경됨
-          },
-        );
-      },
+      onTap: onClick != null ? () => onClick!() : null,
       child: Card(
         elevation: 3,
         margin: EdgeInsets.only(bottom: AppDimensions.normalize(10.8)),
-        child: Padding(
-          padding: isFromWishlist ? Space.all(.5, .5) : Space.all(1, 1),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Hero(
+        clipBehavior: Clip.antiAlias,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Expanded(
+              child: Hero(
                 tag: id,
                 child: imageUrl.isNotEmpty
                     ? CachedNetworkImage(
-                  height: AppDimensions.normalize(70),
                   imageUrl: imageUrl,
-                  placeholder: (context, url) => placeholderShimmer(),
+                  fit: BoxFit.cover,
+                  placeholder: (context, url) => Center(child: placeholderShimmer()),
                   errorWidget: (context, url, error) =>
                   const Center(child: Icon(Icons.error)),
                 )
                     : SvgPicture.asset(
                   AppAssets.greonIcon,
-                  height: AppDimensions.normalize(70),
+                  fit: BoxFit.contain,
                 ),
               ),
-              Space.y1!,
-              Text(
-                name,
-                style: AppText.h3b,
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+            ),
+            Space.y1!,
+            Padding(
+              padding: isFromWishlist ? Space.all(.5, .5) : Space.all(1, 1),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    name,
+                    style: AppText.h3b,
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Space.y!,
+                  Text(
+                    category.isNotEmpty ? category[0].name : '',
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+                  Space.y!,
+                  Text(
+                    price.toString() + r'원',
+                    style: AppText.h3?.copyWith(
+                      color: AppColors.CommonCyan,
+                    ),
+                  ),
+                ],
               ),
-              Space.y!,
-              Text(
-                r'$ ' + price.toString(),
-                style: AppText.h3?.copyWith(
-                  color: AppColors.CommonCyan,
-                ),
-              ),
-              // URL을 화면에 표시 (필요 없으면 삭제해도 됨)
-              Text(
-                '이미지 URL: $imageUrl',
-                style: AppText.b2,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 
   Widget placeholderShimmer() {
-    return Container(); // 필요 시 shimmer 위젯 교체
+    return Container(
+      color: Colors.grey[300],
+      height: AppDimensions.normalize(70),
+    );
   }
 }

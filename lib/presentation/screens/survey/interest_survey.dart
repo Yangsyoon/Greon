@@ -23,7 +23,7 @@ class _InterestSurveyPageState extends State<InterestSurveyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("설문 1/6")),
+      appBar: AppBar(title: Text("설문 1/7")),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

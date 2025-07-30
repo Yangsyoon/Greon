@@ -53,6 +53,7 @@ class _RegisterPlantState extends State<RegisterPlant> {
         _watering = doc['default_watering_cycle'];
         _repotting = doc['default_repotting_cycle'];
         _nutrient = doc['default_nutrient_cycle'];
+        _sunlightLevel = doc['default_sunlight_level'] ?? 3;
         _plantNameController.text = speciesName; // 이름 자동 입력
       });
     }
@@ -295,7 +296,7 @@ class _RegisterPlantState extends State<RegisterPlant> {
             SizedBox(height: 16),
 
             // 일조량 선택
-            Text("일조량 선택"),
+            Text("일조량"),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: List.generate(5, (i) {
@@ -314,7 +315,8 @@ class _RegisterPlantState extends State<RegisterPlant> {
               }),
             ),
             SizedBox(height: 24),
-
+            const Text("주기와 일조량은 각 종에 맞게 자동 추천됩니다."),
+            SizedBox(height: 24),
             // 하단 버튼 (Skip / 설문시작)
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

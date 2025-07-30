@@ -118,22 +118,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Signup")),
+      appBar: AppBar(title: const Text("회원가입")),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: Column(
             children: [
-              buildTextFormField(_nameController, "Full Name"),
+              buildTextFormField(_nameController, "이름"),
               const SizedBox(height: 12),
-              buildTextFormField(_nicknameController, "Nickname"), // 👈 추가
+              buildTextFormField(_nicknameController, "닉네임"), // 👈 추가
               const SizedBox(height: 12),
-              buildTextFormField(_emailController, "Email"),
+              buildTextFormField(_emailController, "이메일"),
               const SizedBox(height: 12),
-              buildTextFormField(_passwordController, "Password", isObscure: true),
+              buildTextFormField(_passwordController, "비밀번호", isObscure: true),
               const SizedBox(height: 12),
-              buildTextFormField(_confirmPasswordController, "Confirm Password", isObscure: true),
+              buildTextFormField(_confirmPasswordController, "비밀번호 확인", isObscure: true),
               const SizedBox(height: 12),
               Row(
                 children: [
@@ -146,7 +146,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     },
                   ),
                   const Expanded(
-                    child: Text("I accept the Privacy Policy and Terms & Conditions."),
+                    child: Text("개인 정보 활용에 동의합니다."),
                   ),
                 ],
               ),
@@ -155,14 +155,14 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 onPressed: isLoading ? null : _signUp,
                 child: isLoading
                     ? const CircularProgressIndicator()
-                    : const Text("Sign Up"),
+                    : const Text("회원가입"),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop(); // 로그인 화면으로 이동
                 },
-                child: const Text("Already have an account? Login"),
+                child: const Text("이미 계정이 있으신가요? 로그인"),
               ),
             ],
           ),

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/configs/configs.dart';
-import 'package:greon/core/constant/colors.dart';
 import 'package:greon/presentation/widgets/custom_appbar.dart';
 import 'package:greon/presentation/widgets/empty_cart_container.dart';
 import 'package:greon/presentation/widgets/error_container.dart';
@@ -33,7 +32,7 @@ class _CartScreenState extends State<CartScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar("CART", context, automaticallyImplyLeading: true),
+      appBar: CustomAppBar("카트", context, automaticallyImplyLeading: true),
       body: Stack(
         children: [
           Padding(
@@ -80,6 +79,9 @@ class _CartScreenState extends State<CartScreen> {
                                   }
                                 });
                               },
+                              onDelete: () {
+                                context.read<CartBloc>().add(DeleteCartItem(item));
+                              },
                             );
                           },
                         ),
@@ -96,7 +98,7 @@ class _CartScreenState extends State<CartScreen> {
           BlocBuilder<UserBloc, UserState>(
             builder: (context, state) {
               return PaymentDetails(
-                buttonText: "Proceed To Checkout",
+                buttonText: "주문하기",
                 isFromCheckout: false,
                 isLogged: state is UserLogged,
               );

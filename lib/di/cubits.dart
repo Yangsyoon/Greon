@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:greon/application/filter_cubit/filter_cubit.dart';
 import 'package:greon/application/notifications_cubit/notifications_cubit.dart';
@@ -12,7 +13,7 @@ void registerCubits() {
   sl.registerFactory(() => NavigationCubit());
 
   //Filter
-  sl.registerFactory(() => FilterCubit());
+  sl.registerFactory(() => FilterCubit(firestore: FirebaseFirestore.instance));
 
   //Wishlist
   sl.registerFactory(() => WishlistCubit());

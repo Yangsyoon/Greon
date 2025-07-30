@@ -1,9 +1,7 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 import '../category/category.dart';
-
-import 'package:equatable/equatable.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProductEntity extends Equatable {
   final String id;
@@ -28,8 +26,21 @@ class ProductEntity extends Equatable {
     required this.isActive,
   });
 
-  @override
-  List<Object?> get props => [id];
+  factory ProductEntity.fromMap(Map<String, dynamic> map, {required String docId}) {
+    return ProductEntity(
+      id: docId,
+      name: map['name'] ?? '',
+      description: map['description'] ?? '',
+      price: (map['price'] ?? 0) is int ? map['price'] : int.tryParse(map['price'].toString()) ?? 0,
+      categories: (map['categories'] as List<dynamic>? ?? [])
+          .map((e) => Category.fromJson(Map<String, dynamic>.from(e)))
+          .toList(),
+      images: List<String>.from(map['images'] ?? []),
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+      isActive: map['isActive'] ?? true,
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -37,7 +48,7 @@ class ProductEntity extends Equatable {
       'name': name,
       'description': description,
       'price': price,
-      'categories': categories.map((c) => c.toJson()).toList(), // Category도 toJson 필요
+      'categories': categories.map((c) => c.toJson()).toList(),
       'images': images,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -45,4 +56,33 @@ class ProductEntity extends Equatable {
     };
   }
 
+  static Future<ProductEntity> fromMapAsync(Map<String, dynamic> map, {required String docId}) async {
+    List<dynamic> rawCategories = map['categories'] ?? [];
+
+    List<Category> categories = [];
+    for (var item in rawCategories) {
+      if (item is DocumentReference) {
+        final snapshot = await item.get();
+        final categoryMap = snapshot.data() as Map<String, dynamic>;
+        categories.add(Category.fromJson(categoryMap));
+      } else if (item is Map<String, dynamic>) {
+        categories.add(Category.fromJson(item));
+      }
+    }
+
+    return ProductEntity(
+      id: docId,
+      name: map['name'] ?? '',
+      description: map['description'] ?? '',
+      price: (map['price'] ?? 0) is int ? map['price'] : int.tryParse(map['price'].toString()) ?? 0,
+      categories: categories,
+      images: List<String>.from(map['images'] ?? []),
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+      isActive: map['isActive'] ?? true,
+    );
+  }
+
+  @override
+  List<Object?> get props => [id];
 }

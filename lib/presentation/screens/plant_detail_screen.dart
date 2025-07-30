@@ -1,22 +1,11 @@
   import 'dart:io';
-  import 'package:android_intent_plus/android_intent.dart';
-  import 'package:android_intent_plus/flag.dart';
   import 'package:cloud_firestore/cloud_firestore.dart';
   import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+  import 'package:firebase_messaging/firebase_messaging.dart';
   import 'package:firebase_storage/firebase_storage.dart';
   import 'package:flutter/material.dart';
   import 'package:image_picker/image_picker.dart';
-  import 'package:permission_handler/permission_handler.dart';
-  import 'package:shared_preferences/shared_preferences.dart';
   import '../../domain/entities/plants/plant_entity.dart';
-  import 'package:cloud_firestore/cloud_firestore.dart';
-
-  // 📍 다른 import 아래
-  import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-  import 'package:timezone/timezone.dart' as tz;
-
-  import '../../main.dart';
 
   class PlantDetailScreen extends StatefulWidget {
     final PlantEntity plant;
@@ -265,6 +254,35 @@ import 'package:firebase_messaging/firebase_messaging.dart';
       });
     }
 
+    void _showSunlightLevelPicker() {
+      showModalBottomSheet(
+        context: context,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (context) {
+          final options = ['적음', '보통', '많음'];
+
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              const Text("필요 일조량 선택", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const Divider(),
+              ...options.map((option) => ListTile(
+                title: Text(option),
+                onTap: () async {
+                  Navigator.of(context).pop(); // 바텀시트 닫기
+                  await _updatePlantField('sunlight_level', option);
+                },
+              )),
+              const SizedBox(height: 16),
+            ],
+          );
+        },
+      );
+    }
+
     Widget _buildEditableInfoCard({
       required IconData icon,
       required String title,
@@ -349,11 +367,17 @@ import 'package:firebase_messaging/firebase_messaging.dart';
                 field: 'repotting_cycle',
                 isNumeric: true,
               ),
-              _buildEditableInfoCard(
-                icon: Icons.wb_sunny,
-                title: "햇빛 필요 정도",
-                value: plantState.sunlightLevel,
-                field: 'sunlight_level',
+              Card(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 3,
+                child: ListTile(
+                  leading: const Icon(Icons.wb_sunny, color: Colors.green),
+                  title: const Text("필요 일조량", style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text(plantState.sunlightLevel),
+                  trailing: const Icon(Icons.edit, size: 18),
+                  onTap: _showSunlightLevelPicker,
+                ),
               ),
               _buildEditableInfoCard(
                 icon: Icons.invert_colors,
@@ -380,8 +404,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
               ),
 
               const SizedBox(height: 16),
-
-
 
             ],
           ),

@@ -1,5 +1,3 @@
-enum SortOrder {newest, highToLow, lowToHigh, aToZ, zToA }
-
 enum PaymentMethod {knet, visa}
 
-enum NavigationTab { homeTab, categoriesTab, productsTap, cartTab, profileTab }
+enum NavigationTab { homeTab, boardTab, productsTap, cartTab, profileTab }

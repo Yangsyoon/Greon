@@ -43,7 +43,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
                     color: AppColors.LightGrey,
                     padding: Space.all(4, 4),
                     child: Center(
-                      child: SvgPicture.asset(
+                      child: Image.asset(
                         AppAssets.greonAppBar,
                         height: AppDimensions.normalize(20),
                       ),

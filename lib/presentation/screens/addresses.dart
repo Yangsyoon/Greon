@@ -39,7 +39,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
         }
       },
       child: Scaffold(
-        appBar: CustomAppBar("ADD ADDRESS", context,
+        appBar: CustomAppBar("주소 목록", context,
             automaticallyImplyLeading: true),
         body: Padding(
           padding: Space.all(1.2, 1),
@@ -50,7 +50,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                   onTap: () {
                     Navigator.of(context).pushNamed(AppRouter.addadress);
                   },
-                  buttonText: "Add New Address"),
+                  buttonText: "새로운 주소 추가"),
               BlocBuilder<DeliveryInfoFetchCubit, DeliveryInfoFetchState>(
                 builder: (context, state) {
                   if (state is! DeliveryInfoFetchLoading &&
@@ -65,18 +65,18 @@ class _AddressesScreenState extends State<AddressesScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              "NO SAVED ADDRESS",
+                              "주소가 없습니다.",
                               style: AppText.h3b
                                   ?.copyWith(color: AppColors.CommonCyan),
                             ),
                             Space.yf(1),
                             Text(
-                              "There Is No Saved Address.",
+                              "현재 저장된 주소가 없습니다.",
                               style: AppText.b2,
                             ),
                             Space.yf(1),
                             Text(
-                              "Please Save New Address!",
+                              "새로운 주소를 추가해주세요!",
                               style: AppText.b2,
                             ),
                           ],

@@ -39,7 +39,7 @@ class _PlantLocationSurveyPageState extends State<PlantLocationSurveyPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('설문 3/6')),
+      appBar: AppBar(title: Text('설문 3/7')),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(

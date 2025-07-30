@@ -25,6 +25,7 @@ class _WritePostScreenState extends State<WritePostScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  String selectedCategory = '정보공유';
 
   File? _selectedImage;
 
@@ -86,6 +87,7 @@ class _WritePostScreenState extends State<WritePostScreen> {
         createdAt: DateTime.now(),
         commentsCount: 0,
         imageUrl: imageUrl,
+        category: selectedCategory,
       );
 
       context.read<PostBloc>().add(AddPost(newPost));
@@ -94,64 +96,112 @@ class _WritePostScreenState extends State<WritePostScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("글 작성")),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: BlocListener<PostBloc, PostState>(
-          listener: (context, state) {
-            if (state is PostAddSuccess) {
-              Navigator.pushNamedAndRemoveUntil(
-                context,
-                '/bulletin-board',
-                    (route) => false,
-              );
-            } else if (state is PostAddFailure) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                    content:
-                    Text('게시글 등록에 실패했습니다: ${state.errorMessage}')),
-              );
-            }
-          },
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              children: [
-                TextFormField(
-                  controller: _titleController,
-                  decoration: const InputDecoration(labelText: '제목'),
-                  validator: (value) =>
-                  value == null || value.isEmpty ? '제목을 입력하세요' : null,
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _contentController,
-                  decoration: const InputDecoration(labelText: '내용'),
-                  maxLines: 8,
-                  validator: (value) =>
-                  value == null || value.isEmpty ? '내용을 입력하세요' : null,
-                ),
-                const SizedBox(height: 16),
-                GestureDetector(
-                  onTap: _pickImage,
-                  child: Container(
-                    height: 200,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      color: Colors.grey.shade200,
+    return Material(
+      color: Colors.white,
+      child: SafeArea(
+        child: Padding(
+          padding:
+          EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: BlocListener<PostBloc, PostState>(
+              listener: (context, state) {
+                if (state is PostAddSuccess) {
+                  Navigator.pop(context, true); // 모달 닫기
+                } else if (state is PostAddFailure) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                        content: Text('게시글 등록에 실패했습니다: ${state.errorMessage}')),
+                  );
+                }
+              },
+              child: Form(
+                key: _formKey,
+                child: ListView(
+                  shrinkWrap: true,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "글 작성",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.close),
+                          onPressed: () => Navigator.pop(context, true),
+                        ),
+                      ],
                     ),
-                    child: _selectedImage != null
-                        ? Image.file(_selectedImage!, fit: BoxFit.cover)
-                        : const Center(child: Text('이미지 선택 (클릭)')),
-                  ),
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextFormField(
+                            controller: _titleController,
+                            decoration: const InputDecoration(labelText: '제목'),
+                            validator: (value) =>
+                            value == null || value.isEmpty ? '제목을 입력하세요' : null,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 1,
+                          child: DropdownButtonFormField<String>(
+                            value: selectedCategory,
+                            items: ['정보공유', 'QnA', '자유'].map((cat) {
+                              return DropdownMenuItem(
+                                value: cat,
+                                child: Text(cat),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  selectedCategory = value;
+                                });
+                              }
+                            },
+                            decoration: const InputDecoration(
+                              labelText: '게시판',
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    TextFormField(
+                      controller: _contentController,
+                      decoration: const InputDecoration(labelText: '내용'),
+                      maxLines: 8,
+                      validator: (value) =>
+                      value == null || value.isEmpty ? '내용을 입력하세요' : null,
+                    ),
+                    const SizedBox(height: 16),
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        height: 200,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey),
+                          color: Colors.grey.shade200,
+                        ),
+                        child: _selectedImage != null
+                            ? Image.file(_selectedImage!, fit: BoxFit.cover)
+                            : const Center(child: Text('이미지 선택 (클릭)')),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _submit,
+                      child: const Text("등록하기"),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _submit,
-                  child: const Text("등록하기"),
-                ),
-              ],
+              ),
             ),
           ),
         ),
@@ -159,3 +209,4 @@ class _WritePostScreenState extends State<WritePostScreen> {
     );
   }
 }
+

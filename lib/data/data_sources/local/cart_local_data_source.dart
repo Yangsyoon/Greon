@@ -47,10 +47,16 @@ class CartLocalDataSourceImpl implements CartLocalDataSource {
   Future<List<CartItemModel>> getCart() {
     final jsonString = sharedPreferences.getString(cachedCart);
     if (jsonString != null) {
-      return Future.value(cartItemModelListFromLocalJson(jsonString));
+      final items = cartItemModelListFromLocalJson(jsonString);
+      final fixedItems = _fixCartData(items);
+      return Future.value(fixedItems); // ✅ Future로 감싸기
     } else {
       throw CacheFailure();
     }
+  }
+
+  List<CartItemModel> _fixCartData(List<CartItemModel> oldItems) {
+    return oldItems.map((item) => item.copyWith(quantity: item.quantity ?? 1)).toList();
   }
 
   @override

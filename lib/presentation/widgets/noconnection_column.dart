@@ -40,14 +40,13 @@ class _NoConnectionColumnState extends State<NoConnectionColumn> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Space.yf(2),
-            SvgPicture.asset(AppAssets.greonAppBar),
+            Image.asset(AppAssets.greonAppBar),
             Space.yf(3),
             SvgPicture.asset(AppAssets.BadConnection),
             Space.yf(3),
@@ -95,7 +94,6 @@ class _NoConnectionColumnState extends State<NoConnectionColumn> {
             Space.yf(1.5),
           ],
         ),
-      ),
-    );
+      );
   }
 }

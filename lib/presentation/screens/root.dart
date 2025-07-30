@@ -6,7 +6,7 @@ import 'package:greon/core/constant/colors.dart';
 import 'package:greon/presentation/screens/cart.dart';
 import 'package:greon/presentation/screens/post/post.dart';
 import 'package:greon/presentation/screens/home.dart';
-import 'package:greon/presentation/screens/products_list.dart';
+import 'package:greon/presentation/screens/product/products_list.dart';
 import 'package:greon/presentation/screens/profile.dart';
 import 'package:greon/presentation/widgets/bottom_navbar.dart';
 
@@ -67,7 +67,7 @@ class RootScreen extends StatelessWidget {
               switch (activeTab) {
                 case NavigationTab.homeTab:
                   return const HomeScreen();
-                case NavigationTab.categoriesTab:
+                case NavigationTab.boardTab:
                   return const BulletinBoardScreen();
                 case NavigationTab.productsTap:
                   return const ProductsListScreen();
