@@ -12,13 +12,13 @@ import 'package:greon/domain/entities/product/product.dart';
 import 'package:greon/presentation/widgets/custom_appbar.dart';
 import 'package:greon/presentation/widgets/photo_view_dialog.dart';
 import 'package:screenshot/screenshot.dart';
-import '../../application/cart_bloc/cart_bloc.dart';
-import '../../application/wishlist_cubit/wishlist_cubit.dart';
-import '../../data/models/product/product_model.dart';
-import '../../domain/entities/cart/cart_item.dart';
-import '../widgets/dots_indicator.dart';
-import '../widgets/loading_shimmer.dart';
-import '../widgets/proceedtocart_modalsheet.dart';
+import '../../../application/cart_bloc/cart_bloc.dart';
+import '../../../application/wishlist_cubit/wishlist_cubit.dart';
+import '../../../data/models/product/product_model.dart';
+import '../../../domain/entities/cart/cart_item.dart';
+import '../../widgets/dots_indicator.dart';
+import '../../widgets/loading_shimmer.dart';
+import '../../widgets/proceedtocart_modalsheet.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});

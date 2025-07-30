@@ -96,6 +96,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
             createdAt: (updatedData['createdAt'] as Timestamp).toDate(),
             commentsCount: updatedData['commentsCount'] ?? 0,
             imageUrl: updatedData['imageUrl'] as String?,
+            category: updatedData['category'],
           );
 
           Navigator.pop(context, updatedPost);

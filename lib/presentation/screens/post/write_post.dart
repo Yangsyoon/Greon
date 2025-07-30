@@ -25,6 +25,7 @@ class _WritePostScreenState extends State<WritePostScreen> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
+  String selectedCategory = '정보공유';
 
   File? _selectedImage;
 
@@ -86,6 +87,7 @@ class _WritePostScreenState extends State<WritePostScreen> {
         createdAt: DateTime.now(),
         commentsCount: 0,
         imageUrl: imageUrl,
+        category: selectedCategory,
       );
 
       context.read<PostBloc>().add(AddPost(newPost));
@@ -134,11 +136,41 @@ class _WritePostScreenState extends State<WritePostScreen> {
                         ),
                       ],
                     ),
-                    TextFormField(
-                      controller: _titleController,
-                      decoration: const InputDecoration(labelText: '제목'),
-                      validator: (value) =>
-                      value == null || value.isEmpty ? '제목을 입력하세요' : null,
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: TextFormField(
+                            controller: _titleController,
+                            decoration: const InputDecoration(labelText: '제목'),
+                            validator: (value) =>
+                            value == null || value.isEmpty ? '제목을 입력하세요' : null,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          flex: 1,
+                          child: DropdownButtonFormField<String>(
+                            value: selectedCategory,
+                            items: ['정보공유', 'QnA', '자유'].map((cat) {
+                              return DropdownMenuItem(
+                                value: cat,
+                                child: Text(cat),
+                              );
+                            }).toList(),
+                            onChanged: (value) {
+                              if (value != null) {
+                                setState(() {
+                                  selectedCategory = value;
+                                });
+                              }
+                            },
+                            decoration: const InputDecoration(
+                              labelText: '게시판',
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     TextFormField(

@@ -40,8 +40,7 @@ class _NoConnectionColumnState extends State<NoConnectionColumn> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -95,7 +94,6 @@ class _NoConnectionColumnState extends State<NoConnectionColumn> {
             Space.yf(1.5),
           ],
         ),
-      ),
-    );
+      );
   }
 }

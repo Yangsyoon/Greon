@@ -4,21 +4,21 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-import '../../application/filter_cubit/filter_cubit.dart';
-import '../../application/products_bloc/product_bloc.dart';
-import '../../configs/app_dimensions.dart';
-import '../../configs/app_typography.dart';
-import '../../configs/space.dart';
-import '../../core/constant/assets.dart';
-import '../../core/constant/colors.dart';
-import '../../core/enums/enums.dart';
-import '../../core/error/failures.dart';
-import '../../core/router/app_router.dart';
-import '../../data/models/product/filter_params_model.dart';
-import '../../data/models/product/product_model.dart';
-import '../../domain/entities/product/product.dart';
-import '../widgets/noconnection_column.dart';
-import '../widgets/rectangular_product_item.dart';
+import '../../../application/filter_cubit/filter_cubit.dart';
+import '../../../application/products_bloc/product_bloc.dart';
+import '../../../configs/app_dimensions.dart';
+import '../../../configs/app_typography.dart';
+import '../../../configs/space.dart';
+import '../../../core/constant/assets.dart';
+import '../../../core/constant/colors.dart';
+import '../../../core/enums/enums.dart';
+import '../../../core/error/failures.dart';
+import '../../../core/router/app_router.dart';
+import '../../../data/models/product/filter_params_model.dart';
+import '../../../data/models/product/product_model.dart';
+import '../../../domain/entities/product/product.dart';
+import '../../widgets/noconnection_column.dart';
+import '../../widgets/rectangular_product_item.dart';
 
 class ProductsListScreen extends StatefulWidget {
   const ProductsListScreen({super.key});
@@ -31,6 +31,8 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
   final ScrollController scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
+  final List<String> availableCategories = ['전체', '꽃', '관엽식물', '다육식물', '허브'];
+  String selectedCategory = '전체';
 
   void _scrollListener() {
     double maxScroll = scrollController.position.maxScrollExtent;
@@ -141,6 +143,25 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   ],
                 ),
               ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: DropdownButton<String>(
+                  isExpanded: true,
+                  value: selectedCategory,
+                  items: availableCategories.map((String category) {
+                    return DropdownMenuItem<String>(
+                      value: category,
+                      child: Text(category),
+                    );
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    if (newValue == null) return;
+                    setState(() {
+                      selectedCategory = newValue;
+                    });
+                  },
+                ),
+              ),
               Space.y1!,
               Expanded(
                 child: RefreshIndicator(
@@ -166,21 +187,15 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                     builder: (context, state) {
                       if (state is ProductLoaded) {
                         final products = state.products;
-                        if (products.isEmpty) {
-                          return const Center(child: Text('상품이 없습니다.'));
-                        }
-                        return _buildGrid(products);
+                        return _buildGridOrEmpty(products, '상품이 없습니다.');
                       } else if (state is ProductError) {
                         if (state.failure is NetworkFailure) {
-                          return const Center(
-                              child: Text("네트워크 오류\n다시 시도해주세요"));
+                          return const Center(child: Text("네트워크 오류\n다시 시도해주세요"));
                         } else {
-                          return const NoConnectionColumn(
-                              isFromCategories: false);
+                          return const NoConnectionColumn(isFromCategories: false);
                         }
                       } else {
-                        return const Center(
-                            child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       }
                     },
                   ),
@@ -192,6 +207,24 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
       ),
     );
   }
+
+  List<ProductEntity> _filterByCategory(List<ProductEntity> products) {
+    if (selectedCategory == '전체') return products;
+    return products.where((p) {
+      if (p.categories.isEmpty) return false;
+      final name = p.categories[0].name;
+      return name == selectedCategory;
+    }).toList();
+  }
+
+  Widget _buildGridOrEmpty(List<ProductEntity> products, String emptyMessage) {
+    final filtered = _filterByCategory(products);
+    if (filtered.isEmpty) {
+      return Center(child: Text(emptyMessage));
+    }
+    return _buildGrid(filtered);
+  }
+
 
   Widget _buildGrid(List<ProductEntity> products) {
     return GridView.builder(

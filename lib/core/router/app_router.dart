@@ -12,7 +12,7 @@ import 'package:greon/presentation/screens/notifications.dart';
 import 'package:greon/presentation/screens/order_failure.dart';
 import 'package:greon/presentation/screens/order_success.dart';
 import 'package:greon/presentation/screens/orders.dart';
-import 'package:greon/presentation/screens/product_details.dart';
+import 'package:greon/presentation/screens/product/product_details.dart';
 import 'package:greon/presentation/screens/root.dart';
 import 'package:greon/presentation/screens/search.dart';
 import 'package:greon/presentation/screens/signup.dart';
