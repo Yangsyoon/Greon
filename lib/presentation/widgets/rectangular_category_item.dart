@@ -29,7 +29,7 @@ class RectangularCategoryItem extends StatelessWidget {
         if (category != null) {
           context
               .read<NavigationCubit>()
-              .updateTab(NavigationTab.productsTap);
+              .updateTab(NavigationTab.shoppingTab);
           context.read<FilterCubit>().update(category: category);
           context
               .read<ProductBloc>()
@@ -69,7 +69,7 @@ class RectangularCategoryItem extends StatelessWidget {
             ),
             Container(
               decoration: const BoxDecoration(
-                  color: AppColors.CommonCyan,
+                  color: Colors.black,
                   borderRadius: BorderRadius.only(
                       topRight: Radius.circular(5),
                       bottomRight: Radius.circular(5))),

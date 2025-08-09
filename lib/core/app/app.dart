@@ -73,42 +73,71 @@ class MyApp extends StatelessWidget {
           create: (context) => di.sl<NotificationsCubit>()..init(),
         ),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: appTitle,
-        onGenerateRoute: AppRouter.onGenerateRoute,
-        theme: ThemeData.light().copyWith(
-          canvasColor: const Color(0xFFDFFFD6),
-          appBarTheme: AppBarTheme(
-              color: Theme.of(context).scaffoldBackgroundColor,
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          title: appTitle,
+          onGenerateRoute: AppRouter.onGenerateRoute,
+          theme: ThemeData.light().copyWith(
+            canvasColor: Colors.white,
+            scaffoldBackgroundColor: Colors.white,
+            appBarTheme: const AppBarTheme(
+              color: Colors.white,
               elevation: 0,
               toolbarHeight: 56,
               centerTitle: true,
-              iconTheme:
-                  const IconThemeData(color: const Color(0xFFDFFFD6), size: 30)),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFDFFFD6),
-              minimumSize: const Size(170, 50),
-              elevation: 0,
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.zero,
+              iconTheme: IconThemeData(
+                color: Colors.black,
+                size: 30,
+              ),
+              titleTextStyle: TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-          ),
-          outlinedButtonTheme: OutlinedButtonThemeData(
-              style: OutlinedButton.styleFrom(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero,
+            elevatedButtonTheme: ElevatedButtonThemeData(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.white),
+                side: MaterialStateProperty.resolveWith<BorderSide?>(
+                      (states) {
+                    return BorderSide(color: Colors.black, width: 1);
+                  },
+                ),
+                foregroundColor: MaterialStateProperty.all(Colors.black),
+              ),
             ),
-          )),
-          iconTheme: const IconThemeData(color: const Color(0xFFDFFFD6), size: 30),
-          floatingActionButtonTheme: const FloatingActionButtonThemeData(
-            backgroundColor: const Color(0xFFDFFFD6),
+            outlinedButtonTheme: OutlinedButtonThemeData(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.white),
+                side: MaterialStateProperty.all(
+                  BorderSide(color: Colors.black, width: 1),
+                ),
+                foregroundColor: MaterialStateProperty.all(Colors.black),
+              ),
+            ),
+            iconTheme: const IconThemeData(
+              color: Colors.black,
+              size: 30,
+            ),
+            floatingActionButtonTheme: const FloatingActionButtonThemeData(
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black,
+            ),
+            textTheme: ThemeData.light().textTheme.apply(
+              bodyColor: Colors.black,
+              displayColor: Colors.black,
+            ),
+            bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+              backgroundColor: Colors.white,
+              selectedItemColor: Colors.black,
+              unselectedItemColor: Colors.black54,
+              selectedLabelStyle: TextStyle(color: Colors.black),
+              unselectedLabelStyle: TextStyle(color: Colors.black54),
+            ),
           ),
-        ),
-        initialRoute: AppRouter.splash,
-      ),
+          initialRoute: AppRouter.splash,
+        )
+
     );
   }
 }

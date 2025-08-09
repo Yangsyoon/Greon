@@ -45,7 +45,7 @@ Future<void> showSuccessfulAuthDialog(BuildContext context, String text) async {
                       child: Text(
                         "Ok",
                         style:
-                            AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+                            AppText.h3b?.copyWith(color: Colors.black),
                       ),
                     )
                   ],

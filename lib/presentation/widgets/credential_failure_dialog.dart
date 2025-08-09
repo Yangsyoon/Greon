@@ -35,7 +35,7 @@ Future<void> showCredentialErrorDialog(BuildContext context) async {
                           child: Text(
                             "Dismiss",
                             style: AppText.h3b?.copyWith(
-                              color: AppColors.CommonCyan,
+                              color: Colors.black,
                             ),
                           ))
                     ],

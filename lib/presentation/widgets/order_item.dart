@@ -121,7 +121,7 @@ class OrderItemWidget extends StatelessWidget {
                                       Text(
                                         '\$${product.price.toStringAsFixed(2)}',
                                         style: AppText.b1b?.copyWith(
-                                            color: AppColors.CommonCyan),
+                                            color: Colors.black),
                                       )
                                     ],
                                   ),

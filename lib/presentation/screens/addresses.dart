@@ -67,7 +67,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                             Text(
                               "주소가 없습니다.",
                               style: AppText.h3b
-                                  ?.copyWith(color: AppColors.CommonCyan),
+                                  ?.copyWith(color: Colors.black),
                             ),
                             Space.yf(1),
                             Text(

@@ -5,6 +5,7 @@ import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../configs/configs.dart';
 import '../../core/constant/colors.dart';
 import '../../core/enums/enums.dart';
+import '../screens/product/products_list.dart';
 
 Widget emptyCartContainer(BuildContext context) {
   return Container(
@@ -18,7 +19,7 @@ Widget emptyCartContainer(BuildContext context) {
         children: [
           Text(
             "카트에 아이템이 없습니다",
-            style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+            style: AppText.h3b?.copyWith(color: Colors.black),
           ),
           Space.yf(),
           Text(
@@ -35,13 +36,17 @@ Widget emptyCartContainer(BuildContext context) {
             width: AppDimensions.normalize(100),
             child: ElevatedButton(
               onPressed: () {
-                context
-                    .read<NavigationCubit>()
-                    .updateTab(NavigationTab.productsTap);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const ProductsListScreen(),
+                  ),
+                );
               },
+
               child: Text(
                 "아이템 추가하러 가기",
-                style: AppText.h3b?.copyWith(color: Colors.white),
+                style: AppText.h3b?.copyWith(color: Colors.black),
               ),
             ),
           )

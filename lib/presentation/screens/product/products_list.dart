@@ -136,7 +136,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                       },
                       child: SvgPicture.asset(
                         AppAssets.Cart,
-                        color: AppColors.CommonCyan,
+                        color: Colors.black,
                         height: AppDimensions.normalize(10),
                       ),
                     ),

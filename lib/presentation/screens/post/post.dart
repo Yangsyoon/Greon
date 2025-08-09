@@ -9,7 +9,8 @@ import '../../../application/post_bloc/post_state.dart';
 import '../../widgets/noconnection_column.dart';
 
 class BulletinBoardScreen extends StatefulWidget {
-  const BulletinBoardScreen({super.key});
+  final String? initialCategory;
+  const BulletinBoardScreen({super.key, this.initialCategory});
 
   @override
   State<BulletinBoardScreen> createState() => _BulletinBoardScreenState();
@@ -26,7 +27,12 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<PostBloc>().add(LoadPosts()); // 기본 전체 로딩
+    if (widget.initialCategory != null) {
+      selectedCategory = widget.initialCategory!;
+    }
+    context.read<PostBloc>().add(
+      LoadPosts(category: selectedCategory == '전체' ? null : selectedCategory),
+    );
   }
 
   Future<String> getNickname(String uid) async {

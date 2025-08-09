@@ -15,12 +15,12 @@ Widget transparentButton({
       child: Container(
         padding: Space.vf(.77),
         decoration: BoxDecoration(
-          border: Border.all(color: AppColors.CommonCyan),
+          border: Border.all(color: Colors.black),
         ),
         child: Center(
           child: Text(
             buttonText,
-            style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+            style: AppText.h3b?.copyWith(color: Colors.black),
           ),
         ),
       ),

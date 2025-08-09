@@ -25,10 +25,10 @@ class NotificationSettingsPage extends StatelessWidget {
           onPressed: () {
             openAppSettings(); // 시스템 설정으로 이동
           },
-          icon: Icon(Icons.settings, color: AppColors.CommonCyan),
+          icon: Icon(Icons.settings, color: Colors.black),
           label: Text(
             "알림 설정 열기",
-            style: AppText.b2?.copyWith(color: AppColors.CommonCyan),
+            style: AppText.b2?.copyWith(color: Colors.black),
           ),
         ),
       ],

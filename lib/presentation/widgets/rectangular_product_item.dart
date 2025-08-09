@@ -100,7 +100,7 @@ class RectangularProductItem extends StatelessWidget {
                   Text(
                     price.toString() + r'원',
                     style: AppText.h3?.copyWith(
-                      color: AppColors.CommonCyan,
+                      color: Colors.black,
                       fontSize: (AppText.h3?.fontSize ?? 14) * 0.8,
                       height: 1.0,
                     ),

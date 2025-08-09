@@ -60,7 +60,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                               Text(
                                 "SHIPPING ADDRESS",
                                 style: AppText.h3b
-                                    ?.copyWith(color: AppColors.CommonCyan),
+                                    ?.copyWith(color: Colors.black),
                               ),
                               Space.yf(.5),
                               const Text(
@@ -92,7 +92,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                         Text(
                           "COUPON CODE",
                           style: AppText.h3b
-                              ?.copyWith(color: AppColors.CommonCyan),
+                              ?.copyWith(color: Colors.black),
                         ),
                         Space.yf(1.1),
                         Container(
@@ -142,7 +142,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                         Text(
                           "PAYMENT METHOD",
                           style: AppText.h3b
-                              ?.copyWith(color: AppColors.CommonCyan),
+                              ?.copyWith(color: Colors.black),
                         ),
                         Space.yf(.4),
                         Container(
@@ -165,7 +165,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                         Radio(
                                           value: PaymentMethod.knet,
                                           fillColor: MaterialStateProperty.all(
-                                              AppColors.CommonCyan),
+                                              Colors.black),
                                           groupValue: paymentMethod,
                                           onChanged: (PaymentMethod? value) {
                                             setState(() {
@@ -191,7 +191,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
                                         Radio(
                                           value: PaymentMethod.visa,
                                           fillColor: MaterialStateProperty.all(
-                                              AppColors.CommonCyan),
+                                              Colors.black),
                                           groupValue: paymentMethod,
                                           onChanged: (PaymentMethod? value) {
                                             setState(() {

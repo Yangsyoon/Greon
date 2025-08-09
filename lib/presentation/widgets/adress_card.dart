@@ -61,13 +61,13 @@ class AdressCard extends StatelessWidget {
                           padding: Space.v1,
                           decoration: BoxDecoration(
                             border: Border.all(
-                                color: AppColors.CommonCyan, width: 1),
+                                color: Colors.black, width: 1),
                           ),
                           child: Center(
                               child: Text(
                             "Change Address",
                             style: AppText.h3b
-                                ?.copyWith(color: AppColors.CommonCyan),
+                                ?.copyWith(color: Colors.black),
                           )),
                         )
                       : SizedBox(

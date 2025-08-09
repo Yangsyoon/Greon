@@ -191,10 +191,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           onPressed: () {
             openAppSettings(); // 시스템 설정으로 이동
           },
-          icon: Icon(Icons.settings, color: AppColors.CommonCyan),
+          icon: Icon(Icons.settings, color: Colors.black),
           label: Text(
             "알림 설정 열기",
-            style: AppText.b2?.copyWith(color: AppColors.CommonCyan),
+            style: AppText.b2?.copyWith(color: Colors.black),
           ),
         ),
       ],
@@ -207,13 +207,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       {
         'label': '내 식물 보기',
         'icon': Icons.local_florist,
-        'color': AppColors.CommonCyan,
+        'color': Colors.black,
         'onTap': () => Navigator.of(context).pushNamed(AppRouter.myPlants),
       },
       {
         'label': '내 식물 추가',
         'icon': Icons.add,
-        'color': AppColors.CommonCyan,
+        'color': Colors.black,
         'onTap': () => Navigator.of(context).pushNamed(AppRouter.registerPlant),
       },
       {
@@ -338,6 +338,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _sectionTitle(String title) {
-    return Text(title, style: AppText.h3b?.copyWith(color: AppColors.CommonCyan));
+    return Text(title, style: AppText.h3b?.copyWith(color: Colors.black));
   }
 }

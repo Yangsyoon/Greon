@@ -53,7 +53,7 @@ class _NoConnectionColumnState extends State<NoConnectionColumn> {
             Text(
               "NO INTERNET CONECTION\nServer Error".toUpperCase(),
               style: AppText.h2b?.copyWith(
-                color: AppColors.CommonCyan,
+                color: Colors.black,
                 height: 1.7,
               ),
               textAlign: TextAlign.center,

@@ -1,9 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/configs/app.dart';
 import 'package:greon/core/constant/colors.dart';
 import 'package:greon/presentation/screens/cart.dart';
+import 'package:greon/presentation/screens/my_plants_screen.dart';
 import 'package:greon/presentation/screens/post/post.dart';
 import 'package:greon/presentation/screens/home.dart';
 import 'package:greon/presentation/screens/product/products_list.dart';
@@ -12,6 +14,7 @@ import 'package:greon/presentation/widgets/bottom_navbar.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../core/enums/enums.dart';
+import 'calendar_screen.dart';
 
 class RootScreen extends StatelessWidget {
   const RootScreen({super.key});
@@ -19,13 +22,14 @@ class RootScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     App.init(context);
+    final String? userId = FirebaseAuth.instance.currentUser?.uid;
     Future<bool> _onWillPop() async {
       return (await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
               title: const Text(
                 "Exit Application",
-                style: TextStyle(color: AppColors.CommonCyan),
+                style: TextStyle(color: Colors.black),
               ),
               content: const Text(
                 "Are You Sure?",
@@ -45,7 +49,7 @@ class RootScreen extends StatelessWidget {
                 TextButton(
                   child: const Text(
                     "No",
-                    style: TextStyle(color: AppColors.CommonCyan),
+                    style: TextStyle(color: Colors.black),
                   ),
                   onPressed: () {
                     Navigator.of(context).pop();
@@ -69,10 +73,12 @@ class RootScreen extends StatelessWidget {
                   return const HomeScreen();
                 case NavigationTab.boardTab:
                   return const BulletinBoardScreen();
-                case NavigationTab.productsTap:
+                case NavigationTab.myPlantsTab:
+                  return const MyPlantsScreen();
+                case NavigationTab.shoppingTab:
                   return const ProductsListScreen();
-                case NavigationTab.cartTab:
-                  return const CartScreen();
+                case NavigationTab.calendarTab:
+                  return CalendarScreen(userId: userId ?? '');
                 case NavigationTab.profileTab:
                   return const ProfileScreen();
                 default:

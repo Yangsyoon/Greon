@@ -44,6 +44,9 @@ sealed class AppAssets {
   static const String LeftArrow = "assets/svg/leftarrow.svg";
   static const String BadConnection = "assets/svg/badconnection.svg";
   static const String Curves = "assets/svg/curves.svg"; //Svg Error
+  static const String Calendar = "assets/svg/calendar.svg";
+  static const String Plant = "assets/svg/plant.svg";
+  static const String Board = "assets/svg/board.svg";
 
   //png
   static const String Ads = "assets/images/ad.png";

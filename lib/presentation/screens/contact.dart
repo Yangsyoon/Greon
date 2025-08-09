@@ -52,7 +52,7 @@ class ContactScreen extends StatelessWidget {
                         Text(
                           "CONTACT US ON WHATSAPP",
                           style: AppText.b1b
-                              ?.copyWith(color: AppColors.CommonCyan),
+                              ?.copyWith(color: Colors.black),
                         )
                       ]),
                   SizedBox(
@@ -77,7 +77,7 @@ class ContactScreen extends StatelessWidget {
                 children: [
                   Text(
                     "GET IN TOUCH",
-                    style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+                    style: AppText.h3b?.copyWith(color: Colors.black),
                   ),
                   TextFieldTopText("Full Name*"),
                   buildTextFormField(_contactTextEditingController, "Name"),
@@ -132,7 +132,7 @@ class ContactScreen extends StatelessWidget {
                                               child: Text(
                                                 "Ok",
                                                 style: AppText.h3b?.copyWith(
-                                                  color: AppColors.CommonCyan,
+                                                  color: Colors.black,
                                                 ),
                                               ),
                                             )

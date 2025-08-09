@@ -6,6 +6,8 @@ import 'package:greon/presentation/widgets/transparent_button.dart';
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../core/enums/enums.dart';
 import '../../core/router/app_router.dart';
+import '../screens/cart.dart';
+import '../screens/product/products_list.dart';
 
 Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
   return showModalBottomSheet(
@@ -38,21 +40,26 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
               transparentButton(
                   context: context,
                   onTap: () {
-                    context
-                        .read<NavigationCubit>()
-                        .updateTab(NavigationTab.cartTab);
-                    Navigator.popAndPushNamed(context, AppRouter.root);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CartScreen(),
+                      ),
+                    );
                   },
+
                   buttonText: "Proceed to Cart"),
               Space.yf(1.5),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    context
-                        .read<NavigationCubit>()
-                        .updateTab(NavigationTab.productsTap);
-                    Navigator.popAndPushNamed(context, AppRouter.root);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ProductsListScreen(),
+                      ),
+                    );
                   },
                   child: Text(
                     "Continue Shopping",

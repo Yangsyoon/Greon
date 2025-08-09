@@ -88,13 +88,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   style: AppText.h2b),
               Space.yf(.6),
               Text("${widget.product.price} 원",
-                  style: AppText.h3b?.copyWith(color: AppColors.CommonCyan)),
+                  style: AppText.h3b?.copyWith(color: Colors.black)),
               Space.yf(.6),
               Row(
                 children: [
                   Text("카테고리 : ", style: AppText.h3),
                   Text(widget.product.categories.first.name.toUpperCase(),
-                      style: AppText.h3b?.copyWith(color: AppColors.CommonCyan)),
+                      style: AppText.h3b?.copyWith(color: Colors.black)),
                 ],
               ),
               Space.yf(1.1),
@@ -142,7 +142,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 ? _pageController.page?.round()
                                 : 0,
                             dotsCount: widget.product.images.length,
-                            activeColor: AppColors.CommonCyan,
+                            activeColor: Colors.black
                           ),
                         ),
                       ],
@@ -172,7 +172,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         decoration: BoxDecoration(
                           border: Border.all(
                             color: _selectedPageIndex == index
-                                ? AppColors.CommonCyan
+                                ? Colors.black
                                 : Colors.transparent,
                             width: 5.0,
                           ),
@@ -282,7 +282,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               },
               child: Text(
                 "카트에 추가",
-                style: AppText.h3b?.copyWith(color: Colors.white),
+                style: AppText.h3b?.copyWith(color: Colors.black),
               ),
             )
           ],

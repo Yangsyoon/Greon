@@ -35,7 +35,7 @@ Future<void> showAuthErrorDialog(BuildContext context, {required String message}
                         child: Text(
                           "Dismiss",
                           style: AppText.h3b?.copyWith(
-                            color: AppColors.CommonCyan,
+                            color: Colors.black,
                           ),
                         ),
                       )

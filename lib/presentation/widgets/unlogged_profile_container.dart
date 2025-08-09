@@ -27,7 +27,7 @@ Widget unloggedProfileContainer(BuildContext context) {
         SvgPicture.asset(
           AppAssets.Profile,
           colorFilter:
-              const ColorFilter.mode(AppColors.CommonCyan, BlendMode.srcIn),
+              const ColorFilter.mode(Colors.black, BlendMode.srcIn),
           height: AppDimensions.normalize(19),
         ),
         Space.y1!,
@@ -47,43 +47,44 @@ Widget unloggedProfileContainer(BuildContext context) {
             onPressed: () {
               Navigator.of(context).pushNamed(AppRouter.login);
             },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white,
+              side: const BorderSide(color: Colors.black),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              minimumSize: const Size.fromHeight(50),
+            ),
             child: Text(
               "로그인",
-              style: AppText.h3b?.copyWith(color: Colors.white),
+              style: AppText.h3b?.copyWith(color: Colors.black),
             ),
           ),
         ),
         Space.yf(1.1),
-        transparentButton(
-          context: context,
-          onTap: () {
-            Navigator.of(context).pushNamed(AppRouter.signup);
-          },
-          buttonText: "회원가입",
-        ),
-        /* GestureDetector(
-          onTap: () {
-            Navigator.of(context)
-                .pushNamed(AppRouter.signup);
-          },
-          child: Container(
-            padding: Space.vf(.75),
-            margin: Space.v1,
-            decoration: BoxDecoration(
-                borderRadius:
-                BorderRadius.circular(5),
-                border: Border.all(
-                    color: AppColors.CommonCyan,
-                    width: 1)),
-            child: Center(
-              child: Text(
-                "Signup",
-                style: AppText.h3b?.copyWith(
-                    color: AppColors.CommonCyan),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton(
+            onPressed: () {
+              Navigator.of(context).pushNamed(AppRouter.signup);
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.white, // 흰 배경
+              side: const BorderSide(color: Colors.black), // 검은 테두리
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
               ),
+              minimumSize: const Size.fromHeight(50),
+            ),
+            child: Text(
+              "회원가입",
+              style: AppText.h3b?.copyWith(color: Colors.black),
             ),
           ),
-        ),*/
+        ),
+
         Space.yf(.6)
       ],
     ),

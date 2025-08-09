@@ -28,7 +28,7 @@ class SquareCategoryItem extends StatelessWidget {
       onTap: () {
         context
             .read<NavigationCubit>()
-            .updateTab(NavigationTab.productsTap);
+            .updateTab(NavigationTab.shoppingTab);
         context.read<FilterCubit>().update(category: category);
         context
             .read<ProductBloc>()

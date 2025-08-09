@@ -134,7 +134,7 @@ class _LoginScreenState extends State<LoginScreen> {
         SizedBox(height: 12),
         ElevatedButton(
           onPressed: _signOut,
-          child: Text("로그아웃", style: AppText.h3b?.copyWith(color: Colors.white)),
+          child: Text("로그아웃", style: AppText.h3b?.copyWith(color: Colors.black)),
         ),
       ],
     );
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Text(
           "로그인",
-          style: AppText.h2b?.copyWith(color: AppColors.CommonCyan),
+          style: AppText.h2b?.copyWith(color: Colors.black),
         ),
         Space.y!,
         Text(
@@ -174,7 +174,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             Text(
               "비밀번호를 잊으셨나요?",
-              style: AppText.h3?.copyWith(color: AppColors.CommonCyan),
+              style: AppText.h3?.copyWith(color: Colors.black),
             )
           ],
         ),
