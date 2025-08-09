@@ -41,10 +41,17 @@ class RectangularProductItem extends StatelessWidget {
 
     return GestureDetector(
       onTap: onClick != null ? () => onClick!() : null,
-      child: Card(
-        elevation: 3,
+      child: Container(
+        height: 280, // 적절한 고정 높이 지정 (필요에 따라 조절)
         margin: EdgeInsets.only(bottom: AppDimensions.normalize(10.8)),
-        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: Colors.grey.shade300,
+            width: 1,
+          ),
+          borderRadius: BorderRadius.zero,
+          color: Colors.white,
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -55,7 +62,8 @@ class RectangularProductItem extends StatelessWidget {
                     ? CachedNetworkImage(
                   imageUrl: imageUrl,
                   fit: BoxFit.cover,
-                  placeholder: (context, url) => Center(child: placeholderShimmer()),
+                  placeholder: (context, url) =>
+                      Center(child: placeholderShimmer()),
                   errorWidget: (context, url, error) =>
                   const Center(child: Icon(Icons.error)),
                 )
@@ -70,27 +78,35 @@ class RectangularProductItem extends StatelessWidget {
               padding: isFromWishlist ? Space.all(.5, .5) : Space.all(1, 1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
+                mainAxisSize: MainAxisSize.min, // 최소 크기만 차지하도록
                 children: [
                   Text(
                     name,
-                    style: AppText.h3b,
+                    style: AppText.h3b?.copyWith(fontSize: (AppText.h3b?.fontSize ?? 18) * 0.8),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  Space.y!,
+                  SizedBox(height: 4), // Space.y! 대신 작게 직접 지정
                   Text(
                     category.isNotEmpty ? category[0].name : '',
+                    style: TextStyle(
+                      fontSize: (AppText.h3?.fontSize ?? 14) * 0.8,
+                      height: 1.0, // 줄 간격 (기본 1.0으로 줄임)
+                    ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  Space.y!,
+                  SizedBox(height: 4),
                   Text(
                     price.toString() + r'원',
                     style: AppText.h3?.copyWith(
                       color: AppColors.CommonCyan,
+                      fontSize: (AppText.h3?.fontSize ?? 14) * 0.8,
+                      height: 1.0,
                     ),
                   ),
+
+
                 ],
               ),
             ),
@@ -102,8 +118,10 @@ class RectangularProductItem extends StatelessWidget {
 
   Widget placeholderShimmer() {
     return Container(
-      color: Colors.grey[300],
-      height: AppDimensions.normalize(70),
+      color: Colors.grey.shade300,
+      child: const Center(
+        child: CircularProgressIndicator(),
+      ),
     );
   }
 }

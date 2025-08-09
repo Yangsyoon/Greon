@@ -19,6 +19,7 @@ PreferredSizeWidget CustomAppBar(
     child: Padding(
       padding: EdgeInsets.only(top: AppDimensions.normalize(10)),
       child: AppBar(
+        backgroundColor: Colors.white, // ✅ 배경색 흰색으로 지정
         automaticallyImplyLeading: automaticallyImplyLeading,
         title: Text(
           title,

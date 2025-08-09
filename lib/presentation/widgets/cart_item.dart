@@ -39,9 +39,16 @@ class CartItemCard extends StatelessWidget {
 
   Widget buildBody(BuildContext context) {
     final cart = cartItem!;
+
     return Column(
       children: [
         Space.yf(1),
+        const Divider(
+          height: 1,
+          thickness: 0.5,
+          color: Colors.grey, // 원하시는 색상으로 조절
+        ),
+        Space.yf(0.5),
         GestureDetector(
           onTap: () {
             Navigator.of(context).pushNamed(
@@ -54,80 +61,96 @@ class CartItemCard extends StatelessWidget {
             height: AppDimensions.normalize(50),
             width: double.infinity,
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                CachedNetworkImage(
-                  imageUrl: (cart.product.images.isNotEmpty)
-                      ? cart.product.images.last
-                      : 'https://via.placeholder.com/150', // 또는 앱에서 지정한 기본 이미지
-                  width: AppDimensions.normalize(50),
-                  height: double.infinity,
-                  fit: BoxFit.fill,
-                  placeholder: (context, url) =>
-                      LoadingShimmer(isSquare: false),
-                  errorWidget: (context, url, error) =>
-                  const Center(child: Icon(Icons.error)),
+                Checkbox(
+                  value: isSelected,
+                  onChanged: (_) => onLongClick?.call(),
+                  activeColor: Colors.black,
+                ),
+                SizedBox(width: 4),
+                //  이미지 + 수량조절
+                Column(
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: (cart.product.images.isNotEmpty)
+                          ? cart.product.images.last
+                          : 'https://via.placeholder.com/150',
+                      width: AppDimensions.normalize(30),
+                      height: AppDimensions.normalize(30),
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) =>
+                          LoadingShimmer(isSquare: false),
+                      errorWidget: (context, url, error) =>
+                      const Center(child: Icon(Icons.error)),
+                    ),
+                    Space.yf(0.5),
+                    SizedBox(
+                      height: AppDimensions.normalize(15),
+                      width: AppDimensions.normalize(55),
+                      child: QuantityRow(
+                        quantity: cartItem?.quantity ?? 1,
+                        padding: 8,
+                        onIncrease: () {
+                          if (cartItem != null) {
+                            context.read<CartBloc>().add(
+                                IncreaseCartItemQuantity(cartItem!));
+                          }
+                        },
+                        onDecrease: () {
+                          if (cartItem != null) {
+                            context.read<CartBloc>().add(
+                                DecreaseCartItemQuantity(cartItem!));
+                          }
+                        },
+                      ),
+                    ),
+                  ],
                 ),
 
                 Space.xf(),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: AppDimensions.normalize(75),
-                      child: Text(
-                        cart.product.name,
-                        maxLines: 2,
-                        style: AppText.h3b,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    Space.yf(.5),
-                    Text(
-                      "${cart.product.price} 원",
-                      style: AppText.h3b?.copyWith(
-                        color: AppColors.CommonCyan,
-                      ),
-                    ),
-                    Space.yf(),
-                    Row(
-                      children: [
-                        SizedBox(
-                          height: AppDimensions.normalize(15),
-                          width: AppDimensions.normalize(55),
-                          child: QuantityRow(
-                            quantity: cartItem?.quantity ?? 1,
-                            padding: 8,
-                            onIncrease: () {
-                              if (cartItem != null) {
-                                context.read<CartBloc>().add(IncreaseCartItemQuantity(cartItem!));
-                              }
-                            },
-                            onDecrease: () {
-                              if (cartItem != null) {
-                                context.read<CartBloc>().add(DecreaseCartItemQuantity(cartItem!));
-                              }
-                            },
-                          )
-                        ),
-                        Space.xf(),
-                        GestureDetector(
-                          onTap: onDelete,
-                          child: const Icon(
-                            Icons.delete_forever_outlined,
-                            size: 40,
-                            color: Colors.black54,
+
+                // ✅ 텍스트 + 삭제아이콘 + 가격
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 제품명 + 삭제 아이콘
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 제품 이름
+                          Expanded(
+                            child: Text(
+                              cart.product.name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: AppText.h3b,
+                            ),
                           ),
-                        )
-                      ],
-                    )
-                  ],
-                )
+                          // 삭제 아이콘
+                          GestureDetector(
+                            onTap: onDelete,
+                            child: Image.asset(
+                              'assets/images/delete_icon.png',
+                              width: 24,
+                              height: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Space.yf(3.5),
+                      Text(
+                        "${cart.product.price} 원",
+                        style: AppText.h3b?.copyWith(color: Colors.black),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
         ),
-        Space.yf(1),
-        const DashedSeparator()
       ],
     );
   }

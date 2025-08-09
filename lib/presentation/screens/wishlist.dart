@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../data/models/product/product_model.dart';
 import '../../application/wishlist_cubit/wishlist_cubit.dart';
 import 'package:greon/application/wishlist_cubit/wishlist_cubit.dart';
+import '../../core/router/app_router.dart';
 import '../widgets/rectangular_product_item.dart';
 
 class WishListScreen extends StatefulWidget {
@@ -17,11 +18,16 @@ class WishListScreen extends StatefulWidget {
 
   @override
   State<WishListScreen> createState() => _WishListScreenState();
+
 }
 
 class _WishListScreenState extends State<WishListScreen> {
+  Set<ProductModel> selectedItems = {};
+  bool allSelected = false;
+
   @override
   void initState() {
+
     context.read<WishlistCubit>().loadWishlist();
     super.initState();
   }
@@ -75,7 +81,7 @@ class _WishListScreenState extends State<WishListScreen> {
                     children: [
                       Text(
                         "상품이 없습니다",
-                        style: AppText.h3b?.copyWith(color: AppColors.CommonCyan),
+                        style: AppText.h3b?.copyWith(color: Colors.white),
                       ),
                       const SizedBox(height: 8),
                       const Text(
@@ -89,31 +95,117 @@ class _WishListScreenState extends State<WishListScreen> {
               );
             }
 
-            return GridView.builder(
-              padding: Space.all(1),
-              itemCount: wishlist.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                childAspectRatio: 0.7,
-                crossAxisSpacing: 6,
+            return Column(
+              children: [
+              SizedBox(
+              height: 48,
+                // ✅ 전체선택 / 선택삭제 UI
+                child :Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      Transform.scale(
+                        scale: 0.6, // 체크박스 크기 0.6배 축소
+                        child: Checkbox(
+                          value: allSelected,
+                          onChanged: (val) {
+                            setState(() {
+                              allSelected = val!;
+                              selectedItems = val ? wishlist.toSet() : {};
+                            });
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text(
+                        '전체 선택',
+                        style: TextStyle(fontSize: 8.4), // 글자 크기 0.6배 (기본 14로 가정)
+                      ),
+                      const Spacer(),
+                      ElevatedButton(
+                        onPressed: selectedItems.isEmpty
+                            ? null
+                            : () {
+                         // context.read<WishlistCubit>().removeFromWishlistBatch(selectedItems.toList());
+                          setState(() {
+                            selectedItems.clear();
+                            allSelected = false;
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          minimumSize: const Size(0, 0), // 최소 크기 제한 해제
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          foregroundColor: Colors.white,  // 텍스트 색상 흰색으로 지정
+                          backgroundColor: Colors.red,    // 필요하면 버튼 배경색도 지정 가능 (예: 빨간색)
+                        ),
+
+                        child: const Text(
+                          '선택 삭제',
+                          style: TextStyle(fontSize: 8.4), // 버튼 텍스트 크기도 0.6배
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-              physics: const ClampingScrollPhysics(),
-              shrinkWrap: true,
-              itemBuilder: (BuildContext context, int index) {
-                final product = wishlist[index];
-                return RectangularProductItem(
-                  product: product,
-                  isFromWishlist: true,
-                );
-              },
-            );
-          } else {
-            return const Center(
-              child: CircularProgressIndicator(
-                color: AppColors.CommonCyan,
-              ),
+
+
+                // ✅ GridView
+                Expanded(
+                  child: GridView.builder(
+                    padding: Space.all(1),
+                    itemCount: wishlist.length,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 0.7,
+                      crossAxisSpacing: 6,
+                    ),
+                    physics: const ClampingScrollPhysics(),
+                    itemBuilder: (BuildContext context, int index) {
+                      final productModel = wishlist[index];
+                      final isSelected = selectedItems.contains(productModel);
+
+                      return GestureDetector(
+                        onTap: () {
+                          Navigator.of(context).pushNamed(AppRouter.productDetails, arguments: productModel.toEntity());
+                        },
+                        onLongPress: () {
+                          setState(() {
+                            if (isSelected) {
+                              selectedItems.remove(productModel);
+                            } else {
+                              selectedItems.add(productModel);
+                            }
+                            allSelected = selectedItems.length == wishlist.length;
+                          });
+                        },
+                        child: Stack(
+                          children: [
+                            RectangularProductItem(
+                              product: productModel,
+                              isFromWishlist: true,
+                            ),
+                            if (isSelected)
+                              const Positioned(
+                                top: 8,
+                                right: 8,
+                                child: Icon(Icons.check_circle, color: Colors.green),
+                              ),
+                          ],
+                        ),
+                      );
+
+                    },
+                  ),
+                ),
+              ],
             );
           }
+          // ❗ 다른 모든 경우의 기본 처리
+          return const Center(
+            child: CircularProgressIndicator(color: Colors.white),
+          );
         },
       ),
     );

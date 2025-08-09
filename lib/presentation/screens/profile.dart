@@ -8,6 +8,7 @@ import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/assets.dart';
 import 'package:greon/core/constant/colors.dart';
 import 'package:greon/core/router/app_router.dart';
+import 'package:greon/presentation/screens/settings_page.dart';
 import 'package:greon/presentation/widgets/top_row.dart';
 import 'package:greon/presentation/widgets/user_logged_profile_container.dart';
 import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
@@ -122,43 +123,56 @@ class _ProfileScreenState extends State<ProfileScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildPlantActionButtons(context),
-        Space.yf(2),
-        _sectionTitle("내 계정"),
-        Space.yf(1),
-        _iconRow(context, "주문 내역", AppAssets.Archive, AppRouter.orders, arrowForward),
-        _iconRow(context, "배송지 관리", AppAssets.Marker, AppRouter.addresses, arrowForward),
-        _iconRow(context, "계정 정보 수정", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
-        _iconRow(context, "비밀번호 변경", AppAssets.Lock, null, arrowForward),
-        _iconRowWithSystemIcon(
-          context,
-          "회원 정보 입력",
-          Icons.info_outline,
-          null,
-          arrowForward,
-          iconColor: AppColors.CommonCyan,
-          onTapOverride: () {
-            Navigator.of(context).push(MaterialPageRoute(builder: (_) => UserInfoInputPage()));
-          },
-        ),
-        Space.yf(2),
-        _sectionTitle("설정"),
-        Space.yf(1),
-        _notificationSettingButton(),
-        Space.yf(3),
-        Center(child: Text("버전 1.0", style: AppText.b1b)),
-        Space.yf(1),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(AppAssets.Whats, height: AppDimensions.normalize(15)),
-            SizedBox(width: AppDimensions.normalize(6)),
-            SvgPicture.asset(AppAssets.Noti, height: AppDimensions.normalize(15)),
-            SizedBox(width: AppDimensions.normalize(6)),
-            SvgPicture.asset(AppAssets.Music, height: AppDimensions.normalize(15)),
-          ],
-        ),
-        Space.yf(2),
+        // Space.yf(2),
+        // _sectionTitle("내 계정"),
+        // Space.yf(1),
+        // _iconRow(context, "주문 내역", AppAssets.Archive, AppRouter.orders, arrowForward),
+        // _iconRow(context, "배송지 관리", AppAssets.Marker, AppRouter.addresses, arrowForward),
+        // _iconRow(context, "계정 정보 수정", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
+        // _iconRow(context, "비밀번호 변경", AppAssets.Lock, null, arrowForward),
+        // _iconRowWithSystemIcon(
+        //   context,
+        //   "회원 정보 입력",
+        //   Icons.info_outline,
+        //   null,
+        //   arrowForward,
+        //   iconColor: AppColors.CommonCyan,
+        //   onTapOverride: () {
+        //     Navigator.of(context).push(MaterialPageRoute(builder: (_) => UserInfoInputPage()));
+        //   },
+        // ),
+        // Space.yf(2),
+        // _sectionTitle("설정"),
+        // Space.yf(1),
+        // _notificationSettingButton(),
+        // Space.yf(1),
+        _settingButton(context),
+        // Space.yf(3),
+        // Center(child: Text("버전 1.0", style: AppText.b1b)),
+        // Space.yf(1),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     SvgPicture.asset(AppAssets.Whats, height: AppDimensions.normalize(15)),
+        //     SizedBox(width: AppDimensions.normalize(6)),
+        //     SvgPicture.asset(AppAssets.Noti, height: AppDimensions.normalize(15)),
+        //     SizedBox(width: AppDimensions.normalize(6)),
+        //     SvgPicture.asset(AppAssets.Music, height: AppDimensions.normalize(15)),
+        //   ],
+        // ),
+        // Space.yf(2),
       ],
+    );
+  }
+
+  Widget _settingButton(BuildContext context) {
+    return ElevatedButton(
+      onPressed: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => SettingsPage()),
+        );
+      },
+      child: const Text('설정 열기'),
     );
   }
 

@@ -25,12 +25,15 @@ import '../../domain/entities/product/product.dart';
 import '../../presentation/screens/add_schedule_screen.dart';
 import '../../presentation/screens/calendar_screen.dart';
 import '../../presentation/screens/my_plants_screen.dart';
+import '../../presentation/screens/notification_settings_page.dart';
 import '../../presentation/screens/post/post.dart';
 import '../../presentation/screens/post/post_detail.dart';
 import '../../presentation/screens/register_plant.dart';
 import '../../presentation/screens/addresses.dart';
 
 import '../../presentation/screens/post/write_post.dart';
+import '../../presentation/screens/settings_page.dart';
+import '../../presentation/screens/user_info_input_page.dart';
 import '../error/exceptions.dart';
 import 'package:flutter/material.dart';
 
@@ -58,6 +61,13 @@ sealed class AppRouter {
   static const String myPlants = '/my-plants';
   static const calendar = '/calendar';
   static const String addSchedule = '/addSchedule';
+
+  static const String settings = '/settings';
+  static const String userInfoInput = '/user_info_input';
+  static const String addressManagement = '/address_management';
+  static const String customInfo = '/custom_info';
+  static const String notificationSettings = '/notification_settings';
+  static const String changePassword = '/change_password';
 
   // 게시판 관련 경로 추가
   static const String bulletinBoard = '/bulletin-board';
@@ -177,6 +187,20 @@ sealed class AppRouter {
       case postDetail:
         final post = routeSettings.arguments as PostModel;
         return MaterialPageRoute(builder: (_) => PostDetailScreen(post: post));
+      case settings:
+        return MaterialPageRoute(builder: (_) => const SettingsPage());
+
+      case userInfoInput:
+        return MaterialPageRoute(builder: (_) => UserInfoInputPage());
+
+      case notificationSettings:
+        return MaterialPageRoute(builder: (_) => const NotificationSettingsPage());
+
+      // case customInfo:
+      //   return MaterialPageRoute(builder: (_) => const CustomInfoPage());
+      //
+      // case changePassword:
+      //   return MaterialPageRoute(builder: (_) => const ChangePasswordPage());
 
       default:
         throw const RouteException('Route not found!');

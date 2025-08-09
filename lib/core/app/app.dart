@@ -78,17 +78,17 @@ class MyApp extends StatelessWidget {
         title: appTitle,
         onGenerateRoute: AppRouter.onGenerateRoute,
         theme: ThemeData.light().copyWith(
-          canvasColor: AppColors.CommonCyan,
+          canvasColor: const Color(0xFFDFFFD6),
           appBarTheme: AppBarTheme(
               color: Theme.of(context).scaffoldBackgroundColor,
               elevation: 0,
               toolbarHeight: 56,
               centerTitle: true,
               iconTheme:
-                  const IconThemeData(color: AppColors.CommonCyan, size: 30)),
+                  const IconThemeData(color: const Color(0xFFDFFFD6), size: 30)),
           elevatedButtonTheme: ElevatedButtonThemeData(
             style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.CommonCyan,
+              backgroundColor: const Color(0xFFDFFFD6),
               minimumSize: const Size(170, 50),
               elevation: 0,
               shape: const RoundedRectangleBorder(
@@ -102,9 +102,9 @@ class MyApp extends StatelessWidget {
               borderRadius: BorderRadius.zero,
             ),
           )),
-          iconTheme: const IconThemeData(color: AppColors.CommonCyan, size: 30),
+          iconTheme: const IconThemeData(color: const Color(0xFFDFFFD6), size: 30),
           floatingActionButtonTheme: const FloatingActionButtonThemeData(
-            backgroundColor: AppColors.CommonCyan,
+            backgroundColor: const Color(0xFFDFFFD6),
           ),
         ),
         initialRoute: AppRouter.splash,

@@ -25,52 +25,35 @@ class QuantityRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         GestureDetector(
           onTap: onDecrease,
-          child: Container(
-            width: AppDimensions.normalize(15), // 기존보다 작게
-            height: AppDimensions.normalize(15),
-            decoration: BoxDecoration(
-              color: AppColors.CommonCyan,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                AppAssets.Minus,
-                color: Colors.white,
-                height: 10,
-              ),
-            ),
+          child: Image.asset(
+            'assets/images/minus.png',
+            width: 20,   // 이미지 크기 조절 가능
+            height: 20,
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: padding),
-          child: Text(
-            "$quantity",
-            style: AppText.h3b,
+        const SizedBox(width: 12),
+        Text(
+          '$quantity',
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
           ),
         ),
+        const SizedBox(width: 12),
         GestureDetector(
           onTap: onIncrease,
-          child: Container(
-            width: AppDimensions.normalize(15),
-            height: AppDimensions.normalize(15),
-            decoration: BoxDecoration(
-              color: AppColors.CommonCyan,
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: Center(
-              child: SvgPicture.asset(
-                AppAssets.Plus,
-                color: Colors.white,
-                height: 13,
-              ),
-            ),
+          child: Image.asset(
+            'assets/images/plus.png',
+            width: 20,
+            height: 20,
           ),
         ),
       ],
     );
+
   }
 }
