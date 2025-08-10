@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase Auth 추가
 import 'package:greon/domain/entities/user/app_user.dart';
+import 'package:greon/presentation/screens/profile.dart';
+import 'package:greon/presentation/screens/root.dart';
 import 'package:greon/presentation/widgets/auth_error_dialog.dart'; // 로그인 오류 대화상자
 import 'package:greon/presentation/widgets/successful_auth_dialog.dart'; // 로그인 성공 대화상자
 import 'package:greon/presentation/widgets/custom_appbar.dart';
@@ -14,7 +16,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/application/user_bloc/user_bloc.dart'; // UserBloc import 추가
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 
+import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
+import '../../core/enums/enums.dart';
 import '../../di/di.dart' as di;
+import 'home.dart';
 
 
 AppUser convertFirebaseUserToAppUser(firebase_auth.User firebaseUser) {
@@ -118,27 +123,30 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Form(
             key: _formKey,
             child: _isLoggedIn
-                ? _buildLoggedInUI() // 로그인 됐을 때
-                : _buildLoginFormUI(), // 로그인 안 됐을 때
+                ? _buildLoggedInUI()
+                : _buildLoginFormUI(),
           ),
         ),
       ),
     );
   }
 
-  // 로그인 후 UI
   Widget _buildLoggedInUI() {
-    return Column(
-      children: [
-        Text("${_loggedInEmail ?? ''}로 로그인 하셨습니다.", style: AppText.b1), // null-safe 처리
-        SizedBox(height: 12),
-        ElevatedButton(
-          onPressed: _signOut,
-          child: Text("로그아웃", style: AppText.h3b?.copyWith(color: Colors.black)),
-        ),
-      ],
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const RootScreen()),
+      );
+    });
+
+    return const Center(child: CircularProgressIndicator());
   }
+
+
+
+
+
+
 
   // 로그인 폼 UI
   Widget _buildLoginFormUI() {
@@ -192,7 +200,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           child: Text(
             "로그인",
-            style: AppText.h3b?.copyWith(color: Colors.white),
+            style: AppText.h3b?.copyWith(color: Colors.black),
           ),
         ),
         Space.yf(1.5),

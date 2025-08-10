@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
@@ -118,52 +119,120 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+
+
   Widget _buildLoggedInSection(BuildContext context, SvgPicture arrowForward) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildPlantActionButtons(context),
-        // Space.yf(2),
-        // _sectionTitle("내 계정"),
-        // Space.yf(1),
-        // _iconRow(context, "주문 내역", AppAssets.Archive, AppRouter.orders, arrowForward),
-        // _iconRow(context, "배송지 관리", AppAssets.Marker, AppRouter.addresses, arrowForward),
-        // _iconRow(context, "계정 정보 수정", AppAssets.Profile, null, arrowForward, iconColor: AppColors.CommonCyan),
-        // _iconRow(context, "비밀번호 변경", AppAssets.Lock, null, arrowForward),
-        // _iconRowWithSystemIcon(
-        //   context,
-        //   "회원 정보 입력",
-        //   Icons.info_outline,
-        //   null,
-        //   arrowForward,
-        //   iconColor: AppColors.CommonCyan,
-        //   onTapOverride: () {
-        //     Navigator.of(context).push(MaterialPageRoute(builder: (_) => UserInfoInputPage()));
-        //   },
-        // ),
-        // Space.yf(2),
-        // _sectionTitle("설정"),
-        // Space.yf(1),
-        // _notificationSettingButton(),
-        // Space.yf(1),
-        _settingButton(context),
-        // Space.yf(3),
-        // Center(child: Text("버전 1.0", style: AppText.b1b)),
-        // Space.yf(1),
-        // Row(
-        //   mainAxisAlignment: MainAxisAlignment.center,
-        //   children: [
-        //     SvgPicture.asset(AppAssets.Whats, height: AppDimensions.normalize(15)),
-        //     SizedBox(width: AppDimensions.normalize(6)),
-        //     SvgPicture.asset(AppAssets.Noti, height: AppDimensions.normalize(15)),
-        //     SizedBox(width: AppDimensions.normalize(6)),
-        //     SvgPicture.asset(AppAssets.Music, height: AppDimensions.normalize(15)),
-        //   ],
-        // ),
-        // Space.yf(2),
+        const Divider(),
+        const Text(
+          '내 정보',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        const SizedBox(height: 16),
+
+        // 🔽 기존에 버튼 눌러서 이동하던 settings_page 내용 바로 표시
+        _buildSettingRow(
+          context: context,
+          title: '회원 정보 수정',
+          onTap: () => Navigator.pushNamed(context, '/user_info_input'),
+        ),
+        const SizedBox(height: 12),
+        _buildSettingRow(
+          context: context,
+          title: '배송지 관리',
+          onTap: () => Navigator.pushNamed(context, '/addresses'),
+        ),
+        const SizedBox(height: 12),
+        _buildSettingRow(
+          context: context,
+          title: '맞춤 정보',
+          onTap: () => Navigator.pushNamed(context, '/custom_info'),
+        ),
+        const SizedBox(height: 12),
+        _buildSettingRow(
+          context: context,
+          title: '알림 설정',
+          onTap: () => Navigator.of(context).pushNamed(AppRouter.notificationSettings),
+        ),
+        const SizedBox(height: 24),
+        const Divider(),
+        const SizedBox(height: 24),
+        const Text(
+          '계정',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+        ),
+        const SizedBox(height: 12),
+        _buildSettingRow(
+          context: context,
+          title: '비밀번호 변경',
+          onTap: () => Navigator.pushNamed(context, '/change_password'),
+        ),
+        const SizedBox(height: 12),
+        _buildSettingRow(
+          context: context,
+          title: '로그아웃',
+          onTap: () {
+            // 로그아웃 처리
+          },
+        ),
       ],
     );
   }
+
+  Widget _buildSettingRow({
+    required BuildContext context,
+    required String title,
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        height: 60,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border: Border.all(color: const Color(0xFFE0E0E0)),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(color: Colors.black, fontSize: 16),
+              ),
+            ),
+            const Icon(
+              Icons.chevron_right,
+              color: Colors.grey,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // 테스트 알림 시험
+  Future<void> createTestNotification(String fcmToken) async {
+    final now = DateTime.now();
+    final scheduledTime = now.add(const Duration(minutes: 1)); // 1분 뒤 알림
+
+    final docRef = FirebaseFirestore.instance.collection('notification_requests').doc();
+
+    await docRef.set({
+      'fcm_token': fcmToken,
+      'title': '테스트 알림',
+      'body': '앱이 꺼져 있어도 알림이 오는지 확인해보세요!',
+      'scheduled_time': Timestamp.fromDate(scheduledTime),
+      'sent': false,
+      'created_at': Timestamp.now(),
+    });
+
+    print('테스트 알림 문서 생성 완료: ${docRef.id}');
+  }
+
 
   Widget _settingButton(BuildContext context) {
     return ElevatedButton(
