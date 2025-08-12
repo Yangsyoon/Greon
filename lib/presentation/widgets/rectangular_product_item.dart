@@ -42,43 +42,46 @@ class RectangularProductItem extends StatelessWidget {
     return GestureDetector(
       onTap: onClick != null ? () => onClick!() : null,
       child: Container(
-        height: 280, // 적절한 고정 높이 지정 (필요에 따라 조절)
+        height: 240, // 적절한 고정 높이 지정 (필요에 따라 조절)
         margin: EdgeInsets.only(bottom: AppDimensions.normalize(10.8)),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.grey.shade300,
-            width: 1,
-          ),
           borderRadius: BorderRadius.zero,
           color: Colors.white,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Expanded(
-              child: Hero(
-                tag: id,
-                child: imageUrl.isNotEmpty
-                    ? CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  fit: BoxFit.cover,
-                  placeholder: (context, url) =>
-                      Center(child: placeholderShimmer()),
-                  errorWidget: (context, url, error) =>
-                  const Center(child: Icon(Icons.error)),
-                )
-                    : SvgPicture.asset(
-                  AppAssets.greonIcon,
-                  fit: BoxFit.contain,
+            Padding(
+              padding: isFromWishlist ? Space.all(.5, .5) : Space.all(1, 1),
+              child: SizedBox(
+                height: 130, // 이미지 높이 키움
+                child: Hero(
+                  tag: id,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: imageUrl.isNotEmpty
+                        ? CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      fit: BoxFit.cover,  // 사진 꽉 차게
+                      placeholder: (context, url) => Center(child: placeholderShimmer()),
+                      errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                    )
+                        : SvgPicture.asset(
+                      AppAssets.greonIcon,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
                 ),
               ),
             ),
-            Space.y1!,
+
+            SizedBox(height: 5),
+
             Padding(
               padding: isFromWishlist ? Space.all(.5, .5) : Space.all(1, 1),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min, // 최소 크기만 차지하도록
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
                     name,
@@ -86,12 +89,12 @@ class RectangularProductItem extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
-                  SizedBox(height: 4), // Space.y! 대신 작게 직접 지정
+                  SizedBox(height: 4),
                   Text(
                     category.isNotEmpty ? category[0].name : '',
                     style: TextStyle(
                       fontSize: (AppText.h3?.fontSize ?? 14) * 0.8,
-                      height: 1.0, // 줄 간격 (기본 1.0으로 줄임)
+                      height: 1.0,
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -105,12 +108,11 @@ class RectangularProductItem extends StatelessWidget {
                       height: 1.0,
                     ),
                   ),
-
-
                 ],
               ),
             ),
           ],
+
         ),
       ),
     );

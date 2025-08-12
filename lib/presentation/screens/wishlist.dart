@@ -35,7 +35,7 @@ class _WishListScreenState extends State<WishListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar('위시리스트', context, automaticallyImplyLeading: true),
+      appBar: CustomAppBar('찜', context, automaticallyImplyLeading: true),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           showDialog(
@@ -149,6 +149,69 @@ class _WishListScreenState extends State<WishListScreen> {
                   ),
                 ),
               ),
+
+                /// ✅ 여기 새 행 추가
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                  child: Row(
+                    children: [
+                      // 왼쪽 붙는 버튼
+                      ElevatedButton(
+                        onPressed: () {
+                          // 왼쪽 버튼 동작
+                        },
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // 원래의 절반
+                          minimumSize: const Size(0, 0), // 크기 제한 해제
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+
+                        child: const Text('담은순 >'),
+                      ),
+                      const Spacer(),
+                      // 오른쪽 붙는 4개 버튼
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // 원래의 절반
+                          minimumSize: const Size(0, 0), // 크기 제한 해제
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('전체'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // 원래의 절반
+                          minimumSize: const Size(0, 0), // 크기 제한 해제
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('식물'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // 원래의 절반
+                          minimumSize: const Size(0, 0), // 크기 제한 해제
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('토분'),
+                      ),
+                      const SizedBox(width: 8),
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3), // 원래의 절반
+                          minimumSize: const Size(0, 0), // 크기 제한 해제
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text('원예용품'),
+                      ),
+                    ],
+                  ),
+                ),
 
 
                 // ✅ GridView

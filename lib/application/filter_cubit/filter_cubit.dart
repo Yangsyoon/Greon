@@ -64,11 +64,6 @@ class FilterCubit extends Cubit<FilterProductParams> {
   void reset() => emit(const FilterProductParams());
 
   Future<void> applySearch(String keyword) async {
-    if (keyword.trim().isEmpty) {
-      emit(state.copyWith(products: [])); // 검색 초기화
-      return;
-    }
-
     try {
       final snapshot = await firestore.collection('products').get();
 
@@ -78,6 +73,13 @@ class FilterCubit extends Cubit<FilterProductParams> {
 
       final products = await Future.wait(futures);
 
+      if (keyword.trim().isEmpty) {
+        // 검색어 없으면 전체 상품
+        emit(state.copyWith(products: products));
+        return;
+      }
+
+      // 검색어 있는 경우 필터링
       final filtered = products.where((product) {
         final containsKeyword = product.name.contains(keyword);
         return containsKeyword;
@@ -90,5 +92,6 @@ class FilterCubit extends Cubit<FilterProductParams> {
       emit(state.copyWith(products: []));
     }
   }
+
 
 }

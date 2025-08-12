@@ -54,4 +54,6 @@ sealed class AppAssets {
   static const String Profile_bg_png = "assets/images/profile-bg.png";
   static const String Curves_bg_png = "assets/images/curves-bg.png";
   static const String greonAppBar = "assets/images/greon.png";
+  static const String black_heart = "assets/images/black_heart.png";
+
 }
