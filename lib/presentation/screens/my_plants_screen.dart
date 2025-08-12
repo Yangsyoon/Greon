@@ -158,11 +158,28 @@ class MyPlantsScreen extends StatelessWidget {
 
                                     if (confirm == true) {
                                       try {
-                                        await FirebaseFirestore.instance.collection('plant').doc(plant.id).delete();
+                                        // plant 문서 삭제
+                                        await FirebaseFirestore.instance
+                                            .collection('plant')
+                                            .doc(plant.id)
+                                            .delete();
+
+                                        // 스토리지 파일 삭제 (없어도 무시)
                                         final ref = FirebaseStorage.instance
                                             .ref()
                                             .child('user_plant/$userId/${plant.id}.jpg');
-                                        await ref.delete();
+
+                                        try {
+                                          await ref.delete();
+                                        } catch (e) {
+                                          if (e is FirebaseException && e.code == 'object-not-found') {
+                                            print("이미지 없음, 삭제 스킵");
+                                          } else {
+                                            rethrow; // 다른 에러는 그대로 던짐
+                                          }
+                                        }
+
+                                        // users 문서에서 plant.id 제거
                                         await FirebaseFirestore.instance
                                             .collection('users')
                                             .doc(userId)
