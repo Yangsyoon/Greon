@@ -20,136 +20,138 @@ class BottomNavigation extends StatelessWidget {
 
     return BlocBuilder<NavigationCubit, NavigationTab>(
       builder: (context, activeTab) {
-        return SizedBox(
-          height: AppDimensions.normalize(27),
-          child: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: activeTab.index,
-            onTap: (index) {
-              final newTab = NavigationTab.values[index];
-              context.read<NavigationCubit>().updateTab(newTab);
-            },
-            items: <BottomNavigationBarItem>[
-              // 홈
-              BottomNavigationBarItem(
-                icon: Padding(
-                  padding: padding,
-                  child: SvgPicture.asset(
-                    AppAssets.Home,
-                    height: height,
-                    width: width,
-                    fit: BoxFit.fill,
-                    colorFilter: ColorFilter.mode(
-                      activeTab == NavigationTab.homeTab
-                          ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
-                          : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
-                      BlendMode.srcIn,
+        return SafeArea(
+          child: SizedBox(
+            height: AppDimensions.normalize(27),
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              currentIndex: activeTab.index,
+              onTap: (index) {
+                final newTab = NavigationTab.values[index];
+                context.read<NavigationCubit>().updateTab(newTab);
+              },
+              items: <BottomNavigationBarItem>[
+                // 홈
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: padding,
+                    child: SvgPicture.asset(
+                      AppAssets.Home,
+                      height: height,
+                      width: width,
+                      fit: BoxFit.fill,
+                      colorFilter: ColorFilter.mode(
+                        activeTab == NavigationTab.homeTab
+                            ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
+                            : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
+                  label: '홈',
                 ),
-                label: '홈',
-              ),
-              // 게시판
-              BottomNavigationBarItem(
-                icon: Padding(
-                  padding: padding,
-                  child: SvgPicture.asset(
-                    AppAssets.Board,
-                    height: height,
-                    width: width,
-                    fit: BoxFit.fill,
-                    colorFilter: ColorFilter.mode(
-                      activeTab == NavigationTab.homeTab
-                          ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
-                          : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
-                      BlendMode.srcIn,
+                // 게시판
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: padding,
+                    child: SvgPicture.asset(
+                      AppAssets.Board,
+                      height: height,
+                      width: width,
+                      fit: BoxFit.fill,
+                      colorFilter: ColorFilter.mode(
+                        activeTab == NavigationTab.homeTab
+                            ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
+                            : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
+                  label: '게시판',
                 ),
-                label: '게시판',
-              ),
-              // 내식물
-              BottomNavigationBarItem(
-                icon: Padding(
-                  padding: padding,
-                  child: SvgPicture.asset(
-                    AppAssets.Plant, // 내식물 아이콘에 맞게 변경 필요
-                    height: height,
-                    width: width,
-                    fit: BoxFit.fill,
-                    colorFilter: ColorFilter.mode(
-                      activeTab == NavigationTab.homeTab
-                          ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
-                          : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
-                      BlendMode.srcIn,
+                // 내식물
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: padding,
+                    child: SvgPicture.asset(
+                      AppAssets.Plant, // 내식물 아이콘에 맞게 변경 필요
+                      height: height,
+                      width: width,
+                      fit: BoxFit.fill,
+                      colorFilter: ColorFilter.mode(
+                        activeTab == NavigationTab.homeTab
+                            ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
+                            : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
+                  label: '내식물',
                 ),
-                label: '내식물',
-              ),
-              // 쇼핑
-              BottomNavigationBarItem(
-                icon: Padding(
-                  padding: padding,
-                  child: SvgPicture.asset(
-                    AppAssets.Cart,
-                    height: height,
-                    width: width,
-                    fit: BoxFit.fill,
-                    colorFilter: ColorFilter.mode(
-                      activeTab == NavigationTab.homeTab
-                          ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
-                          : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
-                      BlendMode.srcIn,
+                // 쇼핑
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: padding,
+                    child: SvgPicture.asset(
+                      AppAssets.Cart,
+                      height: height,
+                      width: width,
+                      fit: BoxFit.fill,
+                      colorFilter: ColorFilter.mode(
+                        activeTab == NavigationTab.homeTab
+                            ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
+                            : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
+                  label: '쇼핑',
                 ),
-                label: '쇼핑',
-              ),
-              // 캘린더
-              BottomNavigationBarItem(
-                icon: Padding(
-                  padding: padding,
-                  child: SvgPicture.asset(
-                    AppAssets.Calendar, // 캘린더 아이콘 이미지 경로
-                    height: height,
-                    width: width,
-                    fit: BoxFit.fill,
-                    colorFilter: ColorFilter.mode(
-                      activeTab == NavigationTab.homeTab
-                          ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
-                          : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
-                      BlendMode.srcIn,
+                // 캘린더
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: padding,
+                    child: SvgPicture.asset(
+                      AppAssets.Calendar, // 캘린더 아이콘 이미지 경로
+                      height: height,
+                      width: width,
+                      fit: BoxFit.fill,
+                      colorFilter: ColorFilter.mode(
+                        activeTab == NavigationTab.homeTab
+                            ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
+                            : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
+                  label: '캘린더',
                 ),
-                label: '캘린더',
-              ),
-              // 개인페이지
-              BottomNavigationBarItem(
-                icon: Padding(
-                  padding: padding,
-                  child: SvgPicture.asset(
-                    AppAssets.Profile,
-                    height: height,
-                    width: width,
-                    fit: BoxFit.fill,
-                    colorFilter: ColorFilter.mode(
-                      activeTab == NavigationTab.homeTab
-                          ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
-                          : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
-                      BlendMode.srcIn,
+                // 개인페이지
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: padding,
+                    child: SvgPicture.asset(
+                      AppAssets.Profile,
+                      height: height,
+                      width: width,
+                      fit: BoxFit.fill,
+                      colorFilter: ColorFilter.mode(
+                        activeTab == NavigationTab.homeTab
+                            ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
+                            : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
+                        BlendMode.srcIn,
+                      ),
                     ),
                   ),
+                  label: '개인페이지',
                 ),
-                label: '개인페이지',
-              ),
-            ],
-            selectedItemColor: Colors.black,
-            unselectedItemColor: Colors.black26,
-            iconSize: AppDimensions.normalize(12),
-            selectedLabelStyle: AppText.b2b,
-            unselectedLabelStyle: AppText.b2,
+              ],
+              selectedItemColor: Colors.black,
+              unselectedItemColor: Colors.black26,
+              iconSize: AppDimensions.normalize(12),
+              selectedLabelStyle: AppText.b2b,
+              unselectedLabelStyle: AppText.b2,
+            ),
           ),
         );
       },

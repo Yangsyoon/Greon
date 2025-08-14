@@ -6,6 +6,7 @@ import 'package:greon/presentation/screens/user_info_input_page.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'home.dart';
 import 'survey/interest_survey.dart';
 
 class RegisterPlant extends StatefulWidget {
@@ -331,7 +332,7 @@ class _RegisterPlantState extends State<RegisterPlant> {
                     await _submitPlantData(); // 식물 등록
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (_) => UserInfoInputPage()),
+                      MaterialPageRoute(builder: (_) => const HomeScreen()),
                     );
                   },
                   child: Text("설문 Skip"),

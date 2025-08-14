@@ -46,7 +46,6 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _pageController = PageController(initialPage: currentPage);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
     context.read<FilterCubit>().reset();
     context.read<WishlistCubit>().loadWishlist();
     context.read<PostBloc>().add(LoadPosts());
@@ -69,8 +68,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       body: SafeArea(
-        bottom: true, // ✅ 하단 네비게이션 버튼 영역 침범 방지
-        child: SingleChildScrollView(
+        top: true,
+        bottom: true,
+        child:SingleChildScrollView(
           padding: Space.h1!,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,15 +87,18 @@ class _HomeScreenState extends State<HomeScreen> {
                         context,
                         MaterialPageRoute(builder: (_) => const SettingsPage()),
                       );
-                    },
+                      },
                   ),
                 ],
               ),
               const SizedBox(height: 20),
 
-              Text(
-                "지금 내 식물은?",
-                style: AppText.h2b?.copyWith(color: Colors.black),
+              Center(
+                child: Text(
+                  "지금 내 식물은?",
+                  style: AppText.h2b?.copyWith(color: Colors.black),
+                  textAlign: TextAlign.center,
+                ),
               ),
               const SizedBox(height: 10),
 
@@ -115,96 +118,77 @@ class _HomeScreenState extends State<HomeScreen> {
                         .map((doc) => PlantEntity.fromFirestore(doc))
                         .toList();
 
-                    if (plants.isEmpty) {
-                      return Container(
-                        height: 150,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey[200],
-                        ),
-                        child: const Center(
-                          child: Icon(Icons.local_florist, size: 60, color: Colors.green),
-                        ),
-                      );
-                    }
-
-                    return GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2, // ✅ 한 줄에 2개
-                        crossAxisSpacing: 12,
-                        mainAxisSpacing: 12,
-                        childAspectRatio: 1,
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey, width: 1), // 테두리
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                      itemCount: plants.length,
-                      itemBuilder: (context, index) {
-                        final plant = plants[index];
-                        return FutureBuilder<String?>(
-                          future: getPlantImageUrl(userId, plant.id),
-                          builder: (context, imgSnapshot) {
-                            final imgUrl = imgSnapshot.data;
-                            return GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => PlantDetailScreen(plant: plant),
-                                  ),
-                                );
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Colors.white,
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black12,
-                                      blurRadius: 4,
-                                      offset: Offset(0, 2),
-                                    )
-                                  ],
-                                ),
+                      padding: EdgeInsets.all(12),
+                      child: plants.isEmpty
+                          ? Container(
+                        height: 150,
+                        alignment: Alignment.center,
+                        child: const Icon(Icons.local_florist, size: 60, color: Colors.green),
+                      )
+                          : GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2, // 한 줄에 2개
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.8, // 비율 조정
+                        ),
+                        itemCount: plants.length,
+                        itemBuilder: (context, index) {
+                          final plant = plants[index];
+                          return FutureBuilder<String?>(
+                            future: getPlantImageUrl(userId, plant.id),
+                            builder: (context, imgSnapshot) {
+                              final imgUrl = imgSnapshot.data;
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => PlantDetailScreen(plant: plant),
+                                    ),
+                                  );
+                                  },
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius: const BorderRadius.vertical(top: Radius.circular(12)),
+                                    ClipOval(
                                       child: imgUrl != null
                                           ? Image.network(
                                         imgUrl,
-                                        height: 100,
-                                        width: double.infinity,
+                                        width: 80,
+                                        height: 80,
                                         fit: BoxFit.cover,
                                       )
                                           : Container(
-                                        height: 100,
+                                        width: 80,
+                                        height: 80,
                                         color: Colors.grey[200],
-                                        alignment: Alignment.center, // 추가: 아이콘 중앙 정렬
-                                        child: const Icon(
-                                          Icons.eco,
-                                          size: 50, // 높이 100인데 아이콘 50이 적당
-                                          color: Colors.green,
-                                        ),
+                                        alignment: Alignment.center,
+                                        child: const Icon(Icons.eco, size: 40, color: Colors.green),
                                       ),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-                                      child: Text(
-                                        plant.name,
-                                        style: AppText.b1b,
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
+                                    SizedBox(height: 8),
+                                    Text(
+                                      plant.name,
+                                      style: AppText.b1b,
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ],
                                 ),
-                              ),
-                            );
+                              );
+                              },
+                          );
                           },
-                        );
-                      },
+                      ),
                     );
-                  },
+                    },
                 ),
               const SizedBox(height: 12),
 
@@ -217,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(builder: (_) => RegisterPlant()),
                         );
-                      },
+                        },
                       child: const Text("식물 등록하기"),
                     ),
                   ),
@@ -229,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           context,
                           MaterialPageRoute(builder: (_) => const MyPlantsScreen()),
                         );
-                      },
+                        },
                       child: const Text("내 식물 관리하기"),
                     ),
                   ),
@@ -237,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               const SizedBox(height: 20),
 
-              // 슬라이드 뷰
+                  // 슬라이드 뷰
               SizedBox(
                 height: AppDimensions.normalize(110),
                 child: Stack(
@@ -248,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         setState(() {
                           currentPage = pos;
                         });
-                      },
+                        },
                       itemCount: AppAssets.bannerImages.length,
                       itemBuilder: (context, index) {
                         return GestureDetector(
@@ -265,13 +249,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 SnackBar(content: Text('URL을 열 수 없습니다.')),
                               );
                             }
-                          },
+                            },
                           child: Image.asset(
                             AppAssets.bannerImages[index],
                             fit: BoxFit.cover,
                           ),
                         );
-                      },
+                        },
                     ),
                     Positioned(
                       bottom: AppDimensions.normalize(2),
@@ -303,37 +287,50 @@ class _HomeScreenState extends State<HomeScreen> {
   // ✅ 새로 만든 카테고리 버튼 UI
   Widget _buildBoardCategoryButtons(BuildContext context) {
     final categories = ["정보공유", "QnA", "자유"];
+    final base = 'assets/images/';
+    final imageUrls = [base+'info.png', base+'qna.png', base+'free.png'];
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("게시판", style: AppText.h2b?.copyWith(color: Colors.black)),
+        Text(
+          "게시판",
+          style: AppText.h2b?.copyWith(color: Colors.black),
+        ),
         const SizedBox(height: 8),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: categories.map((cat) {
+          children: List.generate(categories.length, (index) {
+            final cat = categories[index];
             return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => BulletinBoardScreen(initialCategory: cat),
-                      ),
-                    );
-                  },
-                  child: Text(cat),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => BulletinBoardScreen(initialCategory: cat),
+                    ),
+                  );
+                },
+                child: Column(
+                  children: [
+                    CircleAvatar(
+                      radius: 30,
+                      backgroundImage: AssetImage(imageUrls[index]),
+                      backgroundColor: Colors.grey[200],
+                    ),
+                    const SizedBox(height: 6),
+                    Text(cat, style: AppText.b1b),
+                  ],
                 ),
               ),
             );
-          }).toList(),
+          }),
         ),
         const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text("판매모종", style: AppText.h2b?.copyWith(color: Colors.black)),
+            Text("상점", style: AppText.h2b?.copyWith(color: Colors.black)),
             TextButton(
               onPressed: () {
                 Navigator.push(
