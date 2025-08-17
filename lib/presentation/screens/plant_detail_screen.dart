@@ -5,6 +5,7 @@
   import 'package:firebase_storage/firebase_storage.dart';
   import 'package:flutter/material.dart';
   import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
   import '../../domain/entities/plants/plant_entity.dart';
 
   class PlantDetailScreen extends StatefulWidget {
@@ -313,101 +314,135 @@
 
     @override
     Widget build(BuildContext context) {
-      return Scaffold(
-        appBar: AppBar(title: Text(plantState.name)),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: _pickAndUploadImage,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: imageUrl != null
-                      ? Image.network(
-                    imageUrl!,
-                    width: double.infinity,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  )
-                      : Container(
-                    width: double.infinity,
-                    height: 200,
-                    color: Colors.green[100],
-                    child: const Icon(Icons.eco, size: 64, color: Colors.green),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 24),
-              _buildEditableInfoCard(
-                icon: Icons.label,
-                title: "이름",
-                value: plantState.name,
-                field: 'name',
-              ),
-              _buildEditableInfoCard(
-                icon: Icons.water_drop,
-                title: "최근 물 준 날짜",
-                value: plantState.lastWateredDate,
-                field: 'last_watered_date',
-                isDate: true,
-              ),
-              _buildEditableInfoCard(
-                icon: Icons.vaccines,
-                title: "영양제 주기",
-                value: "${plantState.nutrientFrequency}일",
-                field: 'nutrient_frequency',
-                isNumeric: true,
-              ),
-              _buildEditableInfoCard(
-                icon: Icons.local_florist,
-                title: "분갈이 주기",
-                value: "${plantState.repottingCycle}일",
-                field: 'repotting_cycle',
-                isNumeric: true,
-              ),
-              Card(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 3,
-                child: ListTile(
-                  leading: const Icon(Icons.wb_sunny, color: Colors.green),
-                  title: const Text("필요 일조량", style: TextStyle(fontWeight: FontWeight.bold)),
-                  subtitle: Text(plantState.sunlightLevel),
-                  trailing: const Icon(Icons.edit, size: 18),
-                  onTap: _showSunlightLevelPicker,
-                ),
-              ),
-              _buildEditableInfoCard(
-                icon: Icons.invert_colors,
-                title: "물 주는 주기",
-                value: "${plantState.wateringCycle}일",
-                field: 'watering_cycle',
-                isNumeric: true,
-              ),
-              Center(
-                child: ElevatedButton.icon(
-                  onPressed: () async {
-                    await _waterPlantAndSchedule(context, plantState);
-                  },
-                  icon: const Icon(Icons.water_drop),
-                  label: const Text("물 주기"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        return const Scaffold(
+          body: Center(child: Text("로그인이 필요합니다")),
+        );
+      }
+
+      return StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(userId)
+            .collection('plants')
+            .doc(plantState.id)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (!snapshot.hasData) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          final data = snapshot.data!.data() as Map<String, dynamic>? ?? {};
+          final updatedPlantState = plantState.copyWith(
+            name: data['name'] ?? plantState.name,
+            lastWateredDate: (data['last_watered_date'] as Timestamp?) != null
+                ? DateFormat('yyyy-MM-dd').format((data['last_watered_date'] as Timestamp).toDate())
+                : plantState.lastWateredDate,
+            nutrientFrequency: data['nutrient_frequency'] ?? plantState.nutrientFrequency,
+            repottingCycle: data['repotting_cycle'] ?? plantState.repottingCycle,
+            sunlightLevel: data['sunlight_level'] ?? plantState.sunlightLevel,
+            wateringCycle: data['watering_cycle'] ?? plantState.wateringCycle,
+          );
+
+          return Scaffold(
+            appBar: AppBar(title: Text(updatedPlantState.name)),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: _pickAndUploadImage,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: imageUrl != null
+                          ? Image.network(
+                        imageUrl!,
+                        width: double.infinity,
+                        height: 200,
+                        fit: BoxFit.cover,
+                      )
+                          : Container(
+                        width: double.infinity,
+                        height: 200,
+                        color: Colors.green[100],
+                        child: const Icon(Icons.eco, size: 64, color: Colors.green),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(height: 24),
+                  _buildEditableInfoCard(
+                    icon: Icons.label,
+                    title: "이름",
+                    value: updatedPlantState.name,
+                    field: 'name',
+                  ),
+                  _buildEditableInfoCard(
+                    icon: Icons.water_drop,
+                    title: "최근 물 준 날짜",
+                    value: updatedPlantState.lastWateredDate,
+                    field: 'last_watered_date',
+                    isDate: true,
+                  ),
+                  _buildEditableInfoCard(
+                    icon: Icons.vaccines,
+                    title: "영양제 주기",
+                    value: "${updatedPlantState.nutrientFrequency}일",
+                    field: 'nutrient_frequency',
+                    isNumeric: true,
+                  ),
+                  _buildEditableInfoCard(
+                    icon: Icons.local_florist,
+                    title: "분갈이 주기",
+                    value: "${updatedPlantState.repottingCycle}일",
+                    field: 'repotting_cycle',
+                    isNumeric: true,
+                  ),
+                  Card(
+                    margin: const EdgeInsets.symmetric(vertical: 8),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    elevation: 3,
+                    child: ListTile(
+                      leading: const Icon(Icons.wb_sunny, color: Colors.green),
+                      title: const Text("필요 일조량", style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(updatedPlantState.sunlightLevel),
+                      trailing: const Icon(Icons.edit, size: 18),
+                      onTap: _showSunlightLevelPicker,
+                    ),
+                  ),
+                  _buildEditableInfoCard(
+                    icon: Icons.invert_colors,
+                    title: "물 주는 주기",
+                    value: "${updatedPlantState.wateringCycle}일",
+                    field: 'watering_cycle',
+                    isNumeric: true,
+                  ),
+                  Center(
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await _waterPlantAndSchedule(context, updatedPlantState);
+                      },
+                      icon: const Icon(Icons.water_drop),
+                      label: const Text("물 주기"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
               ),
-
-              const SizedBox(height: 16),
-
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       );
     }
+
   }

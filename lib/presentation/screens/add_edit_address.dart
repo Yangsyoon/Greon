@@ -1,180 +1,241 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greon/configs/configs.dart';
-import 'package:greon/core/router/app_router.dart';
-import 'package:greon/presentation/widgets/custom_appbar.dart';
-import 'package:greon/presentation/widgets/mobile_number_textfield.dart';
-import 'package:greon/presentation/widgets/textfield_toptext.dart';
+import 'package:flutter/services.dart';
+import 'package:kpostal/kpostal.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-import '../../application/delivery_info_action_cubit/delivery_info_action_cubit.dart';
-import '../../application/delivery_info_fetch_cubit/delivery_info_fetch_cubit.dart';
-import '../../application/notifications_cubit/notifications_cubit.dart';
-import '../../data/models/delivery/delivery_info_model.dart';
-import '../../domain/entities/delivery/delivery_info.dart';
-import '../widgets/custom_textfield.dart';
-
-class AddAddressScreen extends StatefulWidget {
-  final DeliveryInfo? deliveryInfo;
-
-  const AddAddressScreen({
-    super.key,
-    this.deliveryInfo,
-  });
+class AddEditAddressPage extends StatefulWidget {
+  const AddEditAddressPage({super.key});
 
   @override
-  State<AddAddressScreen> createState() => _AddAddressScreenState();
+  State<AddEditAddressPage> createState() => _AddEditAddressPageState();
 }
 
-class _AddAddressScreenState extends State<AddAddressScreen> {
-  String? id;
-  final TextEditingController _firstName = TextEditingController();
-  final TextEditingController _lastName = TextEditingController();
-  final TextEditingController _addressLineOne = TextEditingController();
-  final TextEditingController _addressLineTwo = TextEditingController();
-  final TextEditingController _city = TextEditingController();
-  final TextEditingController _zipCode = TextEditingController();
-  final TextEditingController _contactNumber = TextEditingController();
-  final _formKey = GlobalKey<FormState>();
+class _AddEditAddressPageState extends State<AddEditAddressPage> {
+  final TextEditingController _recipientController = TextEditingController();
+  final TextEditingController _postCodeController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _detailController = TextEditingController();
+  final TextEditingController _phone1Controller = TextEditingController();
+  final TextEditingController _phone2Controller = TextEditingController();
+  final TextEditingController _phone3Controller = TextEditingController();
 
-  @override
-  void initState() {
-    if (widget.deliveryInfo != null) {
-      id = widget.deliveryInfo!.id;
-      _firstName.text = widget.deliveryInfo!.firstName;
-      _lastName.text = widget.deliveryInfo!.lastName;
-      _addressLineOne.text = widget.deliveryInfo!.addressLineOne;
-      _addressLineTwo.text = widget.deliveryInfo!.addressLineTwo;
-      _city.text = widget.deliveryInfo!.city;
-      _zipCode.text = widget.deliveryInfo!.zipCode;
-      _contactNumber.text = widget.deliveryInfo!.contactNumber;
-    }
-    super.initState();
+  final FocusNode _recipientFocus = FocusNode();
+  final FocusNode _detailFocus = FocusNode();
+  final FocusNode _phone1Focus = FocusNode();
+  final FocusNode _phone2Focus = FocusNode();
+  final FocusNode _phone3Focus = FocusNode();
+
+  String? _postCode;
+
+  InputDecoration _inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      border: const UnderlineInputBorder(),
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(vertical: 8),
+    );
   }
 
-  @override
-  void dispose() {
-    _firstName.dispose();
-    _lastName.dispose();
-    _addressLineOne.dispose();
-    _addressLineTwo.dispose();
-    _city.dispose();
-    _zipCode.dispose();
-    _contactNumber.dispose();
-    super.dispose();
+  void _openKpostal() async {
+    Kpostal result = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => KpostalView()),
+    );
+
+    if (!mounted) return;
+
+    setState(() {
+      _postCode = result.postCode;
+      _postCodeController.text = result.postCode;
+      _addressController.text = result.address;
+    });
+  }
+
+  Widget _buildPhoneField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    FocusNode? nextFocus,
+    required int maxLength,
+  }) {
+    return SizedBox(
+      width: maxLength == 3 ? 50 : 60,
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        keyboardType: TextInputType.number,
+        maxLength: maxLength,
+        decoration: const InputDecoration(
+          counterText: "", // 0/3 표시 제거
+          isDense: true, // 패딩 최소화
+          contentPadding: EdgeInsets.symmetric(vertical: 8), // 높이 조절
+          border: UnderlineInputBorder(),
+        ),
+        onChanged: (value) {
+          if (value.length == maxLength && nextFocus != null) {
+            FocusScope.of(context).requestFocus(nextFocus);
+          }
+        },
+      )
+    );
+  }
+
+  Future<void> _saveAddress() async {
+    try {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      if (uid == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("로그인이 필요합니다.")),
+        );
+        return;
+      }
+
+      final addressData = {
+        'recipient': _recipientController.text,
+        'postCode': _postCodeController.text,
+        'address': _addressController.text,
+        'detail': _detailController.text,
+        'phone': '${_phone1Controller.text}-${_phone2Controller.text}-${_phone3Controller.text}',
+        'fullAddress': '${_addressController.text} ${_detailController.text}',
+        'createdAt': FieldValue.serverTimestamp(),
+      };
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('addresses')
+          .add(addressData);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("주소가 저장되었습니다.")),
+      );
+
+      Navigator.pop(context, addressData);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("저장 실패: $e")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar("새로운 주소 추가", context,
-          automaticallyImplyLeading: true),
-      body: BlocListener<DeliveryInfoActionCubit, DeliveryInfoActionState>(
-        listener: (context, state) {
-          if (state is DeliveryInfoActionLoading) {
-          } else if (state is DeliveryInfoAddActionSuccess) {
-            context
-                .read<DeliveryInfoFetchCubit>()
-                .addDeliveryInfo(state.deliveryInfo);
-            Navigator.of(context).pop();
-          } else if (state is DeliveryInfoEditActionSuccess) {
-            context
-                .read<DeliveryInfoFetchCubit>()
-                .editDeliveryInfo(state.deliveryInfo);
-            Navigator.of(context).pop();
-          } else if (state is DeliveryInfoActionFail) {}
-        },
-        child: Padding(
-          padding: Space.all(1.2, 0),
-          child: SingleChildScrollView(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  TextFieldTopText("성*"),
-                  buildTextFormField(_firstName, '성'),
-                  TextFieldTopText("이름*"),
-                  buildTextFormField(_lastName, '이름'),
-                  TextFieldTopText("도로명 주소*"),
-                  buildTextFormField(_addressLineOne, '도로명 주소'),
-                  TextFieldTopText("상세주소*"),
-                  buildTextFormField(_addressLineTwo, '상세주소'),
-                  TextFieldTopText("도시*"),
-                  buildTextFormField(_city, '도시'),
-                  TextFieldTopText("우편번호*"),
-                  buildTextFormField(_zipCode, '우편번호'),
-                  TextFieldTopText("전화번호*"),
-                  MobileNumberTextField(_contactNumber, '전화번호'),
-                  Space.yf(2),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          if (widget.deliveryInfo == null) {
-                            context
-                                .read<DeliveryInfoActionCubit>()
-                                .addDeliveryInfo(DeliveryInfoModel(
-                                  id: '',
-                                  firstName: _firstName.text,
-                                  lastName: _lastName.text,
-                                  addressLineOne: _addressLineOne.text,
-                                  addressLineTwo: _addressLineTwo.text,
-                                  city: _city.text,
-                                  zipCode: _zipCode.text,
-                                  contactNumber: _contactNumber.text,
-                                ));
-                            context
-                                .read<NotificationsCubit>()
-                                .showAndSaveNotification("Addresses Update",
-                                    "Congratulations, You have successfully updated your Address Book.");
-                            // Phoenix.rebirth(context);
-                            context
-                                .read<DeliveryInfoFetchCubit>()
-                                .fetchDeliveryInfo();
-                            Navigator.pop(context);
+      appBar: AppBar(title: const Text("배송지 추가")),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 받는 분
+            TextField(
+              controller: _recipientController,
+              focusNode: _recipientFocus,
+              decoration: _inputDecoration("받는 분"),
+              textInputAction: TextInputAction.next,
+              onSubmitted: (_) => _detailFocus.requestFocus(),
+            ),
+            const SizedBox(height: 16),
 
-                            Navigator.of(context)
-                                .popAndPushNamed(AppRouter.addresses);
-                          } else {
-                            context
-                                .read<DeliveryInfoActionCubit>()
-                                .editDeliveryInfo(DeliveryInfoModel(
-                                  id: id!,
-                                  firstName: _firstName.text,
-                                  lastName: _lastName.text,
-                                  addressLineOne: _addressLineOne.text,
-                                  addressLineTwo: _addressLineTwo.text,
-                                  city: _city.text,
-                                  zipCode: _zipCode.text,
-                                  contactNumber: _contactNumber.text,
-                                ));
-                            context
-                                .read<NotificationsCubit>()
-                                .showAndSaveNotification("Addresses Update",
-                                    "Congratulations, You have successfully updated your Address Book.");
-                            // Phoenix.rebirth(context);
-                            context
-                                .read<DeliveryInfoFetchCubit>()
-                                .fetchDeliveryInfo();
-                            Navigator.pop(context);
-                            //   Navigator.of(context).popAndPushNamed(AppRouter.addresses);
-                          }
-                        }
-                      },
-                      child: Text(
-                        widget.deliveryInfo == null
-                            ? '주소 추가'
-                            : '주소 수정',
-                        style: AppText.h3b?.copyWith(color: Colors.white),
-                      ),
-                    ),
+            // 우편번호 + 검색 버튼
+            Row(
+              children: [
+                Expanded(
+                  child: TextField(
+                    controller: _postCodeController,
+                    readOnly: true,
+                    decoration: _inputDecoration("우편번호"),
                   ),
-                  Space.yf(2)
-                ],
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: _openKpostal,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.black,
+                    elevation: 0,
+                  ),
+                  child: const Text("우편번호 검색"),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // 주소
+            TextField(
+              controller: _addressController,
+              readOnly: true,
+              decoration: _inputDecoration("주소"),
+            ),
+            const SizedBox(height: 16),
+
+            // 상세주소
+            TextField(
+              controller: _detailController,
+              focusNode: _detailFocus,
+              decoration: _inputDecoration("상세주소"),
+              textInputAction: TextInputAction.next,
+              onSubmitted: (_) => _phone1Focus.requestFocus(),
+            ),
+            const SizedBox(height: 16),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  "연락처",
+                  style: TextStyle(fontSize: 12),
+                ),
+                const SizedBox(height: 4), // 글자와 입력란 간격
+                Row(
+                  children: [
+                    _buildPhoneField(
+                      controller: _phone1Controller,
+                      focusNode: _phone1Focus,
+                      nextFocus: _phone2Focus,
+                      maxLength: 3,
+                    ),
+                    const SizedBox(width: 4),
+                    const Text('-'),
+                    const SizedBox(width: 4),
+                    _buildPhoneField(
+                      controller: _phone2Controller,
+                      focusNode: _phone2Focus,
+                      nextFocus: _phone3Focus,
+                      maxLength: 4,
+                    ),
+                    const SizedBox(width: 4),
+                    const Text('-'),
+                    const SizedBox(width: 4),
+                    _buildPhoneField(
+                      controller: _phone3Controller,
+                      focusNode: _phone3Focus,
+                      maxLength: 4,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+
+            const SizedBox(height: 32),
+
+            Center(
+              child: ElevatedButton(
+                onPressed: _saveAddress,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding:
+                  const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
+                ),
+                child: const Text(
+                  "배송지 입력하기",
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

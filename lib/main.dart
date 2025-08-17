@@ -163,6 +163,7 @@ Future<void> _setupFCM(BuildContext context) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+
   tz.initializeTimeZones();
   await GetStorage.init();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

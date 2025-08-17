@@ -37,6 +37,7 @@ import '../../presentation/screens/user_info_input_page.dart';
 import '../error/exceptions.dart';
 import 'package:flutter/material.dart';
 
+
 sealed class AppRouter {
   static const String splash = '/';
   static const String ads = '/ads';
@@ -73,6 +74,7 @@ sealed class AppRouter {
   static const String bulletinBoard = '/bulletin-board';
   static const String writePost = '/write-post';
   static const String postDetail = '/post-detail';
+  static const addEditAddress = '/add_edit_address';
 
   static Route<dynamic> _errorRoute() {
     String message = "에러";
@@ -122,13 +124,13 @@ sealed class AppRouter {
       case cart:
         return MaterialPageRoute(builder: (_) => const CartScreen());
       case addresses:
-        return MaterialPageRoute(builder: (_) => const AddressesScreen());
-      case addadress:
+        return MaterialPageRoute(builder: (_) => AddressesScreen());
+      case addEditAddress:
         DeliveryInfo? deliveryInfo = routeSettings.arguments as DeliveryInfo?;
         return MaterialPageRoute(
-            builder: (_) => AddAddressScreen(
-              deliveryInfo: deliveryInfo,
-            ));
+            builder: (_) => AddEditAddressPage()
+        );
+
       case checkout:
         List<CartItem> items = routeSettings.arguments as List<CartItem>;
         return MaterialPageRoute(

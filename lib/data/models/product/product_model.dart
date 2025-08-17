@@ -14,6 +14,7 @@ class ProductModel {
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isActive;
+  final bool? tempUnliked; // ✅ 하트 상태 표시를 위한 임시 필드
 
   const ProductModel({
     required this.id,
@@ -25,7 +26,34 @@ class ProductModel {
     required this.createdAt,
     required this.updatedAt,
     required this.isActive,
+    this.tempUnliked,
   });
+
+  ProductModel copyWith({
+    String? id,
+    String? name,
+    String? description,
+    int? price,
+    List<Category>? categories,
+    List<String>? images,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+    bool? isActive,
+    bool? tempUnliked,
+  }) {
+    return ProductModel(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      price: price ?? this.price,
+      categories: categories ?? this.categories,
+      images: images ?? this.images,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      isActive: isActive ?? this.isActive,
+      tempUnliked: tempUnliked ?? this.tempUnliked,
+    );
+  }
 
   factory ProductModel.errorModel([String? docId]) {
     return ProductModel(

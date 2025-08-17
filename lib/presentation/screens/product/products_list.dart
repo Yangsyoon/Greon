@@ -274,7 +274,7 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isSelected ? Colors.green : Colors.grey,
+                                    color: isSelected ? Colors.black : Colors.grey,
                                     width: 2,
                                   ),
                                   image: DecorationImage(

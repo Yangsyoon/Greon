@@ -37,16 +37,8 @@ export const scheduledNotificationSender = functions
       const sendPromise = admin.messaging().send(message)
         .then(() => {
           console.log(`FCM 전송 성공: ${doc.id}`);
-
-          // 예를 들어, 다음 예약일을 하루 후로 업데이트
-          const nextDate = new Date(data.scheduled_time.toDate());
-          nextDate.setDate(nextDate.getDate() + 1);
-
-          return doc.ref.update({
-            scheduled_time: admin.firestore.Timestamp.fromDate(nextDate),
-            sent: false,       // 다시 예약 대기 상태로
-            lastSent: admin.firestore.Timestamp.now(),
-          });
+          // 알림 성공 시 문서 즉시 삭제
+          return doc.ref.delete();
         })
         .catch((err) => {
           console.error(`FCM 전송 실패 (${doc.id}):`, err);

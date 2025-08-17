@@ -231,7 +231,10 @@ class _WishListScreenState extends State<WishListScreen> {
 
                       return GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushNamed(AppRouter.productDetails, arguments: productModel.toEntity());
+                          Navigator.of(context).pushNamed(
+                            AppRouter.productDetails,
+                            arguments: productModel.toEntity(),
+                          );
                         },
                         onLongPress: () {
                           setState(() {
@@ -245,23 +248,69 @@ class _WishListScreenState extends State<WishListScreen> {
                         },
                         child: Stack(
                           children: [
+                            /// 상품 카드
                             RectangularProductItem(
                               product: productModel,
                               isFromWishlist: true,
                             ),
+
+                            // ✅ 상단 하트 아이콘 (추가/삭제 공통)
+                            // ✅ 상단 하트 아이콘 (추가/삭제 공통)
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  final cubit = context.read<WishlistCubit>();
+
+                                  // 1. Firebase & DB 삭제
+                                  await cubit.removeFromWishlist(productModel.id);
+
+                                  // 2. 하트 색만 흰색(빈 하트)으로 변경
+                                  setState(() {
+                                    wishlist[wishlist.indexOf(productModel)] =
+                                        productModel.copyWith(tempUnliked: true);
+                                  });
+
+                                  // 3. 1초 후 UI에서 카드 제거
+                                  Future.delayed(const Duration(seconds: 1), () {
+                                    if (mounted) {
+                                      setState(() {
+                                        wishlist.remove(productModel);
+                                      });
+                                    }
+                                  });
+                                },
+
+                                // ✅ tempUnliked 상태에 따라 하트 모양/색상 변경
+                                child: Icon(
+                                  productModel.tempUnliked == true
+                                      ? Icons.favorite_border  // 빈 하트
+                                      : Icons.favorite,         // 꽉 찬 하트
+                                  color: productModel.tempUnliked == true
+                                      ? Colors.white             // 빈 하트일 때 내부 색
+                                      : Colors.red,               // 기본 빨간 하트
+                                  size: 24,
+                                ),
+                              ),
+                            ),
+
+
+
+                            /// 선택 모드 체크박스
                             if (isSelected)
                               const Positioned(
-                                top: 8,
+                                bottom: 8,
                                 right: 8,
                                 child: Icon(Icons.check_circle, color: Colors.green),
                               ),
                           ],
                         ),
                       );
-
                     },
                   ),
-                ),
+                )
+
               ],
             );
           }
