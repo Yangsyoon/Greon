@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
+import '../../application/bottom_navbar_cubit/navigation_state.dart';
 import '../../configs/app_dimensions.dart';
 import '../../configs/app_typography.dart';
 import '../../core/constant/assets.dart';
@@ -18,8 +19,9 @@ class BottomNavigation extends StatelessWidget {
     double width = AppDimensions.normalize(10);
     EdgeInsets padding = EdgeInsets.only(bottom: AppDimensions.normalize(1.5));
 
-    return BlocBuilder<NavigationCubit, NavigationTab>(
-      builder: (context, activeTab) {
+    return BlocBuilder<NavigationCubit, NavigationState>(
+      builder: (context, state) {
+        final activeTab = state.tab;
         return SafeArea(
           child: SizedBox(
             height: AppDimensions.normalize(27),

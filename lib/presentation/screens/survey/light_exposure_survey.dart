@@ -8,10 +8,12 @@ import 'package:light/light.dart';
 class LightExposureSurveyPage extends StatefulWidget {
   final Map<String, dynamic> surveyData;
 
-  const LightExposureSurveyPage({Key? key, required this.surveyData}) : super(key: key);
+  const LightExposureSurveyPage({Key? key, required this.surveyData})
+      : super(key: key);
 
   @override
-  State<LightExposureSurveyPage> createState() => _LightExposureSurveyPageState();
+  State<LightExposureSurveyPage> createState() =>
+      _LightExposureSurveyPageState();
 }
 
 class _LightExposureSurveyPageState extends State<LightExposureSurveyPage> {
@@ -40,10 +42,11 @@ class _LightExposureSurveyPageState extends State<LightExposureSurveyPage> {
     if (_selectedLightLevel != null) {
       widget.surveyData['light_exposure'] = _selectedLightLevel;
       // 다음 설문 페이지로 이동
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-          builder: (_) => HomeDirectionSurveyPage(surveyData: widget.surveyData), // 다음 페이지로 연결
+          builder: (_) => HomeDirectionSurveyPage(
+              surveyData: widget.surveyData), // 다음 페이지로 연결
         ),
       );
     }
@@ -121,55 +124,79 @@ class _LightExposureSurveyPageState extends State<LightExposureSurveyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("설문 5/7")),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '이 위치에서는 빛을 얼마나 받나요?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+      final shouldExit = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text("설문 종료"),
+          content: Text("정말 설문을 스킵하시겠습니까?"),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false), // 아니오
+              child: Text("취소"),
             ),
-            SizedBox(height: 16),
-            Text(
-              '해당 위치의 조명 설정을 선택하세요.',
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-            ),
-            SizedBox(height: 24),
-            // 스마트폰 센서로 측정할 수 있는 경우 이 버튼을 사용
-            ElevatedButton(
-              onPressed: _measureLightLevel,
-              child: Text('광도계를 써서 측정하세요'),
-            ),
-            SizedBox(height: 24),
-            // 일광 선택 버튼들
-            _buildLightLevelButton(
-              '전체 일광',
-              '적어도 8시간 동안의 직접, 걸러지지 않은 햇빛',
-            ),
-            _buildLightLevelButton(
-              '일부 일광, 일부 그늘',
-              '하루 종일 밝은 빛과 어느 정도의 직접 햇빛',
-            ),
-            _buildLightLevelButton(
-              '그늘',
-              '직접 햇빛이 거의 없거나 전혀 없는 장소',
-            ),
-            _buildLightLevelButton(
-              '어두움',
-              '햇빛이 없거나 창문이 없는 방',
-            ),
-            Spacer(),
-            Center(
-              child: ElevatedButton(
-                onPressed: _onNextPressed,
-                child: Text('다음'),
-              ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true), // 예
+              child: Text("확인"),
             ),
           ],
         ),
+      );
+      return shouldExit ?? false; // true면 pop 허용, false면 차단
+    },
+    child:Scaffold(
+        appBar: AppBar(title: Text("설문 5/7")),
+        body: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '이 위치에서는 빛을 얼마나 받나요?',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              Text(
+                '해당 위치의 조명 설정을 선택하세요.',
+                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+              ),
+              SizedBox(height: 24),
+              // 스마트폰 센서로 측정할 수 있는 경우 이 버튼을 사용
+              ElevatedButton(
+                onPressed: _measureLightLevel,
+                child: Text('광도계를 써서 측정하세요'),
+              ),
+              SizedBox(height: 24),
+              // 일광 선택 버튼들
+              _buildLightLevelButton(
+                '전체 일광',
+                '적어도 8시간 동안의 직접, 걸러지지 않은 햇빛',
+              ),
+              _buildLightLevelButton(
+                '일부 일광, 일부 그늘',
+                '하루 종일 밝은 빛과 어느 정도의 직접 햇빛',
+              ),
+              _buildLightLevelButton(
+                '그늘',
+                '직접 햇빛이 거의 없거나 전혀 없는 장소',
+              ),
+              _buildLightLevelButton(
+                '어두움',
+                '햇빛이 없거나 창문이 없는 방',
+              ),
+              Spacer(),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _onNextPressed,
+                  child: Text('다음'),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
       ),
     );
   }

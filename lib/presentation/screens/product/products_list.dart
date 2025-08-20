@@ -4,6 +4,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
+import '../../../application/bottom_navbar_cubit/navigation_state.dart';
 import '../../../application/filter_cubit/filter_cubit.dart';
 import '../../../application/products_bloc/product_bloc.dart';
 import '../../../configs/app_dimensions.dart';
@@ -21,15 +23,19 @@ import '../../widgets/noconnection_column.dart';
 import '../../widgets/rectangular_product_item.dart';
 
 class ProductsListScreen extends StatefulWidget {
-  const ProductsListScreen({super.key});
+  final String initialCategory;
+
+  @override
+  const ProductsListScreen({
+    super.key,
+    this.initialCategory = '전체', // 기본값
+  });
 
   @override
   State<ProductsListScreen> createState() => _ProductsListScreenState();
 }
 
-
 class _ProductsListScreenState extends State<ProductsListScreen> {
-
   final ScrollController scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
@@ -59,6 +65,11 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
   void initState() {
     super.initState();
     scrollController.addListener(_scrollListener);
+    final navigationState = context.read<NavigationCubit>().state;
+    if (navigationState.category != null) {
+      selectedCategory = navigationState.category!;
+    }
+    context.read<FilterCubit>().applyCategory(navigationState.category ?? '전체');
   }
 
   @override
@@ -77,10 +88,19 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     FocusScope.of(context).unfocus();
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
+    return BlocListener<NavigationCubit, NavigationState>(
+        listener: (context, state) {
+      if (state.tab == NavigationTab.shoppingTab && state.category != null) {
+        setState(() {
+          selectedCategory = state.category!;
+        });
+        // `FilterCubit`에도 변경된 카테고리 적용
+        context.read<FilterCubit>().applyCategory(state.category!);
+      }
+    },
+      child: WillPopScope(
       onWillPop: () async {
         if (_isSearching) {
           _exitSearchMode();
@@ -111,36 +131,35 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                     Expanded(
                       child: _isSearching
                           ? TextField(
-                        controller: _searchController,
-                        autofocus: true,
-                        decoration: const InputDecoration(
-                          hintText: "상품 검색",
-                          border: InputBorder.none,
-                        ),
-                        onChanged: (value) {
-                          context
-                              .read<FilterCubit>()
-                              .applySearch(value.trim());
-                        },
-                        onSubmitted: (_) {
-                          FocusScope.of(context).unfocus(); // 키보드 닫기
-                        },
-                      )
+                              controller: _searchController,
+                              autofocus: true,
+                              decoration: const InputDecoration(
+                                hintText: "상품 검색",
+                                border: InputBorder.none,
+                              ),
+                              onChanged: (value) {
+                                context
+                                    .read<FilterCubit>()
+                                    .applySearch(value.trim());
+                              },
+                              onSubmitted: (_) {
+                                FocusScope.of(context).unfocus(); // 키보드 닫기
+                              },
+                            )
                           : BlocBuilder<FilterCubit, FilterProductParams>(
-                        builder: (context, filterState) {
-                          return Text(
-                            (filterState.categories.isEmpty
-                                ? " "
-                                : filterState.categories.first.name)
-                                .toUpperCase(),
-                            style: AppText.b1b?.copyWith(
-                                color: AppColors.GreyText),
-                            textAlign: TextAlign.center,
-                          );
-                        },
-                      ),
+                              builder: (context, filterState) {
+                                return Text(
+                                  (filterState.categories.isEmpty
+                                          ? " "
+                                          : filterState.categories.first.name)
+                                      .toUpperCase(),
+                                  style: AppText.b1b
+                                      ?.copyWith(color: AppColors.GreyText),
+                                  textAlign: TextAlign.center,
+                                );
+                              },
+                            ),
                     ),
-
                     SizedBox(width: 12),
                     Material(
                       color: Colors.transparent,
@@ -156,12 +175,12 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                         ),
                       ),
                     )
-
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Row(
                   children: [
                     // 왼쪽 4/5 영역: 가로로 넘기는 이미지 스크롤 뷰
@@ -173,19 +192,20 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                           scrollDirection: Axis.horizontal,
                           children: List.generate(
                             5, // 이미지 개수
-                                (index) => Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8),
+                            (index) => Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: Image.asset(
-                                  'assets/images/shop_picture.png', // 모든 페이지에서 같은 PNG 사용
+                                  'assets/images/shop_picture.png',
+                                  // 모든 페이지에서 같은 PNG 사용
                                   fit: BoxFit.cover,
                                 ),
                               ),
                             ),
                           ),
                         ),
-
                       ),
                     ),
 
@@ -197,57 +217,53 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                        Material(
-                        color: Colors.transparent,
-                          child:InkWell(
-                            onTap: () {
-                              Navigator.of(context).pushNamed(AppRouter.cart);
-                            },
-                            child: Image.asset(
-                              'assets/images/cart.png',
-                              width: 60,
-                              height: 60,
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context).pushNamed(AppRouter.cart);
+                              },
+                              child: Image.asset(
+                                'assets/images/cart.png',
+                                width: 60,
+                                height: 60,
+                              ),
                             ),
                           ),
-                        ),
-
                           const SizedBox(height: 8),
-                Material(
-                  color: Colors.transparent,
-                          child:InkWell(
-                            onTap: () {
-                              Navigator.of(context).pushNamed(AppRouter.wishlist);
-                            },
-                            child: Image.asset(
-                              'assets/images/jjim.png',
-                              width: 60,
-                              height: 60,
+                          Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.of(context)
+                                    .pushNamed(AppRouter.wishlist);
+                              },
+                              child: Image.asset(
+                                'assets/images/jjim.png',
+                                width: 60,
+                                height: 60,
+                              ),
                             ),
                           ),
-                ),
-
                           const SizedBox(height: 8),
-                Material(
-                  color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              // 클릭 시 동작
-                            },
-                            child: Image.asset(
-                              'assets/images/coupon.png',
-                              width: 60,
-                              height: 60,
-                            ),
-                          )
-                )
-
+                          Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  // 클릭 시 동작
+                                },
+                                child: Image.asset(
+                                  'assets/images/coupon.png',
+                                  width: 60,
+                                  height: 60,
+                                ),
+                              ))
                         ],
                       ),
                     ),
                   ],
                 ),
               ),
-
               SizedBox(
                 height: 100, // 이미지+텍스트 전체 높이
                 child: SingleChildScrollView(
@@ -274,7 +290,8 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   border: Border.all(
-                                    color: isSelected ? Colors.black : Colors.grey,
+                                    color:
+                                        isSelected ? Colors.black : Colors.grey,
                                     width: 2,
                                   ),
                                   image: DecorationImage(
@@ -288,8 +305,11 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                               Text(
                                 category['name']!,
                                 style: TextStyle(
-                                  color: isSelected ? Colors.green : Colors.black,
-                                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                  color:
+                                      isSelected ? Colors.green : Colors.black,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
                                 ),
                               ),
                             ],
@@ -318,7 +338,8 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                             // 정렬 로직 호출 가능
                           },
                           style: TextButton.styleFrom(
-                            backgroundColor: isSelected ? Colors.white : Colors.transparent,
+                            backgroundColor:
+                                isSelected ? Colors.white : Colors.transparent,
                             foregroundColor: Colors.black,
                             side: BorderSide(color: Colors.white),
                             shape: RoundedRectangleBorder(
@@ -333,13 +354,11 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 8),
-
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: EdgeInsets.only(left: 16),  // 왼쪽 16px 띄우기
+                  padding: EdgeInsets.only(left: 16), // 왼쪽 16px 띄우기
                   child: Text(
                     '판매 모종 >',
                     style: TextStyle(
@@ -350,7 +369,6 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   ),
                 ),
               ),
-
               Space.y1!,
               Expanded(
                 child: RefreshIndicator(
@@ -361,38 +379,41 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                   },
                   child: _isSearching
                       ? BlocBuilder<FilterCubit, FilterProductParams>(
-                    builder: (context, filterState) {
-                      final products = filterState.products;
+                          builder: (context, filterState) {
+                            final products = filterState.products;
 
-                      if (products.isEmpty) {
-                        return const Center(
-                            child: Text('검색 결과가 없습니다.'));
-                      }
+                            if (products.isEmpty) {
+                              return const Center(child: Text('검색 결과가 없습니다.'));
+                            }
 
-                      return _buildGrid(products);
-                    },
-                  )
+                            return _buildGrid(products);
+                          },
+                        )
                       : BlocBuilder<ProductBloc, ProductState>(
-                    builder: (context, state) {
-                      if (state is ProductLoaded) {
-                        final products = state.products;
-                        return _buildGridOrEmpty(products, '상품이 없습니다.');
-                      } else if (state is ProductError) {
-                        if (state.failure is NetworkFailure) {
-                          return const Center(child: Text("네트워크 오류\n다시 시도해주세요"));
-                        } else {
-                          return const NoConnectionColumn(isFromCategories: false);
-                        }
-                      } else {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
+                          builder: (context, state) {
+                            if (state is ProductLoaded) {
+                              final products = state.products;
+                              return _buildGridOrEmpty(products, '상품이 없습니다.');
+                            } else if (state is ProductError) {
+                              if (state.failure is NetworkFailure) {
+                                return const Center(
+                                    child: Text("네트워크 오류\n다시 시도해주세요"));
+                              } else {
+                                return const NoConnectionColumn(
+                                    isFromCategories: false);
+                              }
+                            } else {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
+                          },
+                        ),
                 ),
               ),
             ],
           ),
         ),
+      ),
       ),
     );
   }
@@ -413,7 +434,6 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
     }
     return _buildGrid(filtered);
   }
-
 
   Widget _buildGrid(List<ProductEntity> products) {
     return GridView.builder(

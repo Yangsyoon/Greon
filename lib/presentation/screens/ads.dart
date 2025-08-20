@@ -11,32 +11,34 @@ class AdsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     App.init(context);
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: const BoxDecoration(
-              image: DecorationImage(
-                  image: AssetImage(
-                    AppAssets.Ads,
-                  ),
-                  fit: BoxFit.cover),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            Container(
+              decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(
+                      AppAssets.Ads,
+                    ),
+                    fit: BoxFit.cover),
+              ),
             ),
-          ),
-          Positioned(
-              bottom: AppDimensions.normalize(10),
-              right: AppDimensions.normalize(8),
-              child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamedAndRemoveUntil(
-                      AppRouter.root,
-                      (route) => false,
-                    );
-                  },
-                  child: Text(
-                    "Skip".toUpperCase(),
-                    style: AppText.h3b,
-                  ))),
-        ],
+            Positioned(
+                bottom: AppDimensions.normalize(10),
+                right: AppDimensions.normalize(8),
+                child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        AppRouter.root,
+                        (route) => false,
+                      );
+                    },
+                    child: Text(
+                      "Skip".toUpperCase(),
+                      style: AppText.h3b,
+                    ))),
+          ],
+        ),
       ),
     );
   }

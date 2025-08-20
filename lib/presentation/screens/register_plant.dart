@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 // import 'package:greon/presentation/screens/interest_survey.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:greon/presentation/screens/root.dart';
 import 'package:greon/presentation/screens/user_info_input_page.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
+import '../../core/enums/enums.dart';
 import 'home.dart';
 import 'survey/interest_survey.dart';
 
@@ -34,10 +39,11 @@ class _RegisterPlantState extends State<RegisterPlant> {
 
   Future<void> _fetchPlantSpecies() async {
     final querySnapshot =
-    await FirebaseFirestore.instance.collection('plant_species').get();
+        await FirebaseFirestore.instance.collection('plant_species').get();
     setState(() {
-      _plantSpeciesList =
-          querySnapshot.docs.map((doc) => doc['species_name'] as String).toList();
+      _plantSpeciesList = querySnapshot.docs
+          .map((doc) => doc['species_name'] as String)
+          .toList();
     });
   }
 
@@ -95,7 +101,7 @@ class _RegisterPlantState extends State<RegisterPlant> {
   Widget _buildNumberField(
       String label, int initialValue, Function(int) onChanged) {
     TextEditingController controller =
-    TextEditingController(text: initialValue.toString());
+        TextEditingController(text: initialValue.toString());
     return TextField(
       controller: controller,
       keyboardType: TextInputType.number,
@@ -147,7 +153,8 @@ class _RegisterPlantState extends State<RegisterPlant> {
   }
 
   Future<void> _submitPlantData() async {
-    if (_selectedSpeciesId == null || _plantNameController.text.trim().isEmpty) {
+    if (_selectedSpeciesId == null ||
+        _plantNameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("식물 종과 이름을 입력해주세요.")),
       );
@@ -164,7 +171,8 @@ class _RegisterPlantState extends State<RegisterPlant> {
         .where('repotting_cycle', isEqualTo: _repotting)
         .where('nutrient_frequency', isEqualTo: _nutrient)
         .where('last_watered_date', isEqualTo: _lastWateredDate)
-        .where('sunlight_level', isEqualTo: _getSunlightLevelLabel(_sunlightLevel))
+        .where('sunlight_level',
+            isEqualTo: _getSunlightLevelLabel(_sunlightLevel))
         .where('species_id', isEqualTo: _selectedSpeciesId)
         .get();
 
@@ -194,13 +202,6 @@ class _RegisterPlantState extends State<RegisterPlant> {
       if (imageUrl != null) "image_url": imageUrl,
     });
 
-    if (uid != null) {
-      final userRef = FirebaseFirestore.instance.collection('users').doc(uid);
-      await userRef.update({
-        'plants': FieldValue.arrayUnion([newDoc.id])
-      });
-    }
-
     final surveyData = {
       'plant_id': newDoc.id,
       'location': "실내 관엽 식물",
@@ -209,15 +210,13 @@ class _RegisterPlantState extends State<RegisterPlant> {
       'user_interest_level': 3,
     };
 
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (_) => InterestSurveyPage(surveyData: surveyData),
       ),
     );
-   }
-
-
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -234,11 +233,12 @@ class _RegisterPlantState extends State<RegisterPlant> {
               child: _selectedImage != null
                   ? Image.file(_selectedImage!, height: 150)
                   : Container(
-                height: 150,
-                width: double.infinity,
-                color: Colors.grey[300],
-                child: Icon(Icons.add_a_photo, size: 50, color: Colors.grey[700]),
-              ),
+                      height: 150,
+                      width: double.infinity,
+                      color: Colors.grey[300],
+                      child: Icon(Icons.add_a_photo,
+                          size: 50, color: Colors.grey[700]),
+                    ),
             ),
             SizedBox(height: 16),
             // 식물 종 선택
@@ -289,7 +289,7 @@ class _RegisterPlantState extends State<RegisterPlant> {
                 if (picked != null) {
                   setState(() {
                     _lastWateredDate =
-                    picked.toLocal().toString().split(" ")[0];
+                        picked.toLocal().toString().split(" ")[0];
                   });
                 }
               },
@@ -329,10 +329,10 @@ class _RegisterPlantState extends State<RegisterPlant> {
                     minimumSize: Size(120, 40),
                   ),
                   onPressed: () async {
-                    await _submitPlantData(); // 식물 등록
-                    Navigator.push(
+                    await _submitPlantData();
+                    Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(builder: (_) => const HomeScreen()),
+                      MaterialPageRoute(builder: (_) => RootScreen()),
                     );
                   },
                   child: Text("설문 Skip"),
@@ -348,7 +348,6 @@ class _RegisterPlantState extends State<RegisterPlant> {
                 ),
               ],
             ),
-
           ],
         ),
       ),

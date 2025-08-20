@@ -5,10 +5,12 @@ import 'package:greon/presentation/screens/user_info_input_page.dart';
 class WindowDistanceSurveyPage extends StatefulWidget {
   final Map<String, dynamic> surveyData;
 
-  const WindowDistanceSurveyPage({Key? key, required this.surveyData}) : super(key: key);
+  const WindowDistanceSurveyPage({Key? key, required this.surveyData})
+      : super(key: key);
 
   @override
-  State<WindowDistanceSurveyPage> createState() => _WindowDistanceSurveyPageState();
+  State<WindowDistanceSurveyPage> createState() =>
+      _WindowDistanceSurveyPageState();
 }
 
 class _WindowDistanceSurveyPageState extends State<WindowDistanceSurveyPage> {
@@ -35,13 +37,16 @@ class _WindowDistanceSurveyPageState extends State<WindowDistanceSurveyPage> {
     });
 
     // Firebase에 데이터 추가
-    FirebaseFirestore.instance.collection('plant_environment').add(data).then((_) {
+    FirebaseFirestore.instance
+        .collection('plant_environment')
+        .add(data)
+        .then((_) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('설문이 완료되었습니다.')),
       );
 
       // 다음 페이지로 이동
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(
           builder: (_) => UserInfoInputPage(),
@@ -54,59 +59,84 @@ class _WindowDistanceSurveyPageState extends State<WindowDistanceSurveyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("설문 7/7")),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '창문으로부터의 거리는?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text("설문 종료"),
+              content: Text("정말 설문을 스킵하시겠습니까?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false), // 아니오
+                  child: Text("취소"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true), // 예
+                  child: Text("확인"),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            Text(
-              '물 주기 정도는 식물이 창문으로부터 얼마나 떨어져 있는지에 따라 다릅니다. 슬라이더를 사용해서 거리를 지정해 주세요',
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-            ),
-            SizedBox(height: 24),
-            Row(
+          );
+          return shouldExit ?? false; // true면 pop 허용, false면 차단
+        },
+        child: Scaffold(
+          appBar: AppBar(title: Text("설문 7/7")),
+          body: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Expanded(
-                  child: TextField(
-                    enabled: false,
-                    decoration: InputDecoration(
-                      labelText: '거리',
-                      suffixText: 'cm',
-                      border: OutlineInputBorder(),
+                Text(
+                  '창문으로부터의 거리는?',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  '물 주기 정도는 식물이 창문으로부터 얼마나 떨어져 있는지에 따라 다릅니다. 슬라이더를 사용해서 거리를 지정해 주세요',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                ),
+                SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        enabled: false,
+                        decoration: InputDecoration(
+                          labelText: '거리',
+                          suffixText: 'cm',
+                          border: OutlineInputBorder(),
+                        ),
+                        controller: TextEditingController(
+                            text: _distanceFromWindow.toStringAsFixed(1)),
+                      ),
                     ),
-                    controller: TextEditingController(text: _distanceFromWindow.toStringAsFixed(1)),
+                  ],
+                ),
+                SizedBox(height: 24),
+                Slider(
+                  value: _distanceFromWindow,
+                  min: 0,
+                  max: 100,
+                  divisions: 100,
+                  label: _distanceFromWindow.toStringAsFixed(1),
+                  onChanged: (double value) {
+                    setState(() {
+                      _distanceFromWindow = value;
+                    });
+                  },
+                ),
+                Spacer(),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _onNextPressed,
+                    child: Text('설문 종료'),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 24),
-            Slider(
-              value: _distanceFromWindow,
-              min: 0,
-              max: 100,
-              divisions: 100,
-              label: _distanceFromWindow.toStringAsFixed(1),
-              onChanged: (double value) {
-                setState(() {
-                  _distanceFromWindow = value;
-                });
-              },
-            ),
-            Spacer(),
-            Center(
-              child: ElevatedButton(
-                onPressed: _onNextPressed,
-                child: Text('설문 종료'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

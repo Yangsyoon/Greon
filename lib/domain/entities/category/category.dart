@@ -80,4 +80,14 @@ class Category {
     "updatedAt": updatedAt.toIso8601String(),
     "isActive": isActive,
   };
+
+  factory Category.fromMap(Map<String, dynamic> map) {
+    return Category(
+      name: map['name'] as String,
+      image: map['image'] as String,
+      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      updatedAt: (map['updatedAt'] as Timestamp).toDate(),
+      isActive: map['isActive'] as bool,
+    );
+  }
 }

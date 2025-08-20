@@ -85,108 +85,111 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   Widget build(BuildContext context) {
     final currentUser = _auth.currentUser;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text("게시글 상세보기"),
-        actions: [
-          if (currentUser != null && currentUser.uid == _post.uid) ...[
-            IconButton(
-              icon: const Icon(Icons.edit),
-              onPressed: () async {
-                final updated = await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditPostScreen(post: _post),
-                  ),
-                );
+    return SafeArea(
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        appBar: AppBar(
+          title: const Text("게시글 상세보기"),
+          actions: [
+            if (currentUser != null && currentUser.uid == _post.uid) ...[
+              IconButton(
+                icon: const Icon(Icons.edit),
+                onPressed: () async {
+                  final updated = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EditPostScreen(post: _post),
+                    ),
+                  );
 
-                if (updated != null && updated is PostModel) {
-                  setState(() {
-                    _post = updated;
-                  });
-                }
-              },
-            ),
-            IconButton(
-              icon: const Icon(Icons.delete),
-              onPressed: () async {
-                final confirm = await showDialog<bool>(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text("삭제 확인"),
-                    content: const Text("정말 이 게시글을 삭제하시겠습니까?"),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text("취소"),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text("삭제"),
-                      ),
-                    ],
-                  ),
-                );
-
-                if (confirm == true) {
-                  await _firestore.collection('posts').doc(_post.id).delete();
-                  Navigator.pop(context, true); // 목록으로 돌아가기
-                }
-              },
-            ),
-          ],
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (_post.imageUrl != null && _post.imageUrl!.isNotEmpty)
-              Container(
-                width: double.infinity,
-                height: 200,
-                margin: const EdgeInsets.only(bottom: 16),
-                child: Image.network(
-                  _post.imageUrl!,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return const Center(child: Icon(Icons.broken_image));
-                  },
-                ),
+                  if (updated != null && updated is PostModel) {
+                    setState(() {
+                      _post = updated;
+                    });
+                  }
+                },
               ),
-            Text(_post.title,
+              IconButton(
+                icon: const Icon(Icons.delete),
+                onPressed: () async {
+                  final confirm = await showDialog<bool>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text("삭제 확인"),
+                      content: const Text("정말 이 게시글을 삭제하시겠습니까?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: const Text("취소"),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: const Text("삭제"),
+                        ),
+                      ],
+                    ),
+                  );
+
+                  if (confirm == true) {
+                    await _firestore.collection('posts').doc(_post.id).delete();
+                    Navigator.pop(context, true); // 목록으로 돌아가기
+                  }
+                },
+              ),
+            ],
+          ],
+        ),
+        body: SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              if (_post.imageUrl != null && _post.imageUrl!.isNotEmpty)
+                Container(
+                  width: double.infinity,
+                  height: 200,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  child: Image.network(
+                    _post.imageUrl!,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(child: Icon(Icons.broken_image));
+                    },
+                  ),
+                ),
+              Text(
+                _post.title,
                 style:
-                const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                FutureBuilder<String>(
-                  future: getNickname(_post.uid),
-                  builder: (context, snapshot) {
-                    final nickname = snapshot.data ?? '로딩 중...';
-                    return Text("작성자: $nickname",
-                        style: const TextStyle(color: Colors.grey));
-                  },
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  DateFormat('yyyy-MM-dd HH:mm').format(_post.createdAt),
-                  style: const TextStyle(color: Colors.grey),
-                ),
-              ],
-            ),
-            const Divider(height: 32),
-            Text(_post.content, style: const TextStyle(fontSize: 16)),
-            const Divider(height: 32),
-            const Text("댓글",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  FutureBuilder<String>(
+                    future: getNickname(_post.uid),
+                    builder: (context, snapshot) {
+                      final nickname = snapshot.data ?? '로딩 중...';
+                      return Text("작성자: $nickname",
+                          style: const TextStyle(color: Colors.grey));
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    DateFormat('yyyy-MM-dd HH:mm').format(_post.createdAt),
+                    style: const TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+              const Divider(height: 32),
+              Text(_post.content, style: const TextStyle(fontSize: 16)),
+              const Divider(height: 32),
+              const Text("댓글",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
+              StreamBuilder<QuerySnapshot>(
                 stream: _firestore
                     .collection('posts')
                     .doc(_post.id)
@@ -204,15 +207,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
 
                   final comments = snapshot.data!.docs;
 
-                  return ListView.builder(
-                    itemCount: comments.length,
-                    itemBuilder: (context, index) {
-                      final comment = comments[index];
+                  return Column(
+                    children: comments.map((comment) {
                       final commentId = comment.id;
                       final authorUid = comment['uid'] ?? '익명';
                       final content = comment['content'] ?? '';
                       final createdAt =
-                      (comment['createdAt'] as Timestamp?)?.toDate();
+                          (comment['createdAt'] as Timestamp?)?.toDate();
                       final isMyComment = currentUser?.uid == authorUid;
 
                       replyControllers[commentId] ??= TextEditingController();
@@ -242,41 +243,38 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       onPressed: () {
                                         setState(() {
                                           showReplyFields[commentId] =
-                                          !(showReplyFields[commentId] ??
-                                              false);
+                                              !(showReplyFields[commentId] ??
+                                                  false);
                                         });
                                       },
                                     ),
                                     if (isMyComment) ...[
                                       IconButton(
-                                        icon:
-                                        const Icon(Icons.edit, size: 18),
+                                        icon: const Icon(Icons.edit, size: 18),
                                         onPressed: () async {
                                           final newContent =
-                                          await showDialog<String>(
+                                              await showDialog<String>(
                                             context: context,
                                             builder: (context) {
-                                              final TextEditingController
-                                              editController =
-                                              TextEditingController(
-                                                  text: content);
+                                              final editController =
+                                                  TextEditingController(
+                                                      text: content);
                                               return AlertDialog(
-                                                title:
-                                                const Text('댓글 수정'),
+                                                title: const Text('댓글 수정'),
                                                 content: TextField(
                                                   controller: editController,
                                                   maxLines: null,
                                                   decoration:
-                                                  const InputDecoration(
-                                                      hintText:
-                                                      "댓글 내용을 수정하세요"),
+                                                      const InputDecoration(
+                                                          hintText:
+                                                              "댓글 내용을 수정하세요"),
                                                 ),
                                                 actions: [
                                                   TextButton(
                                                     onPressed: () =>
-                                                        Navigator.pop(context, true),
-                                                    child:
-                                                    const Text("취소"),
+                                                        Navigator.pop(
+                                                            context, null),
+                                                    child: const Text("취소"),
                                                   ),
                                                   TextButton(
                                                     onPressed: () =>
@@ -284,8 +282,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                                             context,
                                                             editController.text
                                                                 .trim()),
-                                                    child:
-                                                    const Text("저장"),
+                                                    child: const Text("저장"),
                                                   ),
                                                 ],
                                               );
@@ -300,22 +297,22 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                                 .doc(_post.id)
                                                 .collection('comments')
                                                 .doc(commentId)
-                                                .update({
-                                              'content': newContent
-                                            });
+                                                .update(
+                                                    {'content': newContent});
                                           }
                                         },
                                       ),
                                       IconButton(
                                         icon:
-                                        const Icon(Icons.delete, size: 18),
+                                            const Icon(Icons.delete, size: 18),
                                         onPressed: () async {
-                                          final confirm = await showDialog<bool>(
+                                          final confirm =
+                                              await showDialog<bool>(
                                             context: context,
                                             builder: (context) => AlertDialog(
                                               title: const Text("댓글 삭제"),
-                                              content: const Text(
-                                                  "이 댓글을 삭제하시겠습니까?"),
+                                              content:
+                                                  const Text("이 댓글을 삭제하시겠습니까?"),
                                               actions: [
                                                 TextButton(
                                                   onPressed: () =>
@@ -346,7 +343,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                                 .doc(_post.id)
                                                 .update({
                                               'commentsCount':
-                                              FieldValue.increment(-1)
+                                                  FieldValue.increment(-1)
                                             });
                                           }
                                         },
@@ -371,7 +368,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                             if (showReplyFields[commentId] ?? false)
                               Padding(
                                 padding:
-                                const EdgeInsets.only(top: 8.0, left: 16.0),
+                                    const EdgeInsets.only(top: 8.0, left: 16.0),
                                 child: Row(
                                   children: [
                                     Expanded(
@@ -395,126 +392,46 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                   ],
                                 ),
                               ),
-                            StreamBuilder<QuerySnapshot>(
-                              stream: _firestore
-                                  .collection('posts')
-                                  .doc(_post.id)
-                                  .collection('comments')
-                                  .doc(commentId)
-                                  .collection('replies')
-                                  .orderBy('createdAt')
-                                  .snapshots(),
-                              builder: (context, replySnapshot) {
-                                if (!replySnapshot.hasData ||
-                                    replySnapshot.data!.docs.isEmpty) {
-                                  return const SizedBox();
-                                }
-
-                                final replies = replySnapshot.data!.docs;
-
-                                return Padding(
-                                  padding: const EdgeInsets.only(left: 16.0),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                    CrossAxisAlignment.start,
-                                    children: replies.map((reply) {
-                                      final replyContent =
-                                          reply['content'] ?? '';
-                                      final replyUid = reply['uid'] ?? '';
-                                      final replyCreatedAt =
-                                      (reply['createdAt'] as Timestamp?)
-                                          ?.toDate();
-                                      final isMyReply =
-                                          currentUser?.uid == replyUid;
-
-                                      return Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 4.0),
-                                        child: Column(
-                                          crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
-                                              children: [
-                                                FutureBuilder<String>(
-                                                  future:
-                                                  getNickname(replyUid),
-                                                  builder: (context, snapshot) {
-                                                    final replyNickname =
-                                                        snapshot.data ??
-                                                            '로딩 중...';
-                                                    return Text(
-                                                      replyNickname,
-                                                      style: const TextStyle(
-                                                          fontWeight:
-                                                          FontWeight.bold,
-                                                          color:
-                                                          Colors.black87),
-                                                    );
-                                                  },
-                                                ),
-                                              ],
-                                            ),
-                                            Text(replyContent),
-                                            if (replyCreatedAt != null)
-                                              Text(
-                                                DateFormat('yyyy-MM-dd HH:mm')
-                                                    .format(replyCreatedAt),
-                                                style: const TextStyle(
-                                                    fontSize: 12,
-                                                    color: Colors.grey),
-                                              ),
-                                          ],
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                );
-                              },
-                            )
                           ],
                         ),
                       );
-                    },
+                    }).toList(),
                   );
                 },
               ),
-            ),
-            const Divider(height: 16),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 4),
-                      TextField(
-                        controller: _commentController,
-                        decoration: const InputDecoration(
-                          hintText: "댓글을 입력하세요...",
-                          border: OutlineInputBorder(),
-                        ),
-                        maxLines: null,
-                      ),
-                    ],
+              const SizedBox(height: 80), // 댓글 입력창 공간 확보
+            ],
+          ),
+        ),
+        bottomNavigationBar: Padding(
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 8,
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: _commentController,
+                  decoration: const InputDecoration(
+                    hintText: "댓글을 입력하세요...",
+                    border: OutlineInputBorder(),
                   ),
+                  maxLines: null,
                 ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 70,
-                  height: 48,
-                  child: ElevatedButton(
-                    onPressed: _addComment,
-                    child: const Text("등록", style: TextStyle(fontSize: 12)),
-                  ),
+              ),
+              const SizedBox(width: 8),
+              SizedBox(
+                width: 70,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: _addComment,
+                  child: const Text("등록", style: TextStyle(fontSize: 12)),
                 ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
       ),
     );

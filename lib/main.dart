@@ -15,6 +15,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 
+import 'application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
+import 'application/bottom_navbar_cubit/navigation_state.dart';
 import 'application/post_bloc/post_bloc.dart';
 import 'application/post_bloc/post_event.dart';
 import 'core/app/app.dart';
@@ -227,9 +229,14 @@ class _MyAppWrapperState extends State<MyAppWrapper> {
         BlocProvider<PostBloc>(
           create: (_) => PostBloc(PostRepository())..add(LoadPosts()),
         ),
-        // 다른 Bloc들도 여기에 추가 가능
+        BlocProvider<NavigationCubit>(
+          create: (_) => NavigationCubit(),
+        ),
       ],
+        child: BlocListener<NavigationCubit, NavigationState>(
+        listener: (context, state) {},
       child: const MyApp(),
+        ),
     );
   }
 }

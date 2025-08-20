@@ -5,17 +5,26 @@ import 'light_exposure_survey.dart';
 class PlantPlacementSurveyPage extends StatefulWidget {
   final Map<String, dynamic> surveyData;
 
-  const PlantPlacementSurveyPage({Key? key, required this.surveyData}) : super(key: key);
+  const PlantPlacementSurveyPage({Key? key, required this.surveyData})
+      : super(key: key);
 
   @override
-  State<PlantPlacementSurveyPage> createState() => _PlantPlacementSurveyPageState();
+  State<PlantPlacementSurveyPage> createState() =>
+      _PlantPlacementSurveyPageState();
 }
 
 class _PlantPlacementSurveyPageState extends State<PlantPlacementSurveyPage> {
   Set<String> _selectedPlacements = Set<String>();
 
   final List<String> indoorLocations = ['거실', '침실', '부엌', '사무실', '욕실', '홀'];
-  final List<String> outdoorLocations = ['뒷마당', '앞마당', '정원', '화단', '주차장', '채소정원단'];
+  final List<String> outdoorLocations = [
+    '뒷마당',
+    '앞마당',
+    '정원',
+    '화단',
+    '주차장',
+    '채소정원단'
+  ];
 
   void _onPlacementSelected(String location) {
     setState(() {
@@ -28,8 +37,9 @@ class _PlantPlacementSurveyPageState extends State<PlantPlacementSurveyPage> {
   }
 
   void _onNextPressed() {
-    widget.surveyData['plant_placement_locations'] = _selectedPlacements.toList();
-    Navigator.push(
+    widget.surveyData['plant_placement_locations'] =
+        _selectedPlacements.toList();
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (_) => LightExposureSurveyPage(surveyData: widget.surveyData),
@@ -51,51 +61,76 @@ class _PlantPlacementSurveyPageState extends State<PlantPlacementSurveyPage> {
           ),
           minimumSize: Size(100, 40), // 버튼 크기 조정
         ),
-        child: Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        child: Text(label,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("설문 4/7")),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '식물이 어디에 놓여져 있나요?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text("설문 종료"),
+              content: Text("정말 설문을 스킵하시겠습니까?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false), // 아니오
+                  child: Text("취소"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true), // 예
+                  child: Text("확인"),
+                ),
+              ],
             ),
-            SizedBox(height: 8),
-            Text(
-              '여러 개의 옵션을 선택할 수 있습니다',
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+          );
+          return shouldExit ?? false; // true면 pop 허용, false면 차단
+        },
+        child: Scaffold(
+          appBar: AppBar(title: Text("설문 4/7")),
+          body: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '식물이 어디에 놓여져 있나요?',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  '여러 개의 옵션을 선택할 수 있습니다',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                ),
+                SizedBox(height: 20),
+                Text('실내 위치', style: TextStyle(fontWeight: FontWeight.bold)),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: indoorLocations.map(_buildWrapButton).toList(),
+                ),
+                SizedBox(height: 16),
+                Text('실외 위치', style: TextStyle(fontWeight: FontWeight.bold)),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: outdoorLocations.map(_buildWrapButton).toList(),
+                ),
+                Spacer(),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _onNextPressed,
+                    child: Text('다음'),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            Text('실내 위치', style: TextStyle(fontWeight: FontWeight.bold)),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: indoorLocations.map(_buildWrapButton).toList(),
-            ),
-            SizedBox(height: 16),
-            Text('실외 위치', style: TextStyle(fontWeight: FontWeight.bold)),
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: outdoorLocations.map(_buildWrapButton).toList(),
-            ),
-            Spacer(),
-            Center(
-              child: ElevatedButton(
-                onPressed: _onNextPressed,
-                child: Text('다음'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

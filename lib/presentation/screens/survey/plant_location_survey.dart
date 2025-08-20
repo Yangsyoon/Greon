@@ -4,10 +4,12 @@ import 'package:greon/presentation/screens/survey/plant_placement_survey.dart';
 class PlantLocationSurveyPage extends StatefulWidget {
   final Map<String, dynamic> surveyData;
 
-  const PlantLocationSurveyPage({Key? key, required this.surveyData}) : super(key: key);
+  const PlantLocationSurveyPage({Key? key, required this.surveyData})
+      : super(key: key);
 
   @override
-  State<PlantLocationSurveyPage> createState() => _PlantLocationSurveyPageState();
+  State<PlantLocationSurveyPage> createState() =>
+      _PlantLocationSurveyPageState();
 }
 
 class _PlantLocationSurveyPageState extends State<PlantLocationSurveyPage> {
@@ -28,7 +30,7 @@ class _PlantLocationSurveyPageState extends State<PlantLocationSurveyPage> {
     widget.surveyData['plant_locations'] = _selectedLocations.toList();
 
     // 다음 설문 페이지로 이동
-    Navigator.push(
+    Navigator.pushReplacement(
       context,
       MaterialPageRoute(
         builder: (_) => PlantPlacementSurveyPage(surveyData: widget.surveyData),
@@ -38,34 +40,58 @@ class _PlantLocationSurveyPageState extends State<PlantLocationSurveyPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('설문 3/7')),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '식물이 어디에 있나요?',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    return SafeArea(
+      child: WillPopScope(
+        onWillPop: () async {
+          final shouldExit = await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text("설문 종료"),
+              content: Text("정말 설문을 스킵하시겠습니까?"),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false), // 아니오
+                  child: Text("취소"),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true), // 예
+                  child: Text("확인"),
+                ),
+              ],
             ),
-            SizedBox(height: 16),
-            Text(
-              '여러 개의 옵션을 선택할 수 있습니다',
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+          );
+          return shouldExit ?? false; // true면 pop 허용, false면 차단
+        },
+        child: Scaffold(
+          appBar: AppBar(title: Text('설문 3/7')),
+          body: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '식물이 어디에 있나요?',
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  '여러 개의 옵션을 선택할 수 있습니다',
+                  style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+                ),
+                SizedBox(height: 24),
+                _buildLocationButton('실내 관엽 식물'),
+                _buildLocationButton('실외 화분'),
+                _buildLocationButton('정원, 땅속 식물'),
+                Spacer(),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: _onNextPressed,
+                    child: Text('다음'),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 24),
-            _buildLocationButton('실내 관엽 식물'),
-            _buildLocationButton('실외 화분'),
-            _buildLocationButton('정원, 땅속 식물'),
-            Spacer(),
-            Center(
-              child: ElevatedButton(
-                onPressed: _onNextPressed,
-                child: Text('다음'),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );

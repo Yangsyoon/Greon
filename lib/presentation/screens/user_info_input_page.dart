@@ -194,7 +194,7 @@ class _UserInfoInputPageState extends State<UserInfoInputPage> {
                               ? FileImage(_selectedImage!)
                               : (imageUrl != null && imageUrl.isNotEmpty
                               ? NetworkImage(imageUrl)
-                              : AssetImage('assets/images/default_profile.png') as ImageProvider),
+                              : AssetImage('assets/images/default_avatar.png') as ImageProvider),
                           backgroundColor: Colors.grey[200],
                         );
                       },

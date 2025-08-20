@@ -93,5 +93,25 @@ class FilterCubit extends Cubit<FilterProductParams> {
     }
   }
 
+  Future<void> applyCategory(String categoryName) async {
+    try {
+      final querySnapshot = await firestore
+          .collection('categories')
+          .where('name', isEqualTo: categoryName)
+          .get();
+
+      if (querySnapshot.docs.isNotEmpty) {
+        final categoryData = querySnapshot.docs.first.data();
+        final category = Category.fromMap(categoryData);
+        emit(state.copyWith(categories: [category]));
+      } else {
+        // 카테고리 이름이 Firestore에 없을 경우 처리
+        emit(state.copyWith(categories: []));
+      }
+    } catch (e) {
+      debugPrint('카테고리 정보 가져오기 오류: $e');
+      emit(state.copyWith(categories: []));
+    }
+  }
 
 }

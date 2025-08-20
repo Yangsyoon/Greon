@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/configs/app.dart';
-import 'package:greon/core/constant/colors.dart';
-import 'package:greon/presentation/screens/cart.dart';
 import 'package:greon/presentation/screens/my_plants_screen.dart';
 import 'package:greon/presentation/screens/post/post.dart';
 import 'package:greon/presentation/screens/home.dart';
@@ -13,6 +11,7 @@ import 'package:greon/presentation/screens/profile.dart';
 import 'package:greon/presentation/widgets/bottom_navbar.dart';
 
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
+import '../../application/bottom_navbar_cubit/navigation_state.dart';
 import '../../core/enums/enums.dart';
 import 'calendar_screen.dart';
 
@@ -66,8 +65,9 @@ class RootScreen extends StatelessWidget {
       child: Scaffold(
         bottomNavigationBar: const BottomNavigation(),
         body: Center(
-          child: BlocBuilder<NavigationCubit, NavigationTab>(
-            builder: (context, activeTab) {
+          child: BlocBuilder<NavigationCubit, NavigationState>(
+            builder: (context, state) {
+              final activeTab = state.tab;
               switch (activeTab) {
                 case NavigationTab.homeTab:
                   return const HomeScreen();

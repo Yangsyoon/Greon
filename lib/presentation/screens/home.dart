@@ -209,11 +209,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const MyPlantsScreen()),
-                        );
-                        },
+                        context.read<NavigationCubit>().updateTab(NavigationTab.values[2]); // 내 식물 탭으로 이동
+                      },
                       child: const Text("내 식물 관리하기"),
                     ),
                   ),
@@ -303,14 +300,12 @@ class _HomeScreenState extends State<HomeScreen> {
             final cat = categories[index];
             return Expanded(
               child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => BulletinBoardScreen(initialCategory: cat),
-                    ),
-                  );
-                },
+                  onTap: () {
+                    context.read<NavigationCubit>().updateTabWithCategory(
+                      NavigationTab.boardTab,
+                      cat,
+                    );
+                  },
                 child: Column(
                   children: [
                     CircleAvatar(
@@ -331,15 +326,6 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text("상점", style: AppText.h2b?.copyWith(color: Colors.black)),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ProductsListScreen()),
-                );
-              },
-              child: const Text("모두보기"),
-            ),
           ],
         ),
       ],
@@ -347,22 +333,49 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildProductsSection(BuildContext context) {
-    return BlocBuilder<ProductBloc, ProductState>(
-      builder: (context, state) {
-        return SizedBox(
-          height: AppDimensions.normalize(100),
-          child: (state is ProductError)
-              ? Center(child: errorContainer(context, false))
-              : ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: state is ProductLoading ? 3 : state.products.length,
-            itemBuilder: (context, index) {
-              if (state is ProductLoading) return const SquareProductItem();
-              return SquareProductItem(product: state.products[index]);
+    final List<Map<String, String>> categories = [
+      {'name': '전체', 'image': 'assets/images/all.png'},
+      {'name': '꽃', 'image': 'assets/images/flower.png'},
+      {'name': '관엽식물', 'image': 'assets/images/leaf.png'},
+      {'name': '다육식물', 'image': 'assets/images/succulent.png'},
+      {'name': '허브', 'image': 'assets/images/herb.png'},
+    ];
+
+    return SizedBox(
+      height: 90,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: categories.length,
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return GestureDetector(
+            onTap: () {
+              context.read<NavigationCubit>().updateTabWithCategory(
+                NavigationTab.shoppingTab,
+                category['name']!,
+              );
             },
-          ),
-        );
-      },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircleAvatar(
+                    radius: 30,
+                    backgroundImage: AssetImage(category['image']!),
+                    backgroundColor: Colors.grey[200],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    category['name']!,
+                    style: AppText.b1b,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 }
