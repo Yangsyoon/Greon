@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
@@ -98,6 +99,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       try {
         print('Firestore: 사용자 정보 저장 시작');
+        // 1. FCM 토큰 가져오기
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+
 
         await FirebaseFirestore.instance
             .collection('users')
@@ -110,10 +114,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
           'account': _accountController.text.trim(),     // 추가
           'birthday': _birthdayController.text.trim(),   // 추가
           'phone': _phoneController.text.trim(),         // 추가
+          'fcm_token': fcmToken,
           'createdAt': Timestamp.now(),
         });
 
         print('Firestore: 사용자 정보 저장 성공');
+        // 2. 토큰 갱신 시 Firestore 업데이트
+        FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
+          await FirebaseFirestore.instance
+              .collection('users')
+              .doc(credential.user!.uid)
+              .set({'fcm_token': newToken}, SetOptions(merge: true));
+        });
       } catch (e, stackTrace) {
         print('Firestore: 사용자 정보 저장 실패');
         print('에러: $e');
