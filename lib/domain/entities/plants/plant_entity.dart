@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 class PlantEntity {
   final String id;
@@ -25,18 +26,29 @@ class PlantEntity {
 
   factory PlantEntity.fromFirestore(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
+    String _convertDate(dynamic value) {
+      if (value == null) return '';
+      if (value is Timestamp) {
+        return DateFormat('yyyy-MM-dd').format(value.toDate());
+      }
+      if (value is String) return value;
+      return value.toString();
+    }
+
     return PlantEntity(
       id: doc.id,
-      name: data['name'],
-      speciesId: data['species_id'],
-      userId: data['user_id'],
-      lastWateredDate: data['last_watered_date'],
-      nutrientFrequency: data['nutrient_frequency'],
-      repottingCycle: data['repotting_cycle'],
-      sunlightLevel: data['sunlight_level'],
-      wateringCycle: data['watering_cycle'],
+      name: data['name'] ?? '',
+      speciesId: data['species_id'] ?? '',
+      userId: data['user_id'] ?? '',
+      lastWateredDate: _convertDate(data['last_watered_date']),
+      nutrientFrequency: (data['nutrient_frequency'] ?? 0) as int,
+      repottingCycle: (data['repotting_cycle'] ?? 0) as int,
+      sunlightLevel: data['sunlight_level'] ?? '',
+      wateringCycle: (data['watering_cycle'] ?? 0) as int,
     );
   }
+
 
   PlantEntity copyWith({
     String? id,

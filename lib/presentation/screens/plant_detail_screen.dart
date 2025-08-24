@@ -68,9 +68,6 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       }
 
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("변경사항이 저장되었습니다.")),
-      );
     } catch (e) {
       print("Firestore 업데이트 오류: $e");
       if (!mounted) return;
@@ -145,6 +142,140 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
       rethrow;
     }
   }
+  Future<void> _giveNutrientToPlant(
+      BuildContext context, PlantEntity plantState) async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) return;
+
+      final now = DateTime.now();
+      final nextNutrientDate = now.add(Duration(days: plantState.nutrientFrequency));
+
+      await _updatePlantField(
+          'last_nutrient_date', DateFormat('yyyy-MM-dd').format(now));
+
+      final nextNutrientDateUtc = nextNutrientDate.toUtc();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('schedules')
+          .add({
+        'plant_id': plantState.id,
+        'plant_name': plantState.name,
+        'date': Timestamp.fromDate(nextNutrientDate), // Timestamp 대신 String
+        'type': '영양제',
+        'memo': '자동 등록됨',
+        'auto_generated': true,
+      });
+
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      if (fcmToken == null) throw Exception('FCM 토큰을 가져올 수 없습니다');
+
+      final scheduledTime = DateTime(
+        nextNutrientDateUtc.year,
+        nextNutrientDateUtc.month,
+        nextNutrientDateUtc.day,
+        9, // 알림 시간 (예: 오전 9시)
+        0,
+        0,
+      ).toUtc();
+
+      await FirebaseFirestore.instance.collection('notification_requests').add({
+        'user_id': userId,
+        'fcm_token': fcmToken,
+        'title': '${plantState.name} 영양제 줄 시간이에요 🌱',
+        'body': '오늘은 ${plantState.name}에게 영양제를 줄 날입니다!',
+        'scheduled_time': Timestamp.fromDate(scheduledTime),
+        'sent': false,
+        'plant_id': plantState.id,
+        'created_at': Timestamp.now(),
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                "영양제 주기 완료! 다음 일정이 자동 등록되고, 푸시 알림이 예약되었습니다.")),
+      );
+    } catch (e, stack) {
+      print('알림 설정 실패: $e');
+      print(stack);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("알림 설정 실패: ${e.toString()}")),
+      );
+      rethrow;
+    }
+  }
+
+  Future<void> _repotPlant(
+      BuildContext context, PlantEntity plantState) async {
+    try {
+      final userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) return;
+
+      final now = DateTime.now();
+      final nextRepottingDate = now.add(Duration(days: plantState.repottingCycle));
+
+      await _updatePlantField(
+          'last_repotting_date', DateFormat('yyyy-MM-dd').format(now));
+
+      final nextRepottingDateUtc = nextRepottingDate.toUtc();
+
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .collection('schedules')
+          .add({
+        'plant_id': plantState.id,
+        'plant_name': plantState.name,
+        'date': Timestamp.fromDate(nextRepottingDate),
+        'type': '분갈이',
+        'memo': '자동 등록됨',
+        'auto_generated': true,
+      });
+
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      if (fcmToken == null) throw Exception('FCM 토큰을 가져올 수 없습니다');
+
+      final scheduledTime = DateTime(
+        nextRepottingDateUtc.year,
+        nextRepottingDateUtc.month,
+        nextRepottingDateUtc.day,
+        10, // 알림 시간 (예: 오전 10시)
+        0,
+        0,
+      ).toUtc();
+
+      await FirebaseFirestore.instance.collection('notification_requests').add({
+        'user_id': userId,
+        'fcm_token': fcmToken,
+        'title': '${plantState.name} 분갈이 할 시간이에요 🪴',
+        'body': '오늘은 ${plantState.name}를 분갈이 해주세요!',
+        'scheduled_time': Timestamp.fromDate(scheduledTime),
+        'sent': false,
+        'plant_id': plantState.id,
+        'created_at': Timestamp.now(),
+      });
+
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text(
+                "분갈이 완료! 다음 일정이 자동 등록되고, 푸시 알림이 예약되었습니다.")),
+      );
+    } catch (e, stack) {
+      print('알림 설정 실패: $e');
+      print(stack);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("알림 설정 실패: ${e.toString()}")),
+      );
+      rethrow;
+    }
+  }
+
 
   void _showEditDialog(String title, String currentValue, String field,
       {bool isNumeric = false}) {
@@ -406,38 +537,80 @@ class _PlantDetailScreenState extends State<PlantDetailScreen> {
                       onTap: _showSunlightLevelPicker,
                     ),
                   ),
-                  _buildEditableInfoCard(
-                    icon: Icons.invert_colors,
-                    title: "물 주는 주기",
-                    value: "${updatedPlantState.wateringCycle}일",
-                    field: 'watering_cycle',
-                    isNumeric: true,
-                  ),
-                  Center(
-                    child: ElevatedButton.icon(
-                      onPressed: () async {
-                        await _waterPlantAndSchedule(
-                            context, updatedPlantState);
-                      },
-                      icon: const Icon(Icons.water_drop),
-                      label: const Text("물 주기"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 24, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                      ),
+                    _buildEditableInfoCard(
+                      icon: Icons.invert_colors,
+                      title: "물 주는 주기",
+                      value: "${updatedPlantState.wateringCycle}일",
+                      field: 'watering_cycle',
+                      isNumeric: true,
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
-              ),
+                    const SizedBox(height: 8), // 카드와 버튼 사이 여백
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        // 물 주기 버튼
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            await _waterPlantAndSchedule(context, updatedPlantState);
+                          },
+                          icon: const Icon(Icons.water_drop),
+                          label: const Text("물 주기"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                        // 영양제 버튼
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            await _giveNutrientToPlant(context, updatedPlantState);
+                          },
+                          icon: const Icon(Icons.local_florist),
+                          label: const Text("영양제 주기"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.orange,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                        // 분갈이 버튼
+                        ElevatedButton.icon(
+                          onPressed: () async {
+                            await _repotPlant(context, updatedPlantState);
+                          },
+                          icon: const Icon(Icons.grass),
+                          label: const Text("분갈이"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.brown,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16), // Row와 다음 요소 사이 여백
+                  ],
+                )
+
             ),
           ),
         );
       },
     );
   }
+}
+// 분갈이
+class _repotPlant {
+
+}
+
+class _giveNutrientToPlant {
+
 }
