@@ -42,8 +42,7 @@ class RectangularProductItem extends StatelessWidget {
     return GestureDetector(
       onTap: onClick != null ? () => onClick!() : null,
       child: Container(
-        height: 240, // 적절한 고정 높이 지정 (필요에 따라 조절)
-        margin: EdgeInsets.only(bottom: AppDimensions.normalize(10.8)),
+        height: 240,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.zero,
           color: Colors.white,

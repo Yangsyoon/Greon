@@ -29,7 +29,7 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                "CONTINUE",
+                "계속하기",
                 style: AppText.h3b,
               ),
               Space.yf(1),
@@ -48,7 +48,7 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
                     );
                   },
 
-                  buttonText: "Proceed to Cart"),
+                  buttonText: "장바구니로 가기"),
               Space.yf(1.5),
               SizedBox(
                 width: double.infinity,
@@ -62,7 +62,7 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
                     );
                   },
                   child: Text(
-                    "Continue Shopping",
+                    "쇼핑 계속하기",
                     style: AppText.h3b?.copyWith(color: Colors.white),
                   ),
                 ),

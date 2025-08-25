@@ -61,12 +61,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Scaffold(
       body: Padding(
-        padding: Space.hf(1.1),
+        padding: Space.h1!,
         child: SafeArea(
-          minimum: EdgeInsets.only(top: AppDimensions.normalize(20)),
           child: Column(
             children: [
-              TopRow(isFromHome: false, context: context),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.asset(AppAssets.greonAppBar, height: 40),
+                  IconButton(
+                    icon: const Icon(Icons.settings, size: 28),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SettingsPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Center(
+                child: Text(
+                  "마이페이지",
+                  style: AppText.h2b?.copyWith(color: Colors.black),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 10),
               Expanded(
                 child: SingleChildScrollView(
                   child: BlocBuilder<UserBloc, UserState>(

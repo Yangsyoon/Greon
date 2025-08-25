@@ -11,3 +11,10 @@ class AddPost extends PostEvent {
   final PostModel post;
   AddPost(this.post);
 }
+
+class ToggleLikePost extends PostEvent {
+  final PostModel post;
+  final String userId;
+
+  ToggleLikePost({required this.post, required this.userId});
+}

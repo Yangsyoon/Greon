@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -9,9 +10,14 @@ import '../../../application/filter_cubit/filter_cubit.dart';
 import '../../../application/post_bloc/post_bloc.dart';
 import '../../../application/post_bloc/post_event.dart';
 import '../../../application/post_bloc/post_state.dart';
+import '../../../configs/app_typography.dart';
+import '../../../configs/space.dart';
+import '../../../core/constant/assets.dart';
 import '../../../core/enums/enums.dart';
+import '../../../data/models/model/PostModel.dart';
 import '../../../data/models/product/filter_params_model.dart';
 import '../../widgets/noconnection_column.dart';
+import '../settings_page.dart';
 
 class BulletinBoardScreen extends StatefulWidget {
   final String? initialCategory;
@@ -40,15 +46,16 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
           : '전체';
     }
     context.read<PostBloc>().add(
-      LoadPosts(category: selectedCategory == '전체' ? null : selectedCategory),
-    );
+          LoadPosts(
+              category: selectedCategory == '전체' ? null : selectedCategory),
+        );
   }
 
   Future<String> getNickname(String uid) async {
     if (nicknameCache.containsKey(uid)) return nicknameCache[uid]!;
     try {
       final snapshot =
-      await FirebaseFirestore.instance.collection('users').doc(uid).get();
+          await FirebaseFirestore.instance.collection('users').doc(uid).get();
       final nickname = snapshot.data()?['nickname'] ?? '알 수 없음';
       nicknameCache[uid] = nickname;
       return nickname;
@@ -61,62 +68,117 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
   Widget build(BuildContext context) {
     return BlocListener<NavigationCubit, NavigationState>(
       listener: (context, navState) {
-        if (navState.tab == NavigationTab.boardTab && navState.category != null) {
+        if (navState.tab == NavigationTab.boardTab &&
+            navState.category != null) {
           setState(() {
             selectedCategory = navState.category!;
           });
           context.read<PostBloc>().add(
-            LoadPosts(category: navState.category),
-          );
+                LoadPosts(category: navState.category),
+              );
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text("🌿 그리온 게시판", style: TextStyle(color: Colors.green)),
-          backgroundColor: Colors.white,
-          elevation: 1,
-          iconTheme: const IconThemeData(color: Colors.green),
-        ),
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.green,
-          onPressed: () async {
-            final result = await Navigator.pushNamed(context, '/write-post');
-            if (result == true) {
-              context.read<PostBloc>().add(LoadPosts(
-                  category:
-                  selectedCategory == '전체' ? null : selectedCategory));
-            }
-          },
-          child: const Icon(Icons.add),
-        ),
         body: SafeArea(
+          top: true,
+          bottom: true,
           child: Padding(
-            padding: const EdgeInsets.all(16),
+            padding: Space.h1!,
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: DropdownButton<String>(
-                    value: selectedCategory,
-                    items: categories.map((cat) {
-                      return DropdownMenuItem(
-                        value: cat,
-                        child: Text(cat),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          selectedCategory = value;
-                        });
-                        context.read<PostBloc>().add(
-                          LoadPosts(category: value == '전체' ? null : value),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Image.asset(AppAssets.greonAppBar, height: 40),
+                    IconButton(
+                      icon: const Icon(Icons.settings, size: 28),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (_) => const SettingsPage()),
                         );
-                      }
-                    },
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    "게시판",
+                    style: AppText.h2b?.copyWith(color: Colors.black),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 3),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end, // 오른쪽 끝 정렬
+                  children: [
+                    TextButton(
+                      onPressed: () async {
+                        final result =
+                            await Navigator.pushNamed(context, '/write-post');
+                        if (result == true) {
+                          context.read<PostBloc>().add(
+                                LoadPosts(
+                                    category: selectedCategory == '전체'
+                                        ? null
+                                        : selectedCategory),
+                              );
+                        }
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[100],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: Colors.grey.shade200,
+                            width: 2,
+                          ),
+                        ),
+                        child: const Text(
+                          "글쓰기",
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 5),
+                Wrap(
+                  spacing: 8,
+                  children: categories.map((cat) {
+                    final isSelected = selectedCategory == cat;
+                    return ChoiceChip(
+                      label: Text(cat),
+                      selected: isSelected,
+                      selectedColor: Colors.grey[400],
+                      backgroundColor: Colors.white,
+                      labelStyle: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      onSelected: (_) {
+                        setState(() {
+                          selectedCategory = cat;
+                        });
+                        context.read<PostBloc>().add(
+                              LoadPosts(category: cat == '전체' ? null : cat),
+                            );
+                      },
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 10),
                 Expanded(
                   child: BlocBuilder<PostBloc, PostState>(
                     builder: (context, state) {
@@ -130,46 +192,87 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                           itemCount: state.posts.length,
                           itemBuilder: (context, index) {
                             final post = state.posts[index];
+
                             return Card(
+                              color: Colors.white,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               margin: const EdgeInsets.symmetric(vertical: 8),
                               child: ListTile(
                                 contentPadding: const EdgeInsets.all(12),
-                                title: Text(post.title,
-                                    style: const TextStyle(
-                                        fontWeight: FontWeight.bold)),
+                                title: Text(
+                                  post.title,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold),
+                                ),
                                 subtitle: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     const SizedBox(height: 4),
+                                    Text(
+                                      post.content ?? "",
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: const TextStyle(
+                                          fontSize: 14, color: Colors.black87),
+                                    ),
+                                    const SizedBox(height: 6),
                                     FutureBuilder<String>(
                                       future: getNickname(post.uid),
                                       builder: (context, snapshot) {
                                         final nickname =
                                             snapshot.data ?? '로딩 중...';
-                                        return Text(nickname,
-                                            style: const TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey));
+                                        final timeAgo =
+                                            _formatTimeAgo(post.createdAt);
+
+                                        return Row(
+                                          children: [
+                                            BlocBuilder<PostBloc, PostState>(
+                                              builder: (context, state) {
+                                                // 현재 상태에서 해당 게시글 가져오기
+                                                PostModel currentPost = post;
+                                                if (state is PostLoaded) {
+                                                  final found = state.posts.firstWhere(
+                                                        (p) => p.id == post.id,
+                                                    orElse: () => post,
+                                                  );
+                                                  currentPost = found;
+                                                }
+                                                return Row(
+                                                  children: [
+                                                    const Icon(
+                                                      Icons.thumb_up,
+                                                      size: 20,
+                                                      color: Colors.red,
+                                                    ),
+                                                    const SizedBox(width: 2),
+                                                    Text('${currentPost.likesCount}',
+                                                        style: const TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors.grey,
+                                                            fontWeight: FontWeight.bold)),
+                                                    const SizedBox(width: 8),
+                                                    const Icon(Icons.comment,
+                                                        size: 20, color:
+                                                        Colors.lightBlueAccent),
+                                                    const SizedBox(width: 2),
+                                                    Text('${currentPost.commentsCount}',
+                                                        style: const TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors.grey,
+                                                            fontWeight: FontWeight.bold)),
+                                                    const SizedBox(width: 20),
+                                                    Text("$timeAgo  |  $nickname",
+                                                        style: const TextStyle(fontSize: 12, color: Colors.grey)),
+                                                  ],
+                                                );
+                                              },
+                                            )
+                                          ],
+                                        );
                                       },
                                     ),
-                                    Text(
-                                      DateFormat('yyyy-MM-dd HH:mm')
-                                          .format(post.createdAt),
-                                      style: const TextStyle(
-                                          fontSize: 12, color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                                trailing: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    const Icon(Icons.comment,
-                                        size: 16, color: Colors.grey),
-                                    Text('${post.commentsCount}',
-                                        style: const TextStyle(fontSize: 12)),
                                   ],
                                 ),
                                 onTap: () async {
@@ -179,10 +282,12 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                                     arguments: post,
                                   );
                                   if (result == true) {
-                                    context.read<PostBloc>().add(LoadPosts(
-                                        category: selectedCategory == '전체'
-                                            ? null
-                                            : selectedCategory));
+                                    context.read<PostBloc>().add(
+                                          LoadPosts(
+                                              category: selectedCategory == '전체'
+                                                  ? null
+                                                  : selectedCategory),
+                                        );
                                   }
                                 },
                               ),
@@ -204,5 +309,17 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
         ),
       ),
     );
+  }
+
+  String _formatTimeAgo(DateTime dateTime) {
+    final diff = DateTime.now().difference(dateTime);
+
+    if (diff.inMinutes < 1) return "방금 전";
+    if (diff.inMinutes < 60) return "${diff.inMinutes}분 전";
+    if (diff.inHours < 24) return "${diff.inHours}시간 전";
+    if (diff.inDays < 7) return "${diff.inDays}일 전";
+    if (diff.inDays < 30) return "${(diff.inDays / 7).floor()}주 전";
+    if (diff.inDays < 365) return "${(diff.inDays / 30).floor()}개월 전";
+    return "${(diff.inDays / 365).floor()}년 전";
   }
 }

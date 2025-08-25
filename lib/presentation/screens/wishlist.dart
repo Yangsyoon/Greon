@@ -5,11 +5,9 @@ import 'package:greon/configs/app_typography.dart';
 import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/colors.dart';
 import 'package:greon/presentation/widgets/custom_appbar.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../../../data/models/product/product_model.dart';
 import '../../application/wishlist_cubit/wishlist_cubit.dart';
-import 'package:greon/application/wishlist_cubit/wishlist_cubit.dart';
 import '../../core/router/app_router.dart';
 import '../widgets/rectangular_product_item.dart';
 
@@ -215,8 +213,9 @@ class _WishListScreenState extends State<WishListScreen> {
 
 
                 // ✅ GridView
-                Expanded(
+                Flexible(
                   child: GridView.builder(
+                    shrinkWrap: true,
                     padding: Space.all(1),
                     itemCount: wishlist.length,
                     gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -224,7 +223,7 @@ class _WishListScreenState extends State<WishListScreen> {
                       childAspectRatio: 0.7,
                       crossAxisSpacing: 6,
                     ),
-                    physics: const ClampingScrollPhysics(),
+                    physics: const BouncingScrollPhysics(),
                     itemBuilder: (BuildContext context, int index) {
                       final productModel = wishlist[index];
                       final isSelected = selectedItems.contains(productModel);

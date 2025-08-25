@@ -21,6 +21,7 @@ import '../../../data/models/product/product_model.dart';
 import '../../../domain/entities/product/product.dart';
 import '../../widgets/noconnection_column.dart';
 import '../../widgets/rectangular_product_item.dart';
+import '../settings_page.dart';
 
 class ProductsListScreen extends StatefulWidget {
   final String initialCategory;
@@ -91,329 +92,343 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<NavigationCubit, NavigationState>(
-        listener: (context, state) {
-      if (state.tab == NavigationTab.shoppingTab && state.category != null) {
-        setState(() {
-          selectedCategory = state.category!;
-        });
-        // `FilterCubit`에도 변경된 카테고리 적용
-        context.read<FilterCubit>().applyCategory(state.category!);
-      }
-    },
-      child: WillPopScope(
-      onWillPop: () async {
-        if (_isSearching) {
-          _exitSearchMode();
-          return false;
+      listener: (context, state) {
+        if (state.tab == NavigationTab.shoppingTab && state.category != null) {
+          setState(() {
+            selectedCategory = state.category!;
+          });
+          // `FilterCubit`에도 변경된 카테고리 적용
+          context.read<FilterCubit>().applyCategory(state.category!);
         }
-        return true;
       },
-      child: Scaffold(
-        body: SafeArea(
-          minimum: EdgeInsets.only(top: AppDimensions.normalize(24)),
-          child: Column(
-            children: [
-              Padding(
-                padding: Space.h1!,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isSearching = true;
-                          _searchController.clear();
-                        });
-                        context.read<FilterCubit>().applySearch('');
-                      },
-                      child: const Icon(Icons.search),
-                    ),
-                    Expanded(
-                      child: _isSearching
-                          ? TextField(
-                              controller: _searchController,
-                              autofocus: true,
-                              decoration: const InputDecoration(
-                                hintText: "상품 검색",
-                                border: InputBorder.none,
-                              ),
-                              onChanged: (value) {
-                                context
-                                    .read<FilterCubit>()
-                                    .applySearch(value.trim());
-                              },
-                              onSubmitted: (_) {
-                                FocusScope.of(context).unfocus(); // 키보드 닫기
-                              },
-                            )
-                          : BlocBuilder<FilterCubit, FilterProductParams>(
-                              builder: (context, filterState) {
-                                return Text(
-                                  (filterState.categories.isEmpty
-                                          ? " "
-                                          : filterState.categories.first.name)
-                                      .toUpperCase(),
-                                  style: AppText.b1b
-                                      ?.copyWith(color: AppColors.GreyText),
-                                  textAlign: TextAlign.center,
-                                );
-                              },
-                            ),
-                    ),
-                    SizedBox(width: 12),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).pushNamed(AppRouter.settings);
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          'assets/images/setting.png',
-                          width: 30,
-                          height: 30,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    // 왼쪽 4/5 영역: 가로로 넘기는 이미지 스크롤 뷰
-                    Expanded(
-                      flex: 4,
-                      child: SizedBox(
-                        height: 200, // 필요한 이미지 높이로 조절
-                        child: PageView(
-                          scrollDirection: Axis.horizontal,
-                          children: List.generate(
-                            5, // 이미지 개수
-                            (index) => Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 8),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
-                                child: Image.asset(
-                                  'assets/images/shop_picture.png',
-                                  // 모든 페이지에서 같은 PNG 사용
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(width: 16), // 영역 간 간격
-
-                    // 오른쪽 1/5 영역: 버튼 3개 세로 배치
-                    Expanded(
-                      flex: 1,
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
+      child: WillPopScope(
+        onWillPop: () async {
+          if (_isSearching) {
+            _exitSearchMode();
+            return false;
+          }
+          return true;
+        },
+        child: Scaffold(
+          body: SafeArea(
+            child: Column(
+              children: [
+                Padding(
+                  padding: Space.h1!,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context).pushNamed(AppRouter.cart);
-                              },
-                              child: Image.asset(
-                                'assets/images/cart.png',
-                                width: 60,
-                                height: 60,
-                              ),
-                            ),
+                          Image.asset(AppAssets.greonAppBar, height: 40),
+                          IconButton(
+                            icon: const Icon(Icons.settings, size: 28),
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (_) => const SettingsPage()),
+                              );
+                            },
                           ),
-                          const SizedBox(height: 8),
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.of(context)
-                                    .pushNamed(AppRouter.wishlist);
-                              },
-                              child: Image.asset(
-                                'assets/images/jjim.png',
-                                width: 60,
-                                height: 60,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Material(
-                              color: Colors.transparent,
-                              child: InkWell(
-                                onTap: () {
-                                  // 클릭 시 동작
-                                },
-                                child: Image.asset(
-                                  'assets/images/coupon.png',
-                                  width: 60,
-                                  height: 60,
-                                ),
-                              ))
                         ],
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 100, // 이미지+텍스트 전체 높이
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: availableCategories.map((category) {
-                      final isSelected = selectedCategory == category['name'];
+                      const SizedBox(height: 12),
 
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = category['name']!;
-                          });
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              // 동그란 이미지
-                              Container(
-                                width: 60,
-                                height: 60,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color:
-                                        isSelected ? Colors.black : Colors.grey,
-                                    width: 2,
+                      // 2. 검색창/검색아이콘 + 선택된 카테고리 텍스트
+                      Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _isSearching = true;
+                                _searchController.clear();
+                              });
+                              context.read<FilterCubit>().applySearch('');
+                            },
+                            child: const Icon(Icons.search),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: _isSearching
+                                ? TextField(
+                                    controller: _searchController,
+                                    autofocus: true,
+                                    decoration: const InputDecoration(
+                                      hintText: "상품 검색",
+                                      border: InputBorder.none,
+                                    ),
+                                    onChanged: (value) {
+                                      context
+                                          .read<FilterCubit>()
+                                          .applySearch(value.trim());
+                                    },
+                                    onSubmitted: (_) {
+                                      FocusScope.of(context).unfocus();
+                                    },
+                                  )
+                                : BlocBuilder<FilterCubit, FilterProductParams>(
+                                    builder: (context, filterState) {
+                                      return Text(
+                                        (filterState.categories.isEmpty
+                                                ? " "
+                                                : filterState
+                                                    .categories.first.name)
+                                            .toUpperCase(),
+                                        style: AppText.b1b?.copyWith(
+                                            color: AppColors.GreyText),
+                                        textAlign: TextAlign.center,
+                                      );
+                                    },
                                   ),
-                                  image: DecorationImage(
-                                    image: AssetImage(category['image']!),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  child: Row(
+                    children: [
+                      // 왼쪽 4/5 영역: 가로로 넘기는 이미지 스크롤 뷰
+                      Expanded(
+                        flex: 4,
+                        child: SizedBox(
+                          height: 200, // 필요한 이미지 높이로 조절
+                          child: PageView(
+                            scrollDirection: Axis.horizontal,
+                            children: List.generate(
+                              5, // 이미지 개수
+                              (index) => Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 8),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(12),
+                                  child: Image.asset(
+                                    'assets/images/shop_picture.png',
+                                    // 모든 페이지에서 같은 PNG 사용
                                     fit: BoxFit.cover,
                                   ),
                                 ),
                               ),
-                              const SizedBox(height: 6),
-                              // 카테고리 이름
-                              Text(
-                                category['name']!,
-                                style: TextStyle(
-                                  color:
-                                      isSelected ? Colors.green : Colors.black,
-                                  fontWeight: isSelected
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(width: 16), // 영역 간 간격
+
+                      // 오른쪽 1/5 영역: 버튼 3개 세로 배치
+                      Expanded(
+                        flex: 1,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .pushNamed(AppRouter.cart);
+                                },
+                                child: Image.asset(
+                                  'assets/images/cart.png',
+                                  width: 60,
+                                  height: 60,
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 40,
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: ['가격 순', '리뷰 많은 순', '추천 순', '인기순'].map((title) {
-                      final isSelected = selectedSort == title; // 선택 상태 관리 변수
-
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 6),
-                        child: TextButton(
-                          onPressed: () {
-                            setState(() {
-                              selectedSort = title;
-                            });
-                            // 정렬 로직 호출 가능
-                          },
-                          style: TextButton.styleFrom(
-                            backgroundColor:
-                                isSelected ? Colors.white : Colors.transparent,
-                            foregroundColor: Colors.black,
-                            side: BorderSide(color: Colors.white),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20),
                             ),
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                          ),
-                          child: Text(title),
+                            const SizedBox(height: 8),
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
+                                  Navigator.of(context)
+                                      .pushNamed(AppRouter.wishlist);
+                                },
+                                child: Image.asset(
+                                  'assets/images/jjim.png',
+                                  width: 60,
+                                  height: 60,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    // 클릭 시 동작
+                                  },
+                                  child: Image.asset(
+                                    'assets/images/coupon.png',
+                                    width: 60,
+                                    height: 60,
+                                  ),
+                                ))
+                          ],
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    ],
                   ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Padding(
-                  padding: EdgeInsets.only(left: 16), // 왼쪽 16px 띄우기
-                  child: Text(
-                    '판매 모종 >',
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                SizedBox(
+                  height: 100, // 이미지+텍스트 전체 높이
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: availableCategories.map((category) {
+                        final isSelected = selectedCategory == category['name'];
+
+                        return GestureDetector(
+                          onTap: () {
+                            setState(() {
+                              selectedCategory = category['name']!;
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // 동그란 이미지
+                                Container(
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: isSelected
+                                          ? Colors.black
+                                          : Colors.grey,
+                                      width: 2,
+                                    ),
+                                    image: DecorationImage(
+                                      image: AssetImage(category['image']!),
+                                      fit: BoxFit.cover,
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                // 카테고리 이름
+                                Text(
+                                  category['name']!,
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? Colors.green
+                                        : Colors.black,
+                                    fontWeight: isSelected
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
                 ),
-              ),
-              Space.y1!,
-              Expanded(
-                child: RefreshIndicator(
-                  onRefresh: () async {
-                    context
-                        .read<ProductBloc>()
-                        .add(const GetProducts(FilterProductParams()));
-                  },
-                  child: _isSearching
-                      ? BlocBuilder<FilterCubit, FilterProductParams>(
-                          builder: (context, filterState) {
-                            final products = filterState.products;
+                SizedBox(
+                  height: 40,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: ['가격 순', '리뷰 많은 순', '추천 순', '인기순'].map((title) {
+                        final isSelected = selectedSort == title; // 선택 상태 관리 변수
 
-                            if (products.isEmpty) {
-                              return const Center(child: Text('검색 결과가 없습니다.'));
-                            }
-
-                            return _buildGrid(products);
-                          },
-                        )
-                      : BlocBuilder<ProductBloc, ProductState>(
-                          builder: (context, state) {
-                            if (state is ProductLoaded) {
-                              final products = state.products;
-                              return _buildGridOrEmpty(products, '상품이 없습니다.');
-                            } else if (state is ProductError) {
-                              if (state.failure is NetworkFailure) {
-                                return const Center(
-                                    child: Text("네트워크 오류\n다시 시도해주세요"));
-                              } else {
-                                return const NoConnectionColumn(
-                                    isFromCategories: false);
-                              }
-                            } else {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
-                          },
-                        ),
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 6),
+                          child: TextButton(
+                            onPressed: () {
+                              setState(() {
+                                selectedSort = title;
+                              });
+                              // 정렬 로직 호출 가능
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor: isSelected
+                                  ? Colors.white
+                                  : Colors.transparent,
+                              foregroundColor: Colors.black,
+                              side: BorderSide(color: Colors.white),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                            child: Text(title),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(height: 8),
+                const Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 16), // 왼쪽 16px 띄우기
+                    child: Text(
+                      '판매 모종 >',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                ),
+                Space.y1!,
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      context
+                          .read<ProductBloc>()
+                          .add(const GetProducts(FilterProductParams()));
+                    },
+                    child: _isSearching
+                        ? BlocBuilder<FilterCubit, FilterProductParams>(
+                            builder: (context, filterState) {
+                              final products = filterState.products;
+
+                              if (products.isEmpty) {
+                                return const Center(
+                                    child: Text('검색 결과가 없습니다.'));
+                              }
+
+                              return _buildGrid(products);
+                            },
+                          )
+                        : BlocBuilder<ProductBloc, ProductState>(
+                            builder: (context, state) {
+                              if (state is ProductLoaded) {
+                                final products = state.products;
+                                return _buildGridOrEmpty(products, '상품이 없습니다.');
+                              } else if (state is ProductError) {
+                                if (state.failure is NetworkFailure) {
+                                  return const Center(
+                                      child: Text("네트워크 오류\n다시 시도해주세요"));
+                                } else {
+                                  return const NoConnectionColumn(
+                                      isFromCategories: false);
+                                }
+                              } else {
+                                return const Center(
+                                    child: CircularProgressIndicator());
+                              }
+                            },
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
-      ),
       ),
     );
   }

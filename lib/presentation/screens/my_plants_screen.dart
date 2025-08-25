@@ -2,6 +2,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:greon/presentation/screens/settings_page.dart';
+import '../../configs/app_typography.dart';
+import '../../configs/space.dart';
+import '../../core/constant/assets.dart';
 import '../../domain/entities/plants/plant_entity.dart';
 import 'plant_detail_screen.dart';
 
@@ -10,12 +14,21 @@ class MyPlantsScreen extends StatelessWidget {
 
   Future<String?> getPlantImageUrl(String userId, String plantId) async {
     try {
-      final ref = FirebaseStorage.instance.ref().child('user_plant/$userId/$plantId.jpg');
+      final ref = FirebaseStorage.instance
+          .ref()
+          .child('user_plant/$userId/$plantId.jpg');
       return await ref.getDownloadURL();
     } catch (e) {
       print("이미지를 가져오는 중 오류 발생: $e");
       return null;
     }
+  }
+
+  Future<DocumentSnapshot> getPlantSpeciesData(String speciesId) async {
+    return FirebaseFirestore.instance
+        .collection('plant_species')
+        .doc(speciesId)
+        .get();
   }
 
   @override
@@ -29,7 +42,6 @@ class MyPlantsScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text("🌿 나의 식물들")),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('plant')
@@ -51,161 +63,201 @@ class MyPlantsScreen extends StatelessWidget {
             return const Center(child: Text("등록된 식물이 없습니다."));
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(12),
-            child: GridView.builder(
-              itemCount: plants.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                childAspectRatio: 2 / 3,
-              ),
-                itemBuilder: (context, index) {
-                  final plant = plants[index];
-                  return FutureBuilder<String?>(
-                    future: getPlantImageUrl(userId, plant.id),
-                    builder: (context, imageSnapshot) {
-                      final imageUrl = imageSnapshot.data;
+          return SafeArea(
+            child: Padding(
+              padding: Space.h1!,
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Image.asset(AppAssets.greonAppBar, height: 40),
+                      IconButton(
+                        icon: const Icon(Icons.settings, size: 28),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (_) => const SettingsPage()),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Text(
+                      "내 식물",
+                      style: AppText.h2b?.copyWith(color: Colors.black),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemCount: plants.length,
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 1,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        childAspectRatio: 2.2,
+                      ),
+                      itemBuilder: (context, index) {
+                        final plant = plants[index];
 
-                      // 종 이름을 가져오기 위한 FutureBuilder
-                      return FutureBuilder<DocumentSnapshot>(
-                        future: FirebaseFirestore.instance
-                            .collection('plant_species')
-                            .doc(plant.speciesId)
-                            .get(),
-                        builder: (context, speciesSnapshot) {
-                          String speciesName = "알 수 없음";
-                          if (speciesSnapshot.hasData && speciesSnapshot.data!.exists) {
-                            speciesName = speciesSnapshot.data!['species_name'] ?? "알 수 없음";
-                          }
+                        return FutureBuilder<Map<String, dynamic>>(
+                          future: Future.wait([
+                            getPlantImageUrl(userId, plant.id),
+                            getPlantSpeciesData(plant.speciesId),
+                          ]).then((results) {
+                            final imageUrl = results[0] as String?;
+                            final speciesSnapshot = results[1] as DocumentSnapshot;
+                            String speciesName = "알 수 없음";
+                            if (speciesSnapshot.exists) {
+                              speciesName = speciesSnapshot['species_name'] ?? "알 수 없음";
+                            }
+                            return {
+                              'imageUrl': imageUrl,
+                              'speciesName': speciesName,
+                            };
+                          }),
+                          builder: (context, snapshot) {
+                            final imageUrl = snapshot.data?['imageUrl'];
+                            final speciesName = snapshot.data?['speciesName'] ?? "알 수 없음";
 
-                          return Stack(
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => PlantDetailScreen(plant: plant),
+                            return Stack(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => PlantDetailScreen(plant: plant),
+                                      ),
+                                    );
+                                  },
+                                  child: Card(
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
                                     ),
-                                  );
-                                },
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  elevation: 4,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(12),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        ClipRRect(
-                                          borderRadius: BorderRadius.circular(12),
-                                          child: Container(
-                                            height: 140,
-                                            width: double.infinity,
-                                            color: Colors.grey[200],
-                                            child: imageUrl != null
-                                                ? Image.network(imageUrl, fit: BoxFit.cover)
-                                                : const Icon(Icons.eco, size: 64, color: Colors.green),
+                                    elevation: 4,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(12),
+                                      child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        children: [
+                                          ClipRRect(
+                                            borderRadius: BorderRadius.circular(12),
+                                            child: SizedBox(
+                                              height: 120,
+                                              width: 120,
+                                              child: imageUrl != null
+                                                  ? Image.network(imageUrl, fit: BoxFit.cover)
+                                                  : const Icon(Icons.eco, size: 64, color: Colors.green),
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          plant.name,
-                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 4),
-                                        Text(
-                                          "종: $speciesName",
-                                          style: const TextStyle(fontSize: 13, color: Colors.grey),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              // 삭제 버튼
-                              Positioned(
-                                top: 4,
-                                right: 4,
-                                child: IconButton(
-                                  icon: const Icon(Icons.delete, color: Colors.grey),
-                                  onPressed: () async {
-                                    final confirm = await showDialog<bool>(
-                                      context: context,
-                                      builder: (ctx) => AlertDialog(
-                                        title: const Text("식물 삭제"),
-                                        content: Text("정말 '${plant.name}' 식물을 삭제하시겠습니까?"),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(ctx, false),
-                                            child: const Text("취소"),
-                                          ),
-                                          TextButton(
-                                            onPressed: () => Navigator.pop(ctx, true),
-                                            child: const Text("삭제"),
+                                          const SizedBox(width: 12),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment: CrossAxisAlignment.start,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              children: [
+                                                Text(
+                                                  plant.name,
+                                                  style: const TextStyle(
+                                                    fontSize: 16,
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  "종: $speciesName",
+                                                  style: const TextStyle(
+                                                    fontSize: 13,
+                                                    color: Colors.grey,
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow: TextOverflow.ellipsis,
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
-                                    );
-
-                                    if (confirm == true) {
-                                      try {
-                                        // plant 문서 삭제
-                                        await FirebaseFirestore.instance
-                                            .collection('plant')
-                                            .doc(plant.id)
-                                            .delete();
-
-                                        // 스토리지 파일 삭제 (없어도 무시)
-                                        final ref = FirebaseStorage.instance
-                                            .ref()
-                                            .child('user_plant/$userId/${plant.id}.jpg');
-
-                                        try {
-                                          await ref.delete();
-                                        } catch (e) {
-                                          if (e is FirebaseException && e.code == 'object-not-found') {
-                                            print("이미지 없음, 삭제 스킵");
-                                          } else {
-                                            rethrow; // 다른 에러는 그대로 던짐
-                                          }
-                                        }
-
-                                        // users 문서에서 plant.id 제거
-                                        await FirebaseFirestore.instance
-                                            .collection('users')
-                                            .doc(userId)
-                                            .update({
-                                          'plants': FieldValue.arrayRemove([plant.id])
-                                        });
-
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text("'${plant.name}' 삭제 완료")),
-                                        );
-                                      } catch (e) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text("삭제 실패: $e")),
-                                        );
-                                      }
-                                    }
-                                  },
+                                    ),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          );
-                        },
-                      );
-                    },
-                  );
-                }
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.delete, color: Colors.grey),
+                                    onPressed: () async {
+                                      // ... (기존 삭제 로직은 동일)
+                                      final confirm = await showDialog<bool>(
+                                        context: context,
+                                        builder: (ctx) => AlertDialog(
+                                          title: const Text("식물 삭제"),
+                                          content: Text("정말 '${plant.name}' 식물을 삭제하시겠습니까?"),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(ctx, false),
+                                              child: const Text("취소"),
+                                            ),
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(ctx, true),
+                                              child: const Text("삭제"),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+
+                                      if (confirm == true) {
+                                        try {
+                                          await FirebaseFirestore.instance
+                                              .collection('plant')
+                                              .doc(plant.id)
+                                              .delete();
+                                          final ref = FirebaseStorage.instance.ref().child('user_plant/$userId/${plant.id}.jpg');
+                                          try {
+                                            await ref.delete();
+                                          } catch (e) {
+                                            if (e is FirebaseException && e.code == 'object-not-found') {
+                                              print("이미지 없음, 삭제 스킵");
+                                            } else {
+                                              rethrow;
+                                            }
+                                          }
+                                          await FirebaseFirestore.instance
+                                              .collection('users')
+                                              .doc(userId)
+                                              .update({'plants': FieldValue.arrayRemove([plant.id])});
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text("'${plant.name}' 삭제 완료")),
+                                          );
+                                        } catch (e) {
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text("삭제 실패: $e")),
+                                          );
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           );
         },

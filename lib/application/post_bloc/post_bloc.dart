@@ -32,12 +32,39 @@ class PostBloc extends Bloc<PostEvent, PostState> {
         emit(PostError());
       }
     });
-    on<AddPost>((event, emit) async {
+
+    on<ToggleLikePost>((event, emit) async {
+      final post = event.post;
+      final userId = event.userId;
+
+      final postRef = FirebaseFirestore.instance.collection('posts').doc(post.id);
+      final likeRef = postRef.collection('likes').doc(userId);
+
+      final isLiked = (await likeRef.get()).exists;
+
       try {
-        await postRepository.addPost(event.post);
-        emit(PostAddSuccess());
+        if (isLiked) {
+          await likeRef.delete();
+          await postRef.update({'likesCount': FieldValue.increment(-1)});
+        } else {
+          await likeRef.set({'uid': userId, 'createdAt': Timestamp.now()});
+          await postRef.update({'likesCount': FieldValue.increment(1)});
+        }
+
+        // 로컬 상태 업데이트
+        if (state is PostLoaded) {
+          final posts = (state as PostLoaded).posts.map((p) {
+            if (p.id == post.id) {
+              final newLikes = isLiked ? (p.likesCount! - 1) : (p.likesCount! + 1);
+              return p.copyWith(likesCount: newLikes);
+            }
+            return p;
+          }).toList();
+
+          emit(PostLoaded(posts));
+        }
       } catch (e) {
-        emit(PostAddFailure(e.toString()));
+        // 실패 시 무시 또는 에러 처리
       }
     });
   }

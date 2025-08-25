@@ -86,6 +86,7 @@ class _WritePostScreenState extends State<WritePostScreen> {
         uid: user.uid,
         createdAt: DateTime.now(),
         commentsCount: 0,
+        likesCount: 0,
         imageUrl: imageUrl,
         category: selectedCategory,
       );

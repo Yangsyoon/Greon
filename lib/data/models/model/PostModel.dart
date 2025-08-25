@@ -7,6 +7,7 @@ class PostModel {
   final String uid;
   final DateTime createdAt;
   final int commentsCount;
+  int likesCount;
   final String? imageUrl;
   final String category;
 
@@ -17,6 +18,7 @@ class PostModel {
     required this.content,
     required this.createdAt,
     required this.commentsCount,
+    required this.likesCount,
     this.imageUrl,
     required this.category
   });
@@ -29,6 +31,7 @@ class PostModel {
       uid: doc['uid'] ?? '',
       createdAt: (doc['createdAt'] as Timestamp).toDate(),
       commentsCount: doc['commentsCount'] ?? 0,
+      likesCount: doc['likesCount'] ?? 0,
       imageUrl: doc['imageUrl'] as String?, // 안전하게 캐스팅
       category: doc['category'] ?? '',
     );
@@ -41,6 +44,7 @@ class PostModel {
       'uid': uid,
       'createdAt': Timestamp.fromDate(createdAt),
       'commentsCount': commentsCount,
+      'likesCount': likesCount,
       if (imageUrl != null) 'imageUrl': imageUrl,  // null이면 필드 아예 안 넣음
       'category': category,
     };
@@ -54,6 +58,7 @@ class PostModel {
       uid: map['uid'] ?? '',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
       commentsCount: map['commentsCount'] ?? 0,
+      likesCount: map['likesCount'] ?? 0,
       imageUrl: map['imageUrl'] as String?,
       category: map['category'] ?? '',
     );
@@ -66,6 +71,7 @@ class PostModel {
     String? uid,
     DateTime? createdAt,
     int? commentsCount,
+    int? likesCount,
     String? imageUrl,
     String? category,
   }) {
@@ -76,6 +82,7 @@ class PostModel {
       uid: uid ?? this.uid,
       createdAt: createdAt ?? this.createdAt,
       commentsCount: commentsCount ?? this.commentsCount,
+      likesCount: likesCount ?? this.likesCount,
       imageUrl: imageUrl ?? this.imageUrl,
       category: category ?? this.category,
     );

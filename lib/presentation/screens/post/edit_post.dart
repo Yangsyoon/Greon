@@ -95,6 +95,7 @@ class _EditPostScreenState extends State<EditPostScreen> {
             content: updatedData['content'],
             createdAt: (updatedData['createdAt'] as Timestamp).toDate(),
             commentsCount: updatedData['commentsCount'] ?? 0,
+            likesCount: updatedData['likesCount'] ?? 0,
             imageUrl: updatedData['imageUrl'] as String?,
             category: updatedData['category'],
           );
