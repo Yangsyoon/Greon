@@ -27,7 +27,14 @@ class PostBloc extends Bloc<PostEvent, PostState> {
           return PostModel.fromMap(data).copyWith(id: doc.id);
         }).toList();
 
-        emit(PostLoaded(posts));
+        List<PostModel> sortedPosts = List.from(posts);
+        if (event.sort == '최신순') {
+          sortedPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        } else if (event.sort == '추천순') {
+          sortedPosts.sort((a, b) => b.likesCount.compareTo(a.likesCount));
+        }
+
+        emit(PostLoaded(sortedPosts));
       } catch (e) {
         emit(PostError());
       }

@@ -31,6 +31,7 @@ class BulletinBoardScreen extends StatefulWidget {
 class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
   final Map<String, String> nicknameCache = {};
   String selectedCategory = '전체';
+  String selectedSort = '최신순';
   final List<String> categories = ['전체', '정보공유', 'QnA', '자유'];
 
   @override
@@ -152,31 +153,74 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                   ],
                 ),
                 const SizedBox(height: 5),
-                Wrap(
-                  spacing: 8,
-                  children: categories.map((cat) {
-                    final isSelected = selectedCategory == cat;
-                    return ChoiceChip(
-                      label: Text(cat),
-                      selected: isSelected,
-                      selectedColor: Colors.grey[400],
-                      backgroundColor: Colors.white,
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : Colors.black,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      onSelected: (_) {
-                        setState(() {
-                          selectedCategory = cat;
-                        });
-                        context.read<PostBloc>().add(
-                              LoadPosts(category: cat == '전체' ? null : cat),
-                            );
+                Row(
+                  children: [
+                    DropdownButton<String>(
+                      value: selectedSort,
+                      items: ['최신순', '추천순']
+                          .map((sort) => DropdownMenuItem(
+                                value: sort,
+                                child: Text(sort),
+                              ))
+                          .toList(),
+                      onChanged: (value) {
+                        if (value != null) {
+                          setState(() {
+                            selectedSort = value;
+                          });
+                          context.read<PostBloc>().add(
+                                LoadPosts(
+                                  category: selectedCategory == '전체'
+                                      ? null
+                                      : selectedCategory,
+                                  sort: value,
+                                ),
+                              );
+                        }
                       },
-                    );
-                  }).toList(),
+                    ),
+                    Expanded(child:
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: categories.map((cat) {
+                              final isSelected = selectedCategory == cat;
+                              return Padding(
+                                padding: const EdgeInsets.only(right: 8),
+                                child: ChoiceChip(
+                                  label: Text(cat),
+                                  selected: isSelected,
+                                  selectedColor: Colors.grey[400],
+                                  backgroundColor: Colors.white,
+                                  labelStyle: TextStyle(
+                                    color: isSelected ? Colors.white : Colors.black,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  onSelected: (_) {
+                                    setState(() {
+                                      selectedCategory = cat;
+                                    });
+                                    context.read<PostBloc>().add(
+                                      LoadPosts(
+                                        category: cat == '전체' ? null : cat,
+                                        sort: selectedSort, // 현재 선택된 정렬 유지
+                                      ),
+                                    );
+                                  },
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 10),
                 Expanded(
@@ -233,38 +277,57 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                                                 // 현재 상태에서 해당 게시글 가져오기
                                                 PostModel currentPost = post;
                                                 if (state is PostLoaded) {
-                                                  final found = state.posts.firstWhere(
-                                                        (p) => p.id == post.id,
+                                                  final found =
+                                                      state.posts.firstWhere(
+                                                    (p) => p.id == post.id,
                                                     orElse: () => post,
                                                   );
                                                   currentPost = found;
                                                 }
                                                 return Row(
                                                   children: [
-                                                    const Icon(
-                                                      Icons.thumb_up,
-                                                      size: 20,
-                                                      color: Colors.red,
+                                                    if (currentPost.likesCount >
+                                                        0) ...[
+                                                      const Icon(Icons.thumb_up,
+                                                          size: 20,
+                                                          color: Colors.red),
+                                                      const SizedBox(width: 2),
+                                                      Text(
+                                                        '${currentPost.likesCount}',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 8),
+                                                    ],
+                                                    if (currentPost
+                                                            .commentsCount >
+                                                        0) ...[
+                                                      const Icon(Icons.comment,
+                                                          size: 20,
+                                                          color: Colors
+                                                              .lightBlueAccent),
+                                                      const SizedBox(width: 2),
+                                                      Text(
+                                                        '${currentPost.commentsCount}',
+                                                        style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 20),
+                                                    ],
+                                                    Text(
+                                                      "$timeAgo  |  $nickname",
+                                                      style: const TextStyle(
+                                                          fontSize: 12,
+                                                          color: Colors.grey),
                                                     ),
-                                                    const SizedBox(width: 2),
-                                                    Text('${currentPost.likesCount}',
-                                                        style: const TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors.grey,
-                                                            fontWeight: FontWeight.bold)),
-                                                    const SizedBox(width: 8),
-                                                    const Icon(Icons.comment,
-                                                        size: 20, color:
-                                                        Colors.lightBlueAccent),
-                                                    const SizedBox(width: 2),
-                                                    Text('${currentPost.commentsCount}',
-                                                        style: const TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors.grey,
-                                                            fontWeight: FontWeight.bold)),
-                                                    const SizedBox(width: 20),
-                                                    Text("$timeAgo  |  $nickname",
-                                                        style: const TextStyle(fontSize: 12, color: Colors.grey)),
                                                   ],
                                                 );
                                               },

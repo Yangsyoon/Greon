@@ -16,14 +16,14 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
     constraints: BoxConstraints(
         minHeight: AppDimensions.normalize(120), maxWidth: double.infinity),
     builder: (BuildContext context) {
-      return SizedBox(
-        width: double.infinity,
+      return SafeArea(
         child: Padding(
           padding: EdgeInsets.only(
-              top: AppDimensions.normalize(12),
-              left: AppDimensions.normalize(8),
-              right: AppDimensions.normalize(8),
-              bottom: AppDimensions.normalize(5)),
+            top: AppDimensions.normalize(12),
+            left: AppDimensions.normalize(8),
+            right: AppDimensions.normalize(8),
+            bottom: AppDimensions.normalize(5),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,9 +33,7 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
                 style: AppText.h3b,
               ),
               Space.yf(1),
-              const Text("Lorem Ipsum is simply dummy text of the"),
-              Space.yf(.2),
-              const Text("printing and typesetting industry."),
+              const Text("제품이 장바구니에 담겼습니다."),
               Space.yf(2),
               transparentButton(
                   context: context,
@@ -47,7 +45,6 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
                       ),
                     );
                   },
-
                   buttonText: "장바구니로 가기"),
               Space.yf(1.5),
               SizedBox(
@@ -63,7 +60,7 @@ Future<void> showPoceedtoCartBottomSheet(BuildContext context) async {
                   },
                   child: Text(
                     "쇼핑 계속하기",
-                    style: AppText.h3b?.copyWith(color: Colors.white),
+                    style: AppText.h3b?.copyWith(color: Colors.black),
                   ),
                 ),
               )

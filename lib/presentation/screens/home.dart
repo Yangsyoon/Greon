@@ -50,6 +50,14 @@ class _HomeScreenState extends State<HomeScreen> {
     context.read<WishlistCubit>().loadWishlist();
     context.read<PostBloc>().add(LoadPosts());
     context.read<ProductBloc>().add(GetProducts(context.read<FilterCubit>().state));
+
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // 배경 투명 (앱 배경색이 보임)
+        statusBarIconBrightness: Brightness.dark, // 안드로이드용 (아이콘/글씨 검정)
+        statusBarBrightness: Brightness.light, // iOS용 (아이콘/글씨 검정)
+      ),
+    );
   }
 
   Future<String?> getPlantImageUrl(String userId, String plantId) async {
