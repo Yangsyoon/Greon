@@ -27,19 +27,9 @@ Widget userLoggedProfileContainer(
             child: imageUrl == null ? Icon(Icons.person, size: 28) : null,
           ),
           SizedBox(width: 12),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                nickname,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 4),
-              Text(
-                email,
-                style: TextStyle(color: Colors.grey[600]),
-              ),
-            ],
+          Text(
+            nickname,
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -54,4 +44,5 @@ Widget userLoggedProfileContainer(
       ),
     ],
   );
+
 }
