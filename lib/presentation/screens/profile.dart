@@ -5,9 +5,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/configs/configs.dart';
 import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
+import 'package:greon/data/models/product/product_model.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../application/user_bloc/user_bloc.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -43,7 +44,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
+      body:
+      Padding(
         padding: Space.h1!,
         child: SafeArea(
           child: Column(
@@ -82,154 +84,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 16),
-                                // 프로필 사진 + 닉네임
-                                Row(
-                                  children: [
-                                    CircleAvatar(
-                                      radius: 28,
-                                      backgroundImage:
-                                      image != null ? NetworkImage(image) : null,
-                                      child: image == null
-                                          ? const Icon(Icons.person, size: 28)
-                                          : null,
-                                    ),
-                                    const SizedBox(width: 12),
-                                    Text(
-                                      nickname,
-                                      style: const TextStyle(
-                                          fontSize: 16, fontWeight: FontWeight.bold),
-                                    ),
-                                  ],
-                                ),
+                                _buildProfileHeader(image, nickname),
                                 const SizedBox(height: 24),
-
-                                // 4개 버튼
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                  children: [
-                                    _profileActionButton(
-                                      context,
-                                      icon: Icons.shopping_bag,
-                                      label: '주문내역',
-                                      onTap: () => Navigator.pushNamed(context, '/orders'),
-                                    ),
-                                    _profileActionButton(
-                                      context,
-                                      icon: Icons.notifications,
-                                      label: '알림내역',
-                                      onTap: () =>
-                                          Navigator.pushNamed(context, '/notifications'),
-                                    ),
-                                    _profileActionButton(
-                                      context,
-                                      icon: Icons.help_outline,
-                                      label: '문의',
-                                      onTap: () =>
-                                          Navigator.pushNamed(context, '/inquiries'),
-                                    ),
-                                    _profileActionButton(
-                                      context,
-                                      icon: Icons.card_giftcard,
-                                      label: '쿠폰',
-                                      onTap: () =>
-                                          Navigator.pushNamed(context, '/coupons'),
-                                    ),
-                                  ],
-                                ),
+                                _buildProfileActionButtons(context),
                                 const SizedBox(height: 24),
-
-                                // Firestore 기반 광고 슬라이드
-                                StreamBuilder<QuerySnapshot>(
-                                  stream: FirebaseFirestore.instance
-                                      .collection('ads')
-                                      .snapshots(),
-                                  builder: (context, adSnapshot) {
-                                    if (!adSnapshot.hasData ||
-                                        adSnapshot.data!.docs.isEmpty) {
-                                      return const SizedBox(height: 180);
-                                    }
-
-                                    final adDocs = adSnapshot.data!.docs;
-
-                                    return Column(
-                                      children: [
-                                        SizedBox(
-                                          height: 180,
-                                          child: PageView.builder(
-                                            controller: _adPageController,
-                                            itemCount: adDocs.length,
-                                            onPageChanged: (index) {
-                                              setState(() => _currentAdIndex = index);
-                                            },
-                                            itemBuilder: (context, index) {
-                                              final adData =
-                                              adDocs[index].data() as Map<String, dynamic>;
-                                              final imageUrl = adData['url'] as String?;
-                                              final link = adData['link'] as String?;
-                                              return GestureDetector(
-                                                onTap: () async {
-                                                  if (link != null) {
-                                                    final uri = Uri.parse(link);
-                                                    if (await canLaunchUrl(uri)) {
-                                                      await launchUrl(uri, mode: LaunchMode.externalApplication);
-                                                    } else {
-                                                      print("링크를 열 수 없습니다: $link");
-                                                    }
-                                                  }
-                                                },
-                                                child: Container(
-                                                  margin: const EdgeInsets.symmetric(
-                                                      horizontal: 8),
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                    BorderRadius.circular(12),
-                                                    image: imageUrl != null
-                                                        ? DecorationImage(
-                                                      image: NetworkImage(imageUrl),
-                                                      fit: BoxFit.cover,
-                                                    )
-                                                        : null,
-                                                    color: Colors.grey[300],
-                                                  ),
-                                                  child: imageUrl == null
-                                                      ? const Center(
-                                                    child: Icon(
-                                                      Icons.image,
-                                                      size: 50,
-                                                      color: Colors.grey,
-                                                    ),
-                                                  )
-                                                      : null,
-                                                ),
-                                              );
-                                            },
-                                          ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        // 페이지 인디케이터
-                                        Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          children: List.generate(
-                                            adDocs.length,
-                                                (index) => Container(
-                                              margin: const EdgeInsets.symmetric(
-                                                  horizontal: 4),
-                                              width: _currentAdIndex == index ? 12 : 8,
-                                              height: _currentAdIndex == index ? 12 : 8,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: _currentAdIndex == index
-                                                    ? Colors.black
-                                                    : Colors.grey[400],
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
+                                _buildAdsSection(),
                                 const SizedBox(height: 24),
+                                // 최근 본 상품
+                                const RecentlyViewedList(),
                               ],
                             );
                           },
@@ -253,6 +115,135 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildProfileHeader(String? image, String nickname) {
+    return Row(
+      children: [
+        CircleAvatar(
+          radius: 28,
+          backgroundImage: image != null ? NetworkImage(image) : null,
+          child: image == null ? const Icon(Icons.person, size: 28) : null,
+        ),
+        const SizedBox(width: 12),
+        Text(
+          nickname,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildProfileActionButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceAround,
+      children: [
+        _profileActionButton(
+          context,
+          icon: Icons.shopping_bag,
+          label: '주문내역',
+          onTap: () => Navigator.pushNamed(context, '/orders'),
+        ),
+        _profileActionButton(
+          context,
+          icon: Icons.notifications,
+          label: '알림내역',
+          onTap: () => Navigator.pushNamed(context, '/notifications'),
+        ),
+        _profileActionButton(
+          context,
+          icon: Icons.help_outline,
+          label: '문의',
+          onTap: () => Navigator.pushNamed(context, '/inquiries'),
+        ),
+        _profileActionButton(
+          context,
+          icon: Icons.card_giftcard,
+          label: '쿠폰',
+          onTap: () => Navigator.pushNamed(context, '/coupons'),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAdsSection() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance.collection('ads').snapshots(),
+      builder: (context, adSnapshot) {
+        if (!adSnapshot.hasData || adSnapshot.data!.docs.isEmpty) {
+          return const SizedBox(height: 180);
+        }
+
+        final adDocs = adSnapshot.data!.docs;
+
+        return Column(
+          children: [
+            SizedBox(
+              height: 180,
+              child: PageView.builder(
+                controller: _adPageController,
+                itemCount: adDocs.length,
+                onPageChanged: (index) => setState(() => _currentAdIndex = index),
+                itemBuilder: (context, index) {
+                  final adData = adDocs[index].data() as Map<String, dynamic>;
+                  final imageUrl = adData['url'] as String?;
+                  final link = adData['link'] as String?;
+                  return GestureDetector(
+                    onTap: () async {
+                      if (link != null) {
+                        final uri = Uri.parse(link);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                        } else {
+                          print("링크를 열 수 없습니다: $link");
+                        }
+                      }
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(12),
+                        image: imageUrl != null
+                            ? DecorationImage(
+                          image: NetworkImage(imageUrl),
+                          fit: BoxFit.cover,
+                        )
+                            : null,
+                        color: Colors.grey[300],
+                      ),
+                      child: imageUrl == null
+                          ? const Center(
+                          child: Icon(
+                            Icons.image,
+                            size: 50,
+                            color: Colors.grey,
+                          ))
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                adDocs.length,
+                    (index) => Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 4),
+                  width: _currentAdIndex == index ? 12 : 8,
+                  height: _currentAdIndex == index ? 12 : 8,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: _currentAdIndex == index ? Colors.black : Colors.grey[400],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _profileActionButton(BuildContext context,
       {required IconData icon, required String label, required VoidCallback onTap}) {
     return GestureDetector(
@@ -271,6 +262,109 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(label, style: const TextStyle(fontSize: 14)),
         ],
       ),
+    );
+  }
+}
+
+/// 최근 본 상품 위젯
+class RecentlyViewedList extends StatelessWidget {
+  const RecentlyViewedList({super.key});
+
+  Future<List<ProductModel>> _fetchRecentlyViewed() async {
+    final user = firebase.FirebaseAuth.instance.currentUser;
+    if (user == null) return [];
+
+    final snapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user.uid)
+        .collection('recently_viewed')
+        .orderBy('viewedAt', descending: true)
+        .limit(10)
+        .get();
+
+    final ids = snapshot.docs.map((doc) => doc.id).toList();
+
+    final products = await Future.wait(ids.map((id) async {
+      final doc = await FirebaseFirestore.instance.collection('products').doc(id).get();
+      if (!doc.exists) return ProductModel.errorModel(id);
+      return ProductModel.fromDocumentAsync(doc);
+    }));
+
+    return products;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<ProductModel>>(
+      future: _fetchRecentlyViewed(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const SizedBox(
+            height: 180,
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return const SizedBox(
+            height: 180,
+            child: Center(child: Text("최근 본 상품이 없습니다.")),
+          );
+        }
+
+        final products = snapshot.data!;
+
+        return SizedBox(
+          height: 180,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: products.length,
+            itemBuilder: (context, index) {
+              final product = products[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/product-details',
+                    arguments: product.toEntity(),
+                  );
+                },
+                child: Container(
+                  width: 140,
+                  margin: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    color: Colors.grey[200],
+                    image: product.images.isNotEmpty
+                        ? DecorationImage(
+                      image: NetworkImage(product.images.first),
+                      fit: BoxFit.cover,
+                    )
+                        : null,
+                  ),
+                  child: product.images.isEmpty
+                      ? const Center(
+                    child: Icon(Icons.image, size: 40, color: Colors.grey),
+                  )
+                      : Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(4),
+                      color: Colors.black54,
+                      child: Text(
+                        product.name,
+                        style: const TextStyle(color: Colors.white, fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

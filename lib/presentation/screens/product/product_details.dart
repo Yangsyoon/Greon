@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -19,6 +20,7 @@ import '../../../domain/entities/cart/cart_item.dart';
 import '../../widgets/dots_indicator.dart';
 import '../../widgets/loading_shimmer.dart';
 import '../../widgets/proceedtocart_modalsheet.dart';
+import '../recently_viewed_service.dart' show addRecentlyViewedProduct;
 
 class ProductDetailsScreen extends StatefulWidget {
   const ProductDetailsScreen({super.key, required this.product});
@@ -40,6 +42,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   void initState() {
     super.initState();
     _loadWishlistStatus();
+
+    // ✅ 최근 본 상품 Firestore에 기록
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      addRecentlyViewedProduct(user.uid, widget.product.id);
+    }
 
     _pageController.addListener(() {
       setState(() {
