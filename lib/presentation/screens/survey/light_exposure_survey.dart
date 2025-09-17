@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:greon/presentation/screens/survey/home_direction_survey.dart';
 import 'package:greon/presentation/screens/survey/window_distance_survey.dart';
-import 'package:light/light.dart';
+import 'package:light_sensor/light_sensor.dart';
 
 class LightExposureSurveyPage extends StatefulWidget {
   final Map<String, dynamic> surveyData;
@@ -18,13 +18,13 @@ class LightExposureSurveyPage extends StatefulWidget {
 
 class _LightExposureSurveyPageState extends State<LightExposureSurveyPage> {
   String? _selectedLightLevel;
-  Light? _light;
+  //Light? _light;
   late StreamSubscription<int>? _lightSubscription;
 
   @override
   void initState() {
     super.initState();
-    _light = Light();
+    //_light = Light();
   }
 
   // 가정: 스마트폰 센서로 측정할 수 있다면 해당 부분을 추가적으로 구현
@@ -54,11 +54,12 @@ class _LightExposureSurveyPageState extends State<LightExposureSurveyPage> {
 
   void _measureLightLevel() {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('자동으로 빛의 세기를 측정 하였습니다.')),
+      const SnackBar(content: Text('자동으로 빛의 세기를 측정 하였습니다.')),
     );
 
     try {
-      _lightSubscription = _light!.lightSensorStream.listen((luxValue) {
+      // 변경된 부분 5: LightSensor.luxStream() 사용, luxValue 타입은 double
+      _lightSubscription = LightSensor.luxStream().listen((luxValue) {
         print("Lux value: $luxValue");
 
         String level;

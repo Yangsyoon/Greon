@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase;
 import 'package:flutter/material.dart';
@@ -9,6 +11,9 @@ import 'package:greon/data/models/product/product_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../application/user_bloc/user_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import '../../services/room_style_classifier.dart';
+import '../widgets/profile_action_button.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -25,6 +30,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     _startAdAutoSlide();
+  }
+  // AI 모델 서비스 인스턴스 생성
+  final RoomStyleClassifier _classifier = RoomStyleClassifier();
+  final ImagePicker _picker = ImagePicker();
+
+  // 쿠폰 버튼 클릭 시 호출될 함수
+  void _onCouponButtonPressed(BuildContext context) async {
+    try {
+      final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
+      if (photo == null) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('사진 촬영이 취소되었습니다.')));
+        return;
+      }
+
+      File imageFile = File(photo.path);
+      // 서비스 클래스의 classifyImage 함수 호출
+      String? result = await _classifier.classifyImage(imageFile);
+
+      // 결과 다이얼로그 표시
+      showDialog(
+        context: context,
+        builder: (BuildContext dialogContext) {
+          return AlertDialog(
+            title: Text('방 스타일 분석 결과'),
+            content: Text(result ?? '분석 실패'),
+            actions: [
+              TextButton(
+                child: Text('확인'),
+                onPressed: () => Navigator.of(dialogContext).pop(),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      print('카메라 또는 모델 실행 중 오류 발생: $e');
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('오류가 발생했습니다: $e')));
+    }
   }
 
   void _startAdAutoSlide() {
@@ -158,7 +201,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           context,
           icon: Icons.card_giftcard,
           label: '쿠폰',
-          onTap: () => Navigator.pushNamed(context, '/coupons'),
+          onTap: () => _onCouponButtonPressed(context),
         ),
       ],
     );

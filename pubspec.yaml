@@ -8,18 +8,24 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.5 <4.0.0'
+  sdk: '>=3.2.0 <4.0.0'
 
 
 dependencies:
   flutter:
     sdk: flutter
-  provider: ^6.1.1
+  path: ^1.8.3 # 파일 경로 조작
+  image: ^4.1.4 # 이미지 리사이징 및 처리 (모델 입력 전처리)
+
+
+
+  provider: ^6.1.2
+
 
 
   cupertino_icons: ^1.0.2
   equatable: ^2.0.7
-  dartz:
+  dartz: ^0.10.1
   shared_preferences:
   http:
   internet_connection_checker: ^1.0.0+1
@@ -50,7 +56,8 @@ dependencies:
   image_picker: ^1.0.4
   firebase_storage: ^12.4.5
   geolocator: ^14.0.0
-  light : ^4.1.0
+  #light : ^4.1.0
+  light_sensor: ^3.0.1
   table_calendar: ^3.0.9
   timezone: ^0.9.2
   permission_handler: ^11.3.0
@@ -58,14 +65,16 @@ dependencies:
   device_info_plus: ^9.0.0
   kpostal: ^1.0.7
   webview_flutter: ^4.2.1
+  tflite_flutter: ^0.11.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
 
-  flutter_lints: ^2.0.0
-  build_runner:
+
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.11
 
 
 # For information on the generic Dart part of this file, see the
@@ -83,6 +92,7 @@ flutter:
   assets:
     - assets/svg/
     - assets/images/
+    - assets/model.tflite
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
