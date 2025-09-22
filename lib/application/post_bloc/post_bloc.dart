@@ -12,66 +12,31 @@ class PostBloc extends Bloc<PostEvent, PostState> {
     on<LoadPosts>((event, emit) async {
       emit(PostLoading());
       try {
-        Query query = FirebaseFirestore.instance.collection('posts');
-
-        if (event.category != null) {
-          query = query.where('category', isEqualTo: event.category);
-        }
-
-        query = query.orderBy('createdAt', descending: true);
-
-        final snapshot = await query.get();
-
-        final posts = snapshot.docs.map((doc) {
-          final data = doc.data() as Map<String, dynamic>;
-          return PostModel.fromMap(data).copyWith(id: doc.id);
-        }).toList();
-
-        List<PostModel> sortedPosts = List.from(posts);
-        if (event.sort == '최신순') {
-          sortedPosts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
-        } else if (event.sort == '추천순') {
-          sortedPosts.sort((a, b) => b.likesCount.compareTo(a.likesCount));
-        }
-
-        emit(PostLoaded(sortedPosts));
+        // 👇 Firestore 직접 호출 대신 Repository의 함수를 호출하도록 변경
+        final posts = await postRepository.fetchPosts(
+          category: event.category,
+          sort: event.sort,
+        );
+        emit(PostLoaded(posts));
       } catch (e) {
         emit(PostError());
       }
     });
 
     on<ToggleLikePost>((event, emit) async {
-      final post = event.post;
-      final userId = event.userId;
+      // Firestore 직접 접근 대신 Repository 함수 호출
+      final newLikesCount = await postRepository.toggleLike(event.post.id, event.userId);
 
-      final postRef = FirebaseFirestore.instance.collection('posts').doc(post.id);
-      final likeRef = postRef.collection('likes').doc(userId);
-
-      final isLiked = (await likeRef.get()).exists;
-
-      try {
-        if (isLiked) {
-          await likeRef.delete();
-          await postRef.update({'likesCount': FieldValue.increment(-1)});
-        } else {
-          await likeRef.set({'uid': userId, 'createdAt': Timestamp.now()});
-          await postRef.update({'likesCount': FieldValue.increment(1)});
-        }
-
-        // 로컬 상태 업데이트
-        if (state is PostLoaded) {
-          final posts = (state as PostLoaded).posts.map((p) {
-            if (p.id == post.id) {
-              final newLikes = isLiked ? (p.likesCount! - 1) : (p.likesCount! + 1);
-              return p.copyWith(likesCount: newLikes);
-            }
-            return p;
-          }).toList();
-
-          emit(PostLoaded(posts));
-        }
-      } catch (e) {
-        // 실패 시 무시 또는 에러 처리
+      // 로컬 상태 업데이트 로직은 더 간단해짐
+      if (state is PostLoaded) {
+        final currentState = state as PostLoaded;
+        final updatedPosts = currentState.posts.map((p) {
+          if (p.id == event.post.id) {
+            return p.copyWith(likesCount: newLikesCount);
+          }
+          return p;
+        }).toList();
+        emit(PostLoaded(updatedPosts));
       }
     });
   }
