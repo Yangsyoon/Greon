@@ -43,12 +43,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _onCouponButtonPressed(BuildContext context) async {
     try {
       // --- 1. 방 스타일 분석을 위한 사진 촬영 ---
+      print('1');
       final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
       if (photo == null) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('사진 촬영이 취소되었습니다.')));
         return;
       }
-
+      print('2');
       // --- 2. 방 스타일 분석 실행 ---
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('방 스타일을 분석 중입니다...')));
       File imageFile = File(photo.path);
@@ -59,8 +60,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
 
+      print('3');
       // --- 3. ARCore 지원 및 카메라 권한 확인 ---
       final bool isArCoreAvailable = await ArCoreController.checkArCoreAvailability();
+      print("ARCore 지원 여부: $isArCoreAvailable");
       if (!isArCoreAvailable) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('이 기기는 AR을 지원하지 않습니다.')));
         return;
@@ -72,6 +75,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
         return;
       }
 
+
+      print('4');
       // --- 4. 모든 확인 완료 후, 분석 결과를 가지고 AR 측정 화면으로 이동 ---
       Navigator.push(
         context,
