@@ -60,3 +60,4 @@ app.*.map.json
 # To untrack already tracked files, run these commands:
 # git rm --cached <file>
 # git rm -r --cached <directory>
+/key.properties

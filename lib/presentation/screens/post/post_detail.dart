@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:greon/data/models/model/PostModel.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,6 +31,13 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
   void initState() {
     super.initState();
     _post = widget.post; // 초기 포스트 설정
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent, // 배경 투명 (앱 배경색이 보임)
+        statusBarIconBrightness: Brightness.dark, // 안드로이드용 (아이콘/글씨 검정)
+        statusBarBrightness: Brightness.light, // iOS용 (아이콘/글씨 검정)
+      ),
+    );
   }
 
   Future<void> _addComment() async {
@@ -118,7 +126,7 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
       child: Scaffold(
         resizeToAvoidBottomInset: true,
         appBar: AppBar(
-          title: const Text("게시글 상세보기"),
+          title: const Text("게시판"),
           actions: [
             if (currentUser != null && currentUser.uid == _post.uid) ...[
               IconButton(
