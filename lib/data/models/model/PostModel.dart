@@ -10,6 +10,7 @@ class PostModel {
   int likesCount;
   final String? imageUrl;
   final String category;
+  final String? authorNickname;
 
   PostModel({
     required this.uid,
@@ -20,22 +21,23 @@ class PostModel {
     required this.commentsCount,
     required this.likesCount,
     this.imageUrl,
-    required this.category
+    required this.category,
+    this.authorNickname,
   });
 
-  factory PostModel.fromDocument(Map<String, dynamic> doc, String id) {
-    return PostModel(
-      id: id,
-      title: doc['title'] ?? '',
-      content: doc['content'] ?? '',
-      uid: doc['uid'] ?? '',
-      createdAt: (doc['createdAt'] as Timestamp).toDate(),
-      commentsCount: doc['commentsCount'] ?? 0,
-      likesCount: doc['likesCount'] ?? 0,
-      imageUrl: doc['imageUrl'] as String?, // 안전하게 캐스팅
-      category: doc['category'] ?? '',
-    );
-  }
+  // factory PostModel.fromDocument(Map<String, dynamic> doc, String id) {
+  //   return PostModel(
+  //     id: id,
+  //     title: doc['title'] ?? '',
+  //     content: doc['content'] ?? '',
+  //     uid: doc['uid'] ?? '',
+  //     createdAt: (doc['createdAt'] as Timestamp).toDate(),
+  //     commentsCount: doc['commentsCount'] ?? 0,
+  //     likesCount: doc['likesCount'] ?? 0,
+  //     imageUrl: doc['imageUrl'] as String?, // 안전하게 캐스팅
+  //     category: doc['category'] ?? '',
+  //   );
+  // }
 
   Map<String, dynamic> toJson() {
     return {
@@ -74,6 +76,7 @@ class PostModel {
     int? likesCount,
     String? imageUrl,
     String? category,
+    String? authorNickname,
   }) {
     return PostModel(
       id: id ?? this.id,
@@ -85,6 +88,7 @@ class PostModel {
       likesCount: likesCount ?? this.likesCount,
       imageUrl: imageUrl ?? this.imageUrl,
       category: category ?? this.category,
+      authorNickname: authorNickname ?? this.authorNickname,
     );
   }
 

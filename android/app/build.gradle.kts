@@ -66,6 +66,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+    ndkVersion = "27.0.12077973"
 }
 
 
@@ -94,4 +95,5 @@ dependencies {
     implementation("com.google.android.gms:play-services-auth:19.2.0")
     implementation("com.google.android.gms:play-services-maps:19.1.0")
     implementation("com.google.android.gms:play-services-base:16.1.0")
+    implementation ("com.google.ar:core:1.44.0")
 }

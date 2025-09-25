@@ -14,6 +14,10 @@ import '../../application/user_bloc/user_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../services/room_style_classifier.dart';
 import '../widgets/profile_action_button.dart';
+import 'ar_measurement_screen.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
+
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -38,32 +42,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
   // 쿠폰 버튼 클릭 시 호출될 함수
   void _onCouponButtonPressed(BuildContext context) async {
     try {
+      // --- 1. 방 스타일 분석을 위한 사진 촬영 ---
+      print('1');
       final XFile? photo = await _picker.pickImage(source: ImageSource.camera);
       if (photo == null) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('사진 촬영이 취소되었습니다.')));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('사진 촬영이 취소되었습니다.')));
+        return;
+      }
+      print('2');
+      // --- 2. 방 스타일 분석 실행 ---
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('방 스타일을 분석 중입니다...')));
+      File imageFile = File(photo.path);
+      String? styleResult = await _classifier.classifyImage(imageFile);
+
+      if (styleResult == null) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('스타일 분석에 실패했습니다.')));
         return;
       }
 
-      File imageFile = File(photo.path);
-      // 서비스 클래스의 classifyImage 함수 호출
-      String? result = await _classifier.classifyImage(imageFile);
+      print('3');
+      // --- 3. ARCore 지원 및 카메라 권한 확인 ---
+      final bool isArCoreAvailable = await ArCoreController.checkArCoreAvailability();
+      print("ARCore 지원 여부: $isArCoreAvailable");
+      if (!isArCoreAvailable) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('이 기기는 AR을 지원하지 않습니다.')));
+        return;
+      }
 
-      // 결과 다이얼로그 표시
-      showDialog(
-        context: context,
-        builder: (BuildContext dialogContext) {
-          return AlertDialog(
-            title: Text('방 스타일 분석 결과'),
-            content: Text(result ?? '분석 실패'),
-            actions: [
-              TextButton(
-                child: Text('확인'),
-                onPressed: () => Navigator.of(dialogContext).pop(),
-              ),
-            ],
-          );
-        },
+      final status = await Permission.camera.request();
+      if (!status.isGranted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('AR 기능을 사용하려면 카메라 권한이 필요합니다.')));
+        return;
+      }
+
+
+      print('4');
+      // --- 4. 모든 확인 완료 후, 분석 결과를 가지고 AR 측정 화면으로 이동 ---
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          // 분석 결과를 ARMeasurementScreen으로 전달합니다.
+          builder: (context) => ARMeasurementScreen(styleResult: styleResult),
+        ),
       );
+
     } catch (e) {
       print('카메라 또는 모델 실행 중 오류 발생: $e');
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('오류가 발생했습니다: $e')));
@@ -200,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _profileActionButton(
           context,
           icon: Icons.card_giftcard,
-          label: '쿠폰',
+          label: '방 무드 측정',
           onTap: () => _onCouponButtonPressed(context),
         ),
       ],
