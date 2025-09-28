@@ -29,7 +29,7 @@ class BulletinBoardScreen extends StatefulWidget {
 }
 
 class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
-  //final Map<String, String> nicknameCache = {};
+  final Map<String, String> nicknameCache = {};
   String selectedCategory = '전체';
   String selectedSort = '최신순';
   final List<String> categories = ['전체', '정보공유', 'QnA', '자유'];
@@ -52,18 +52,18 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
         );
   }
 
-  // Future<String> getNickname(String uid) async {
-  //   if (nicknameCache.containsKey(uid)) return nicknameCache[uid]!;
-  //   try {
-  //     final snapshot =
-  //         await FirebaseFirestore.instance.collection('users').doc(uid).get();
-  //     final nickname = snapshot.data()?['nickname'] ?? '알 수 없음';
-  //     nicknameCache[uid] = nickname;
-  //     return nickname;
-  //   } catch (e) {
-  //     return '알 수 없음';
-  //   }
-  // }
+   Future<String> getNickname(String uid) async {
+     if (nicknameCache.containsKey(uid)) return nicknameCache[uid]!;
+     try {
+       final snapshot =
+           await FirebaseFirestore.instance.collection('users').doc(uid).get();
+       final nickname = snapshot.data()?['nickname'] ?? '알 수 없음';
+       nicknameCache[uid] = nickname;
+       return nickname;
+     } catch (e) {
+       return '알 수 없음';
+     }
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -262,80 +262,80 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                                           fontSize: 14, color: Colors.black87),
                                     ),
                                     const SizedBox(height: 6),
-                                    // FutureBuilder<String>(
-                                    //   future: getNickname(post.uid),
-                                    //   builder: (context, snapshot) {
-                                    //     final nickname =
-                                    //         snapshot.data ?? '로딩 중...';
-                                    //     final timeAgo =
-                                    //         _formatTimeAgo(post.createdAt);
-                                    //
-                                    //     return Row(
-                                    //       children: [
-                                    //         BlocBuilder<PostBloc, PostState>(
-                                    //           builder: (context, state) {
-                                    //             // 현재 상태에서 해당 게시글 가져오기
-                                    //             PostModel currentPost = post;
-                                    //             if (state is PostLoaded) {
-                                    //               final found =
-                                    //                   state.posts.firstWhere(
-                                    //                 (p) => p.id == post.id,
-                                    //                 orElse: () => post,
-                                    //               );
-                                    //               currentPost = found;
-                                    //             }
-                                    //             return Row(
-                                    //               children: [
-                                    //                 if (currentPost.likesCount >
-                                    //                     0) ...[
-                                    //                   const Icon(Icons.thumb_up,
-                                    //                       size: 20,
-                                    //                       color: Colors.red),
-                                    //                   const SizedBox(width: 2),
-                                    //                   Text(
-                                    //                     '${currentPost.likesCount}',
-                                    //                     style: const TextStyle(
-                                    //                       fontSize: 12,
-                                    //                       color: Colors.grey,
-                                    //                       fontWeight:
-                                    //                           FontWeight.bold,
-                                    //                     ),
-                                    //                   ),
-                                    //                   const SizedBox(width: 8),
-                                    //                 ],
-                                    //                 if (currentPost
-                                    //                         .commentsCount >
-                                    //                     0) ...[
-                                    //                   const Icon(Icons.comment,
-                                    //                       size: 20,
-                                    //                       color: Colors
-                                    //                           .lightBlueAccent),
-                                    //                   const SizedBox(width: 2),
-                                    //                   Text(
-                                    //                     '${currentPost.commentsCount}',
-                                    //                     style: const TextStyle(
-                                    //                       fontSize: 12,
-                                    //                       color: Colors.grey,
-                                    //                       fontWeight:
-                                    //                           FontWeight.bold,
-                                    //                     ),
-                                    //                   ),
-                                    //                   const SizedBox(width: 20),
-                                    //                 ],
-                                    //                 Text(
-                                    //                   "$timeAgo  |  $nickname",
-                                    //                   style: const TextStyle(
-                                    //                       fontSize: 12,
-                                    //                       color: Colors.grey),
-                                    //                 ),
-                                    //               ],
-                                    //             );
-                                    //           },
-                                    //         )
-                                    //       ],
-                                    //     );
-                                    //   },
-                                    // ),
+                                    FutureBuilder<String>(
+                                       future: getNickname(post.uid),
+                                       builder: (context, snapshot) {
+                                         final nickname =
+                                             snapshot.data ?? '로딩 중...';
+                                         final timeAgo =
+                                             _formatTimeAgo(post.createdAt);
+
+                                         return Row(
+                                           children: [
+                                             BlocBuilder<PostBloc, PostState>(
+                                               builder: (context, state) {
+                                                 // 현재 상태에서 해당 게시글 가져오기
+                                                 PostModel currentPost = post;
+                                                 if (state is PostLoaded) {
+                                                   final found =
+                                                       state.posts.firstWhere(
+                                                     (p) => p.id == post.id,
+                                                     orElse: () => post,
+                                                   );
+                                                   currentPost = found;
+                                                 }
+                                                 return Row(
+                                                   children: [
+                                                     if (currentPost.likesCount >
+                                                         0) ...[
+                                                       const Icon(Icons.thumb_up,
+                                                           size: 20,
+                                                           color: Colors.red),
+                                                       const SizedBox(width: 2),
+                                                       Text(
+                                                         '${currentPost.likesCount}',
+                                                        style: const TextStyle(
+                                                           fontSize: 12,
+                                                           color: Colors.grey,
+                                                           fontWeight:
+                                                               FontWeight.bold,
+                                                        ),
+                                                       ),
+                                                       const SizedBox(width: 8),
+                                                     ],
+                                                     if (currentPost
+                                                             .commentsCount >
+                                                         0) ...[
+                                                       const Icon(Icons.comment,
+                                                           size: 20,
+                                                           color: Colors
+                                                               .lightBlueAccent),
+                                                       const SizedBox(width: 2),
+                                                       Text(
+                                                         '${currentPost.commentsCount}',
+                                                         style: const TextStyle(
+                                                           fontSize: 12,
+                                                           color: Colors.grey,
+                                                           fontWeight:
+                                                               FontWeight.bold,
+                                                         ),
+                                                       ),
+                                                       const SizedBox(width: 20),
+                                                     ],
+                                                     Text(
+                                                       "$timeAgo  |  $nickname",
+                                                       style: const TextStyle(
+                                                           fontSize: 12,
+                                                           color: Colors.grey),
+                                                     ),
+                                                   ],
+                                                 );
+                                               },
+                                             )
+                                           ],
+                                         );
+                                       },
+                                     ),
                                   ],
                                 ),
                                 onTap: () async {

@@ -1,12 +1,12 @@
 import java.util.Properties
 import java.io.FileInputStream
 
-// keystore.properties 파일 불러오기
-val keystoreProperties = Properties().apply {
-    val keystoreFile = rootProject.file("key.properties")
-    if (keystoreFile.exists()) {
-        load(FileInputStream(keystoreFile))
-    }
+val keystorePropertiesFile = rootProject.file("key.properties")
+println("key.properties path: ${keystorePropertiesFile.absolutePath}")
+println("exists? ${keystorePropertiesFile.exists()}")
+val keystoreProperties = Properties()
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
 plugins {
@@ -31,6 +31,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        // Flag to enable support for the new language APIs
         isCoreLibraryDesugaringEnabled = true
     }
 
@@ -39,10 +40,13 @@ android {
     }
 
     defaultConfig {
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId = "com.greon.devapps"
-        minSdk = 23
+        // You can update the following values to match your application needs.
+        // For more information, see: https://flutter.dev/to/review-gradle-config.
+        minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode
+        versionCode = 2
         versionName = flutter.versionName
     }
 
@@ -50,25 +54,24 @@ android {
         create("release") {
             keyAlias = keystoreProperties["keyAlias"] as String
             keyPassword = keystoreProperties["keyPassword"] as String
-            storeFile = file(keystoreProperties["storeFile"] as String)
+            storeFile = file(keystoreProperties["storeFile"] as String) // 올바른 keystore 경로
             storePassword = keystoreProperties["storePassword"] as String
         }
     }
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            signingConfig = signingConfigs.named("release").get()
         }
     }
     ndkVersion = "27.0.12077973"
 }
-
 
 flutter {
     source = "../.."
@@ -78,7 +81,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.21")
     implementation("com.android.support:multidex:1.0.3")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
-    implementation("androidx.window:window:1.0.0") 
+    implementation("androidx.window:window:1.0.0")
     implementation("androidx.window:window-java:1.0.0")
 
     // Firebase
@@ -87,9 +90,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-core:21.1.1")
-
-    implementation("org.tensorflow:tensorflow-lite:2.14.0")
-    implementation("org.tensorflow:tensorflow-lite-gpu:2.14.0")
 
     // Google Play Services
     implementation("com.google.android.gms:play-services-auth:19.2.0")

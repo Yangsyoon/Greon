@@ -117,6 +117,49 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
     }
   }
 
+  Future<void> reportTarget(String targetId, String targetType, String targetUid) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("신고 확인"),
+        content: const Text("정말 신고하시겠습니까?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text("취소"),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("신고"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true) return;
+
+    await _firestore.collection('reports').add({
+      'reporterId': user.uid,
+      'targetId': targetId,
+      'targetType': targetType, // "post" or "comment"
+      'targetUid': targetUid,   // 신고 대상 작성자 uid
+      'timestamp': FieldValue.serverTimestamp(),
+      'status': 'pending',
+    });
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("신고가 접수되었습니다."),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -265,6 +308,16 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                     ),
                     const SizedBox(width: 4),
                     Text('${_post.likesCount ?? 0}'),
+
+                    const SizedBox(width: 16),
+                    // 신고 버튼
+                    GestureDetector(
+                      onTap: () => reportTarget(_post.id, "post", _post.uid),
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        child: const Icon(Icons.report, color: Colors.grey, size: 20),
+                      ),
+                    ),
                   ],
                 )
 
@@ -431,6 +484,10 @@ class _PostDetailScreenState extends State<PostDetailScreen> {
                                       },
                                     ),
                                   ],
+                                  IconButton(
+                                    icon: const Icon(Icons.report, size: 18, color: Colors.grey),
+                                    onPressed: () => reportTarget(commentId, "comment", authorUid),
+                                  ),
                                 ],
                               ),
                             ],
