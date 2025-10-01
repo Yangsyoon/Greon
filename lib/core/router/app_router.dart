@@ -24,6 +24,7 @@ import '../../domain/entities/cart/cart_item.dart';
 import '../../domain/entities/product/product.dart';
 import '../../presentation/screens/add_schedule_screen.dart';
 import '../../presentation/screens/calendar_screen.dart';
+import '../../presentation/screens/change_password_screen.dart';
 import '../../presentation/screens/my_plants_screen.dart';
 import '../../presentation/screens/notification_settings_page.dart';
 import '../../presentation/screens/post/post.dart';
@@ -179,6 +180,8 @@ sealed class AppRouter {
         return MaterialPageRoute(
           builder: (_) => ErrorScreen(message: "Invalid arguments for addSchedule"),
         );
+      case changePassword:
+        return MaterialPageRoute(builder: (_) => const ChangePasswordScreen());
 
 
     // 게시판 관련 라우팅 추가

@@ -27,16 +27,16 @@ class RootScreen extends StatelessWidget {
             context: context,
             builder: (context) => AlertDialog(
               title: const Text(
-                "Exit Application",
+                "앱 종료",
                 style: TextStyle(color: Colors.black),
               ),
               content: const Text(
-                "Are You Sure?",
+                "정말 앱을 종료하시겠습니까?",
               ),
               actions: <Widget>[
                 TextButton(
                   child: const Text(
-                    "Yes",
+                    "네",
                     style: TextStyle(
                       color: Colors.red,
                     ),
@@ -47,7 +47,7 @@ class RootScreen extends StatelessWidget {
                 ),
                 TextButton(
                   child: const Text(
-                    "No",
+                    "아니오",
                     style: TextStyle(color: Colors.black),
                   ),
                   onPressed: () {

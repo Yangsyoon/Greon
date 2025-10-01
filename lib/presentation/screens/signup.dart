@@ -3,6 +3,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart'; // <<< 이 부분을 추가합니다.
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -24,7 +25,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
-  bool isChecked = false;
+  bool _agreedToTerms = false; // 서비스 이용 약관 동의
+  bool _agreedToPrivacy = false;    // 개인정보 처리방침 동의
 
   @override
   void dispose() {
@@ -54,7 +56,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   Widget buildUnderlineTextFormField(
       TextEditingController controller, String hint,
-      {bool isObscure = false, TextInputType? keyboardType, VoidCallback? onTap}) {
+      {bool isObscure = false, TextInputType? keyboardType, VoidCallback? onTap, String? Function(String?)? validator}) {
     return TextFormField(
       controller: controller,
       obscureText: isObscure,
@@ -68,7 +70,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
           borderSide: BorderSide(color: Colors.blue),
         ),
       ),
-      validator: (value) => value == null || value.isEmpty ? "Required field" : null,
+      validator: validator ?? (value) => value == null || value.isEmpty ? "필수 입력 항목입니다." : null,
+    );
+  }
+
+  Widget buildTextFormField(TextEditingController controller, String hint,
+      {bool isObscure = false, String? Function(String?)? validator, TextInputType? keyboardType}) {
+    return TextFormField(
+      controller: controller,
+      obscureText: isObscure,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        hintText: hint,
+        border: const OutlineInputBorder(),
+      ),
+      validator: validator ?? (value) => value == null || value.isEmpty ? "필수 입력 항목입니다." : null,
     );
   }
 
@@ -76,13 +92,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
     if (!_formKey.currentState!.validate()) return;
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Passwords do not match")),
+        const SnackBar(content: Text("비밀번호가 일치하지 않습니다.")),
       );
       return;
     }
-    if (!isChecked) {
+    if (!_agreedToTerms || !_agreedToPrivacy) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("You must accept the terms and conditions")),
+        const SnackBar(content: Text("서비스 이용 약관과 개인정보 처리방침에 동의해야 합니다.")),
       );
       return;
     }
@@ -99,27 +115,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       try {
         print('Firestore: 사용자 정보 저장 시작');
-        // 1. FCM 토큰 가져오기
         final fcmToken = await FirebaseMessaging.instance.getToken();
-
 
         await FirebaseFirestore.instance
             .collection('users')
             .doc(credential.user!.uid)
             .set({
           'name': _nameController.text.trim(),
-          'nickname': _nicknameController.text.trim(), // 추가된 부분
+          'nickname': _nicknameController.text.trim(),
           'email': _emailController.text.trim(),
-          'bank': _bankController.text.trim(),           // 추가
-          'account': _accountController.text.trim(),     // 추가
-          'birthday': _birthdayController.text.trim(),   // 추가
-          'phone': _phoneController.text.trim(),         // 추가
+          'bank': _bankController.text.trim(),
+          'account': _accountController.text.trim(),
+          'birthday': _birthdayController.text.trim(),
+          'phone': _phoneController.text.trim(),
           'fcm_token': fcmToken,
           'createdAt': Timestamp.now(),
         });
 
         print('Firestore: 사용자 정보 저장 성공');
-        // 2. 토큰 갱신 시 Firestore 업데이트
         FirebaseMessaging.instance.onTokenRefresh.listen((newToken) async {
           await FirebaseFirestore.instance
               .collection('users')
@@ -131,24 +144,24 @@ class _SignUpScreenState extends State<SignUpScreen> {
         print('에러: $e');
         print('스택트레이스: $stackTrace');
 
-        // 사용자에게도 에러 메시지 표시
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Firestore 저장 실패: $e")),
+          SnackBar(content: Text("사용자 정보 저장 실패: $e")),
         );
       }
 
-
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Successfully registered")),
+        const SnackBar(content: Text("회원가입이 완료되었습니다.")),
       );
 
-      Navigator.of(context).pop(); // or go to login page
+      Navigator.of(context).pop();
     } on FirebaseAuthException catch (e) {
-      String message = "An error occurred";
+      String message = "회원가입 중 오류가 발생했습니다.";
       if (e.code == 'email-already-in-use') {
-        message = "Email already in use";
+        message = "이미 사용 중인 이메일입니다.";
       } else if (e.code == 'weak-password') {
-        message = "Weak password";
+        message = "비밀번호가 너무 약합니다.";
+      } else if (e.code == 'invalid-email') {
+        message = "유효하지 않은 이메일 형식입니다.";
       }
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
@@ -159,17 +172,18 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  Widget buildTextFormField(TextEditingController controller, String hint,
-      {bool isObscure = false}) {
-    return TextFormField(
-      controller: controller,
-      obscureText: isObscure,
-      decoration: InputDecoration(
-        hintText: hint,
-        border: const OutlineInputBorder(),
-      ),
-      validator: (value) => value == null || value.isEmpty ? "Required field" : null,
-    );
+  // <<< _launchUrl 함수를 여기에 추가합니다.
+  Future<void> _launchUrl(String url) async {
+    final Uri uri = Uri.parse(url);
+    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+      // launchUrl 실패 시 예외 처리
+      if (mounted) { // 위젯이 마운트된 상태인지 확인 (비동기 함수에서 context 사용 시 권장)
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('URL을 열 수 없습니다: $url')),
+        );
+      }
+      throw Exception('Could not launch $uri');
+    }
   }
 
   @override
@@ -181,22 +195,42 @@ class _SignUpScreenState extends State<SignUpScreen> {
         child: Form(
           key: _formKey,
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              buildTextFormField(_nameController, "이름"),
+              buildTextFormField(_nameController, "이름",
+                  validator: (value) => value == null || value.isEmpty ? "이름을 입력해주세요." : null),
               const SizedBox(height: 12),
-              buildTextFormField(_nicknameController, "닉네임"), // 👈 추가
+              buildTextFormField(_nicknameController, "닉네임",
+                  validator: (value) => value == null || value.isEmpty ? "닉네임을 입력해주세요." : null),
               const SizedBox(height: 12),
-              buildTextFormField(_emailController, "이메일"),
+              buildTextFormField(_emailController, "이메일",
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "이메일을 입력해주세요.";
+                    if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return "유효한 이메일 형식이 아닙니다.";
+                    return null;
+                  }),
               const SizedBox(height: 12),
-              buildTextFormField(_passwordController, "비밀번호", isObscure: true),
+              buildTextFormField(_passwordController, "비밀번호 (6자 이상)", isObscure: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "비밀번호를 입력해주세요.";
+                    if (value.length < 6) return "비밀번호는 6자 이상이어야 합니다.";
+                    return null;
+                  }),
               const SizedBox(height: 12),
-              buildTextFormField(_confirmPasswordController, "비밀번호 확인", isObscure: true),
+              buildTextFormField(_confirmPasswordController, "비밀번호 확인", isObscure: true,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "비밀번호를 다시 입력해주세요.";
+                    if (value != _passwordController.text) return "비밀번호가 일치하지 않습니다.";
+                    return null;
+                  }),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     flex: 2,
-                    child: buildUnderlineTextFormField(_bankController, "은행명"),
+                    child: buildUnderlineTextFormField(_bankController, "은행명",
+                        validator: (value) => value == null || value.isEmpty ? "은행명을 입력해주세요." : null),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
@@ -205,52 +239,128 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       _accountController,
                       "계좌번호",
                       keyboardType: TextInputType.number,
+                      validator: (value) => value == null || value.isEmpty ? "계좌번호를 입력해주세요." : null,
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 12),
 
-              buildUnderlineTextFormField(_birthdayController, "생년월일", onTap: _pickBirthday),
+              buildUnderlineTextFormField(_birthdayController, "생년월일", onTap: _pickBirthday,
+                  validator: (value) => value == null || value.isEmpty ? "생년월일을 선택해주세요." : null),
               const SizedBox(height: 12),
 
-              // 전화번호
               buildUnderlineTextFormField(
-                _phoneController,
-                "전화번호",
-                keyboardType: TextInputType.phone,
+                  _phoneController,
+                  "전화번호 ('-' 없이 입력)",
+                  keyboardType: TextInputType.phone,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) return "전화번호를 입력해주세요.";
+                    if (!RegExp(r'^[0-9]+$').hasMatch(value)) return "숫자만 입력해주세요.";
+                    return null;
+                  }
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 24),
 
               Row(
                 children: [
                   Checkbox(
-                    value: isChecked,
+                    value: _agreedToTerms,
                     onChanged: (value) {
                       setState(() {
-                        isChecked = value ?? false;
+                        _agreedToTerms = value ?? false;
                       });
                     },
                   ),
-                  const Expanded(
-                    child: Text("개인 정보 활용에 동의합니다."),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _launchUrl('https://github.com/Yangsyoon/greon-terms/blob/main/terms.md'); // <<< 실제 서비스 이용 약관 URL로 변경하세요.
+                      },
+                      child: RichText(
+                        text: const TextSpan( // const 추가
+                          children: [
+                            TextSpan(
+                              text: "서비스 이용 약관",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                                fontSize: 15,
+                              ),
+                            ),
+                            TextSpan(
+                              text: "에 동의합니다.",
+                              style: TextStyle(color: Colors.black, fontSize: 15),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 16),
+
+              Row(
+                children: [
+                  Checkbox(
+                    value: _agreedToPrivacy,
+                    onChanged: (value) {
+                      setState(() {
+                        _agreedToPrivacy = value ?? false;
+                      });
+                    },
+                  ),
+                  Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        _launchUrl('https://github.com/Yangsyoon/greon-terms/blob/main/privacy.md'); // 개인정보 처리방침 URL
+                      },
+                      child: RichText(
+                        text: const TextSpan(
+                          children: [
+                            TextSpan(
+                              text: "개인정보 처리방침",
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                                fontSize: 15,
+                              ),
+                            ),
+                            TextSpan(
+                              text: "에 동의합니다.",
+                              style: TextStyle(color: Colors.black, fontSize: 15),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
               ElevatedButton(
                 onPressed: isLoading ? null : _signUp,
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
                 child: isLoading
-                    ? const CircularProgressIndicator()
-                    : const Text("회원가입"),
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text(
+                  "회원가입",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
               const SizedBox(height: 12),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pop(); // 로그인 화면으로 이동
+                  Navigator.of(context).pop();
                 },
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors.black, // 글씨 색상 검은색
+                  foregroundColor: Colors.black,
                 ),
                 child: const Text("이미 계정이 있으신가요? 로그인"),
               ),
