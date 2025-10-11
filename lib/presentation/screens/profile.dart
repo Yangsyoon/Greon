@@ -217,7 +217,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           context,
           icon: Icons.help_outline,
           label: '문의',
-          onTap: () => Navigator.pushNamed(context, '/inquiries'),
+          onTap: () {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('업데이트 예정입니다.'),
+                duration: Duration(seconds: 2), // 2초간 표시
+              ),
+            );
+          },
         ),
         _profileActionButton(
           context,

@@ -6,10 +6,10 @@ import 'package:image/image.dart' as img;
 
 class RoomStyleClassifier {
   static const List<String> _classNames = [
+    'industrial',
     'modern',
-    'vintage',
-    'minimal',
-    'natural'
+    'natural',
+    'vintage'
   ];
   static const int _inputImageSize = 224;
   static const List<double> _mean = [0.485, 0.456, 0.406];
@@ -28,14 +28,26 @@ class RoomStyleClassifier {
       img.Image? originalImage = img.decodeImage(await imageFile.readAsBytes());
       if (originalImage == null) return '이미지를 로드할 수 없습니다.';
       img.Image resizedImage = img.copyResize(originalImage, width: _inputImageSize, height: _inputImageSize);
-      var inputTensor = List.generate(1, (b) => List.generate(3, (c) => List.generate(_inputImageSize, (j) => List.generate(_inputImageSize, (k) {
-        final pixel = resizedImage.getPixel(k, j);
-        if (c == 0) return ((pixel.r / 255.0) - _mean[0]) / _std[0];
-        else if (c == 1) return ((pixel.g / 255.0) - _mean[1]) / _std[1];
-        else return ((pixel.b / 255.0) - _mean[2]) / _std[2];
-      }))));
+      var inputTensor = List.generate(
+        1,
+            (b) => List.generate(
+          _inputImageSize,
+              (j) => List.generate(
+            _inputImageSize,
+                (k) {
+              final pixel = resizedImage.getPixel(k, j);
+              return [
+                ((pixel.r / 255.0) - _mean[0]) / _std[0],
+                ((pixel.g / 255.0) - _mean[1]) / _std[1],
+                ((pixel.b / 255.0) - _mean[2]) / _std[2],
+              ];
+            },
+          ),
+        ),
+      );
 
-      final interpreter = await Interpreter.fromAsset('assets/model.tflite');
+
+      final interpreter = await Interpreter.fromAsset('assets/model_float32.tflite');
       var outputTensor = List.filled(1 * _classNames.length, 0.0).reshape([1, _classNames.length]);
       interpreter.run(inputTensor, outputTensor);
 
