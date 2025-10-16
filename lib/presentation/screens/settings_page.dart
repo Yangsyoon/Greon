@@ -85,7 +85,14 @@ class SettingsPage extends StatelessWidget {
           _buildSettingRow(
             context: context,
             title: '맞춤 정보',
-            onTap: () => Navigator.pushNamed(context, '/custom_info'),
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('업데이트 예정입니다.'),
+                  duration: Duration(seconds: 2), // 2초간 표시
+                ),
+              );
+            },
           ),
           _buildSettingRow(
             context: context,
