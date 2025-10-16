@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:greon/presentation/screens/terms_viewer_screen.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart'; // <<< 이 부분을 추가합니다.
 
@@ -172,18 +173,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  // <<< _launchUrl 함수를 여기에 추가합니다.
-  Future<void> _launchUrl(String url) async {
-    final Uri uri = Uri.parse(url);
-    if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-      // launchUrl 실패 시 예외 처리
-      if (mounted) { // 위젯이 마운트된 상태인지 확인 (비동기 함수에서 context 사용 시 권장)
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('URL을 열 수 없습니다: $url')),
-        );
-      }
-      throw Exception('Could not launch $uri');
-    }
+  // // <<< _launchUrl 함수를 여기에 추가합니다.
+  // Future<void> _launchUrl(String url) async {
+  //   final Uri uri = Uri.parse(url);
+  //   if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+  //     // launchUrl 실패 시 예외 처리
+  //     if (mounted) { // 위젯이 마운트된 상태인지 확인 (비동기 함수에서 context 사용 시 권장)
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //         SnackBar(content: Text('URL을 열 수 없습니다: $url')),
+  //       );
+  //     }
+  //     throw Exception('Could not launch $uri');
+  //   }
+  // }
+
+  void _showTerms(BuildContext context, String title, String url) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => TermsViewerScreen(
+          title: title,
+          markdownUrl: url,
+        ),
+      ),
+    );
   }
 
   @override
@@ -275,7 +287,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        _launchUrl('https://github.com/Yangsyoon/greon-terms/blob/main/terms.md'); // <<< 실제 서비스 이용 약관 URL로 변경하세요.
+                        // Raw URL을 사용해야 합니다.
+                        const termsUrl = 'https://raw.githubusercontent.com/Yangsyoon/greon-terms/main/terms.md';
+                        _showTerms(context, '서비스 이용 약관', termsUrl);
                       },
                       child: RichText(
                         text: const TextSpan( // const 추가
@@ -314,7 +328,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Expanded(
                     child: GestureDetector(
                       onTap: () {
-                        _launchUrl('https://github.com/Yangsyoon/greon-terms/blob/main/privacy.md'); // 개인정보 처리방침 URL
+                        // Raw URL을 사용해야 합니다.
+                        const privacyUrl = 'https://raw.githubusercontent.com/Yangsyoon/greon-terms/main/privacy.md';
+                        _showTerms(context, '개인정보 처리방침', privacyUrl);
                       },
                       child: RichText(
                         text: const TextSpan(
