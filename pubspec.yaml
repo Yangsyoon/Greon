@@ -72,11 +72,14 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-
-
   flutter_lints: ^4.0.0
   build_runner: ^2.4.11
+  flutter_launcher_icons: ^0.13.1
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/greon.png"
 
 dependency_overrides:
   geolocator: ^14.0.0

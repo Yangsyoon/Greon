@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:greon/configs/app_dimensions.dart';
 import 'package:greon/configs/configs.dart';
+import 'package:greon/presentation/screens/settings_page.dart';
 import 'package:greon/presentation/widgets/unlogged_profile_container.dart';
 import 'package:greon/data/models/product/product_model.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../application/user_bloc/user_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../core/constant/assets.dart';
 import '../../services/room_style_classifier.dart';
 import '../widgets/profile_action_button.dart';
 import 'ar_measurement_screen.dart';
@@ -114,14 +116,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         padding: Space.h1!,
         child: SafeArea(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
-              Center(
-                child: Text(
-                  "마이페이지",
-                  style: AppText.h2b?.copyWith(color: Colors.black),
-                  textAlign: TextAlign.center,
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Image.asset(AppAssets.greonAppBar, height: 40),
+                  IconButton(
+                    icon: const Icon(Icons.settings, size: 28),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SettingsPage()),
+                      );
+                    },
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               Expanded(

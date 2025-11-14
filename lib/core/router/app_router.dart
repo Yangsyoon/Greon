@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:greon/domain/entities/delivery/delivery_info.dart';
 import 'package:greon/presentation/screens/add_edit_address.dart';
-import 'package:greon/presentation/screens/ads.dart';
 import 'package:greon/presentation/screens/app_info.dart';
 import 'package:greon/presentation/screens/cart.dart';
 import 'package:greon/presentation/screens/checkout.dart';
@@ -41,7 +40,6 @@ import 'package:flutter/material.dart';
 
 sealed class AppRouter {
   static const String splash = '/';
-  static const String ads = '/ads';
   static const String root = '/root';
   static const String productDetails = '/product-details';
   static const String search = '/search';
@@ -97,8 +95,6 @@ sealed class AppRouter {
     switch (routeSettings.name) {
       case splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
-      case ads:
-        return MaterialPageRoute(builder: (_) => const AdsScreen());
       case root:
         return MaterialPageRoute(builder: (_) => const RootScreen());
       case search:

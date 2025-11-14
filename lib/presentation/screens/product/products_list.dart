@@ -337,44 +337,6 @@ class _ProductsListScreenState extends State<ProductsListScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 40,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children:
-                                ['가격 순', '리뷰 많은 순', '추천 순', '인기순'].map((title) {
-                              final isSelected =
-                                  selectedSort == title; // 선택 상태 관리 변수
-                              return Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 6),
-                                child: TextButton(
-                                  onPressed: () {
-                                    setState(() {
-                                      selectedSort = title;
-                                    });
-                                    // 정렬 로직 호출 가능
-                                  },
-                                  style: TextButton.styleFrom(
-                                    backgroundColor: isSelected
-                                        ? Colors.white
-                                        : Colors.transparent,
-                                    foregroundColor: Colors.black,
-                                    side: BorderSide(color: Colors.white),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                  ),
-                                  child: Text(title),
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
                       const SizedBox(height: 8),
                       const Align(
                         alignment: Alignment.centerLeft,

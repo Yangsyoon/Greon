@@ -23,6 +23,16 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _birthdayController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
+  String? _selectedBank;
+
+  final List<String> bankList = [
+    "NH농협", "카카오뱅크", "KB국민", "토스뱅크", "신한", "우리", "IBK기업",
+    "하나", "새마을", "부산", "iM뱅크", "케이뱅크", "신협", "우체국",
+    "SC제일", "경남", "광주", "수협", "정북", "저축은행", "제주",
+    "씨티", "KDB산업", "산림조합", "SBI저축은행", "BOA", "중국",
+    "HSBC", "중국공상", "도이치", "JP모건", "BNP파리바", "중국건설"
+  ];
+
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
   bool _agreedToTerms = false; // 서비스 이용 약관 동의
@@ -229,8 +239,23 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 children: [
                   Expanded(
                     flex: 2,
-                    child: buildUnderlineTextFormField(_bankController, "은행명",
-                        validator: (value) => value == null || value.isEmpty ? "은행명을 입력해주세요." : null),
+                    child: DropdownButtonFormField<String>(
+                      value: _selectedBank,
+                      hint: const Text("은행명"), // 힌트 텍스트
+                      isExpanded: true,
+                      items: bankList.map((String bank) {
+                        return DropdownMenuItem<String>(
+                          value: bank,
+                          child: Text(bank),
+                        );
+                      }).toList(),
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedBank = newValue;
+                        });
+                      },
+                      validator: (value) => value == null || value.isEmpty ? "은행명을 선택해주세요." : null,
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(

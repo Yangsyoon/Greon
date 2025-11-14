@@ -13,7 +13,7 @@ abstract class PostRepository {
 }
 
 // --- 구현 클래스 ---
-// 위에서 정의한 기능을 실제로 수행하는 클래스 (이 부분이 없어서 오류 발생)
+// 위에서 정의한 기능을 실제로 수행하는 클래스
 class PostRepositoryImpl implements PostRepository {
   final PostRemoteDataSource remoteDataSource;
   final FirebaseFirestore firestore; // '좋아요' 기능을 위해 추가
@@ -25,10 +25,22 @@ class PostRepositoryImpl implements PostRepository {
 
   @override
   Future<List<PostModel>> fetchPosts({String? category, String? sort}) async {
-    // Repository는 직접 데이터를 가져오지 않고 DataSource에게 요청합니다.
-    // 닉네임 조인 로직 등은 DataSource 또는 여기서 처리할 수 있습니다.
-    // (이전 답변의 상세 로직 참고)
-    return await remoteDataSource.getPosts();
+    Query query = FirebaseFirestore.instance.collection('posts');
+
+    // 카테고리 필터 적용
+    if (category != null && category.isNotEmpty) {
+      query = query.where('category', isEqualTo: category);
+    }
+
+    // 정렬 적용
+    if (sort == '최신순') {
+      query = query.orderBy('createdAt', descending: true);
+    } else if (sort == '추천순') {
+      query = query.orderBy('likesCount', descending: true);
+    }
+
+    final snapshot = await query.get();
+    return snapshot.docs.map((doc) => PostModel.fromDoc(doc)).toList();
   }
 
   @override

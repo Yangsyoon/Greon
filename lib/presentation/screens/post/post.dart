@@ -179,46 +179,41 @@ class _BulletinBoardScreenState extends State<BulletinBoardScreen> {
                         }
                       },
                     ),
-                    Expanded(child:
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: categories.map((cat) {
-                              final isSelected = selectedCategory == cat;
-                              return Padding(
-                                padding: const EdgeInsets.only(right: 8),
-                                child: ChoiceChip(
-                                  label: Text(cat),
-                                  selected: isSelected,
-                                  selectedColor: Colors.grey[400],
-                                  backgroundColor: Colors.white,
-                                  labelStyle: TextStyle(
-                                    color: isSelected ? Colors.white : Colors.black,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  onSelected: (_) {
-                                    setState(() {
-                                      selectedCategory = cat;
-                                    });
-                                    context.read<PostBloc>().add(
-                                      LoadPosts(
-                                        category: cat == '전체' ? null : cat,
-                                        sort: selectedSort, // 현재 선택된 정렬 유지
-                                      ),
-                                    );
-                                  },
+                    Expanded(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: categories.map((cat) {
+                            final isSelected = selectedCategory == cat;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: ChoiceChip(
+                                label: Text(cat),
+                                selected: isSelected,
+                                selectedColor: Colors.grey[400],
+                                backgroundColor: Colors.white,
+                                labelStyle: TextStyle(
+                                  color: isSelected ? Colors.white : Colors.black,
                                 ),
-                              );
-                            }).toList(),
-                          ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                onSelected: (_) {
+                                  setState(() {
+                                    selectedCategory = cat;
+                                  });
+                                  context.read<PostBloc>().add(
+                                    LoadPosts(
+                                      category: cat == '전체' ? null : cat,
+                                      sort: selectedSort,
+                                    ),
+                                  );
+                                },
+                              ),
+                            );
+                          }).toList(),
                         ),
                       ),
-                    ),
                     ),
                   ],
                 ),
