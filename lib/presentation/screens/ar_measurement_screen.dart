@@ -89,7 +89,26 @@ class _ARMeasurementScreenState extends State<ARMeasurementScreen> {
   // 👇 핵심 로직: 상태에 따라 탭 이벤트를 다르게 처리
   void _onPlaneTap(List<ArCoreHitTestResult> hits) {
     if (hits.isEmpty) return;
-    final hit = hits.first;
+
+    // 1. 안정적인 평면 hit를 담을 수 있는 nullable 변수를 선언합니다.
+    ArCoreHitTestResult? planeHit;
+
+    // 2. for 반복문으로 모든 hit를 순회합니다.
+    for (final hit in hits) {
+      final vector.Vector4 rotation = hit.pose.rotation;
+      final double magnitudeXZ = sqrt(pow(rotation.x, 2) + pow(rotation.z, 2));
+
+      // 3. 안정적인 평면을 찾으면 변수에 할당하고 반복을 중단합니다.
+      if (magnitudeXZ < 0.1) {
+        planeHit = hit;
+        break;
+      }
+    }
+
+    // 4. 안정적인 평면(planeHit)을 찾았다면 그것을 사용하고,
+    //    못 찾았다면 기존처럼 리스트의 첫 번째 hit를 사용합니다.
+    final ArCoreHitTestResult hit = planeHit ?? hits.first;
+
     final point = vector.Vector3(
       hit.pose.translation[0],
       hit.pose.translation[1],
