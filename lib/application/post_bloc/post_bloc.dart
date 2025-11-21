@@ -10,6 +10,7 @@ class PostBloc extends Bloc<PostEvent, PostState> {
 
   PostBloc(this.postRepository) : super(PostInitial()) {
     on<LoadPosts>((event, emit) async {
+      print("🔥 LoadPosts triggered: category=${event.category}, sort=${event.sort}");
       emit(PostLoading());
       try {
         // 👇 Firestore 직접 호출 대신 Repository의 함수를 호출하도록 변경

@@ -36,10 +36,44 @@ class _ARMeasurementScreenState extends State<ARMeasurementScreen> {
   String _instructionText = "바닥을 인식시킨 후, 너비 측정 시작점을 탭하세요.";
 
   @override
+  void initState() {
+    super.initState();
+    // AR 시작 시 안전 경고 표시
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _showSafetyDialog();
+    });
+  }
+
+  @override
   void dispose() {
     arCoreController.dispose();
     super.dispose();
   }
+  void _showSafetyDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('⚠️ AR 안전 주의사항'),
+        content: const Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('• AR 사용 시 주변 환경에 항상 주의하세요.'),
+            Text('• 걷거나 이동 중에는 화면에만 집중하지 마세요.'),
+            Text('• 어린이는 보호자 감독하에만 사용해야 합니다.'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('확인'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {

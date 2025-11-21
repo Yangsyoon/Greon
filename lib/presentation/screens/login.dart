@@ -21,7 +21,6 @@ import '../../core/enums/enums.dart';
 import '../../di/di.dart' as di;
 import 'home.dart';
 
-
 AppUser convertFirebaseUserToAppUser(firebase_auth.User firebaseUser) {
   return AppUser(
     id: firebaseUser.uid,
@@ -60,21 +59,26 @@ class _LoginScreenState extends State<LoginScreen> {
           // FirebaseUser를 AppUser로 변환
           final appUser = convertFirebaseUserToAppUser(firebaseUser);
           // UserBloc에 로그인 상태를 전달
-          context.read<UserBloc>().add(EmitUserLogged(appUser)); // AppUser 인스턴스를 전달
+          context
+              .read<UserBloc>()
+              .add(EmitUserLogged(appUser)); // AppUser 인스턴스를 전달
         } else {
           _isLoggedIn = false;
           _loggedInEmail = null; // 로그인 안 됐을 때 초기화
-          context.read<UserBloc>().add(EmitUserUnlogged()); // UserUnlogged 이벤트 전달
+          context
+              .read<UserBloc>()
+              .add(EmitUserUnlogged()); // UserUnlogged 이벤트 전달
         }
       });
     });
   }
 
-
   Future<void> _signOut() async {
     await FirebaseAuth.instance.signOut();
     // 로그아웃 시 UserBloc에 상태 변경
-    context.read<UserBloc>().add(EmitUserUnlogged()); // 로그아웃 시 UserUnlogged 이벤트 전달
+    context
+        .read<UserBloc>()
+        .add(EmitUserUnlogged()); // 로그아웃 시 UserUnlogged 이벤트 전달
   }
 
   Future<void> _signInWithEmailPassword() async {
@@ -83,7 +87,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final password = _passwordController.text.trim();
 
       // Firebase 이메일 로그인
-      UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -98,7 +103,9 @@ class _LoginScreenState extends State<LoginScreen> {
         // FirebaseUser를 AppUser로 변환
         final appUser = convertFirebaseUserToAppUser(firebaseUser);
         // 로그인 후 UserBloc에 상태 전달
-        context.read<UserBloc>().add(EmitUserLogged(appUser)); // AppUser 인스턴스를 전달
+        context
+            .read<UserBloc>()
+            .add(EmitUserLogged(appUser)); // AppUser 인스턴스를 전달
       }
     } on FirebaseAuthException catch (e) {
       // 로그인 오류 처리
@@ -107,24 +114,32 @@ class _LoginScreenState extends State<LoginScreen> {
       } else if (e.code == 'wrong-password') {
         showAuthErrorDialog(context, message: 'Incorrect password.');
       } else {
-        showAuthErrorDialog(context, message: 'An error occurred. Please try again.');
+        showAuthErrorDialog(context,
+            message: 'An error occurred. Please try again.');
       }
     }
   }
 
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar("로그인", context, automaticallyImplyLeading: true),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: Space.all(1, 1.3),
-          child: Form(
-            key: _formKey,
-            child: _isLoggedIn
-                ? _buildLoggedInUI()
-                : _buildLoginFormUI(),
+    return PopScope(
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+
+        Navigator.of(context).pushNamedAndRemoveUntil(
+          '/profile', // 👈 ProfileScreen 라우트 경로 (예시)
+          (Route<dynamic> route) => false,
+        );
+      },
+      child: Scaffold(
+        appBar: CustomAppBar("로그인", context, automaticallyImplyLeading: true),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: Space.all(1, 1.3),
+            child: Form(
+              key: _formKey,
+              child: _isLoggedIn ? _buildLoggedInUI() : _buildLoginFormUI(),
+            ),
           ),
         ),
       ),
@@ -141,12 +156,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return const Center(child: CircularProgressIndicator());
   }
-
-
-
-
-
-
 
   // 로그인 폼 UI
   Widget _buildLoginFormUI() {
@@ -190,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
         ElevatedButton(
           onPressed: () {
             if (_formKey.currentState!.validate()) {
-              _signInWithEmailPassword();  // 로그인 처리 함수 호출
+              _signInWithEmailPassword(); // 로그인 처리 함수 호출
             }
           },
           style: ButtonStyle(

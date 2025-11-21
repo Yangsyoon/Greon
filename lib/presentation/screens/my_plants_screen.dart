@@ -2,6 +2,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:greon/presentation/screens/register_plant.dart';
 import 'package:greon/presentation/screens/settings_page.dart';
 import '../../configs/app_typography.dart';
 import '../../configs/space.dart';
@@ -60,7 +61,56 @@ class MyPlantsScreen extends StatelessWidget {
               .toList();
 
           if (plants.isEmpty) {
-            return const Center(child: Text("등록된 식물이 없습니다."));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // 1. 귀여운 메시지
+                    const Text(
+                      "아직 등록된 식물이 없네요!\n지금 바로 우리 집 초록 친구를 맞이해 볼까요? 🪴",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                        height: 1.5, // 줄 간격 설정
+                      ),
+                    ),
+                    const SizedBox(height: 24), // 텍스트와 버튼 사이 간격
+
+                    // 2. 식물 등록 버튼
+                    // Expanded 대신 SizedBox를 사용하여 버튼 너비를 적절히 제한합니다.
+                    SizedBox(
+                      width: 200, // 버튼의 최대 너비 지정
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          // RegisterPlant 화면으로 이동
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => RegisterPlant()),
+                          );
+                        },
+                        icon: const Icon(Icons.add_circle_outline, size: 20),
+                        label: const Text(
+                          "새 식물 등록하기",
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: Colors.lightGreen,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           return SafeArea(

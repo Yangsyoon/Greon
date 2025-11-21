@@ -92,4 +92,9 @@ class PostModel {
     );
   }
 
+  factory PostModel.fromDoc(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return PostModel.fromMap(data).copyWith(id: doc.id);
+  }
+
 }
