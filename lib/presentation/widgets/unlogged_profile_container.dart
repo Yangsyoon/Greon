@@ -9,6 +9,7 @@ import '../../core/constant/colors.dart';
 import '../../core/router/app_router.dart';
 
 Widget unloggedProfileContainer(BuildContext context) {
+
   return Container(
     padding: Space.all(1.3, .7),
     width: double.infinity,
