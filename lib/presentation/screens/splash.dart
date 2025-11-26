@@ -4,7 +4,7 @@ import 'package:greon/configs/configs.dart';
 import 'package:greon/core/constant/assets.dart';
 import 'package:greon/core/router/app_router.dart';
 import '../../configs/app.dart';
-
+import 'package:greon/presentation/widgets/authgate.dart';
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
 
@@ -15,9 +15,8 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   void _nextScreen() {
     Future.delayed(const Duration(seconds: 1), () {
-      Navigator.of(context).pushNamedAndRemoveUntil(
-        AppRouter.root,
-        (route) => false,
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const AuthGate()),
       );
     });
   }
