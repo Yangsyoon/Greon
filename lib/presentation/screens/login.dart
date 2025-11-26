@@ -110,12 +110,59 @@ class _LoginScreenState extends State<LoginScreen> {
     } on FirebaseAuthException catch (e) {
       // 로그인 오류 처리
       if (e.code == 'user-not-found') {
-        showAuthErrorDialog(context, message: 'No user found for that email.');
+        showAuthErrorDialog(context, message: '이메일을 확인해주세요');
       } else if (e.code == 'wrong-password') {
-        showAuthErrorDialog(context, message: 'Incorrect password.');
+        showAuthErrorDialog(context, message: '비밀번호가 맞지 않습니다');
       } else {
         showAuthErrorDialog(context,
-            message: 'An error occurred. Please try again.');
+            message: '이메일이나 비밀번호를 확인해주세요');
+      }
+    }
+  }
+
+  // 비밀번호 재설정 이메일 발송 함수
+  Future<void> _sendPasswordResetEmail() async {
+    final email = _emailController.text.trim();
+
+    // 1. 이메일 입력 여부 확인
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('비밀번호 재설정을 위해 이메일을 먼저 입력해주세요.'),
+          duration: Duration(seconds: 2),
+          behavior: SnackBarBehavior.floating, // 떠있는 스타일 (선택사항)
+        ),
+      );
+      return;
+    }
+
+    try {
+      // 2. Firebase에 재설정 메일 요청
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+
+      // 3. 성공 알림 (Dialog 표시)
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("이메일 발송 완료"),
+          content: Text("$email 주소로 비밀번호 재설정 메일을 보냈습니다.\n메일함을 확인해주세요."),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("확인"),
+            ),
+          ],
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      // 4. 에러 처리 (예: 가입되지 않은 이메일)
+      if (e.code == 'user-not-found') {
+        showAuthErrorDialog(context, message: '등록되지 않은 이메일입니다.');
+      } else if (e.code == 'invalid-email') {
+        showAuthErrorDialog(context, message: '유효하지 않은 이메일 형식입니다.');
+      } else {
+        showAuthErrorDialog(context, message: '메일 발송 중 오류가 발생했습니다.\n나중에 다시 시도해주세요.');
       }
     }
   }
@@ -189,9 +236,15 @@ class _LoginScreenState extends State<LoginScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Text(
-              "비밀번호를 잊으셨나요?",
-              style: AppText.h3?.copyWith(color: Colors.black),
+            GestureDetector( // 클릭 감지를 위해 GestureDetector 사용
+              onTap: _sendPasswordResetEmail, // 함수 연결
+              child: Text(
+                "비밀번호를 잊으셨나요?",
+                style: AppText.h3?.copyWith(
+                  color: Colors.black,
+                  decoration: TextDecoration.underline, // 링크임을 알리기 위해 밑줄 추가 (선택사항)
+                ),
+              ),
             )
           ],
         ),
