@@ -35,7 +35,7 @@ class _LightLevelScreenState extends State<LightLevelScreen> {
     final isSelected = _selectedLevel == level;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4), // 간격 줄임
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: ElevatedButton(
         onPressed: () {
           setState(() {
@@ -45,30 +45,36 @@ class _LightLevelScreenState extends State<LightLevelScreen> {
         style: ElevatedButton.styleFrom(
           backgroundColor: isSelected ? Colors.green : Colors.grey[200],
           foregroundColor: isSelected ? Colors.white : Colors.black,
-          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16), // 버튼 padding 줄임
+          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(14),
           ),
           elevation: isSelected ? 2 : 0,
-          minimumSize: const Size(double.infinity, 52), // 높이 줄임
+          minimumSize: const Size(double.infinity, 52),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "레벨 $level",
-              style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              description,
-              style: const TextStyle(fontSize: 12),
-            ),
-          ],
+
+        // ★ 버튼 안의 내용을 왼쪽 정렬로 감싸기
+        child: Align(
+          alignment: Alignment.centerLeft,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start, // 텍스트끼리도 왼쪽 정렬
+            children: [
+              Text(
+                "레벨 $level",
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                description,
+                style: const TextStyle(fontSize: 12),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +105,7 @@ class _LightLevelScreenState extends State<LightLevelScreen> {
               _buildLevelButton(2, "약간의 간접광이 있는 공간"),
               _buildLevelButton(3, "일반적인 실내 밝기"),
               _buildLevelButton(4, "밝은 간접광이 들어오는 공간"),
-              _buildLevelButton(5, "햇빛이 매우 많은 공간 (직사광 직각에 가까움)"),
+              _buildLevelButton(5, "햇빛이 매우 많은 공간"),
 
               const SizedBox(height: 16), // Spacer 대신 고정 간격
 
