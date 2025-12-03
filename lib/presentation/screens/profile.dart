@@ -138,14 +138,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: SingleChildScrollView(
                   child: BlocBuilder<UserBloc, UserState>(
                     builder: (context, state) {
-                      if (state is UserLogged) {
-                        final user = firebase.FirebaseAuth.instance.currentUser;
-                        final image = user?.photoURL;
+                      final firebaseUser = firebase.FirebaseAuth.instance.currentUser;
 
+                      // 🔥 1. FirebaseAuth 로그인 여부가 최우선
+                      if (firebaseUser != null) {
                         return StreamBuilder<DocumentSnapshot>(
                           stream: FirebaseFirestore.instance
                               .collection('users')
-                              .doc(user!.uid)
+                              .doc(firebaseUser.uid)
                               .snapshots(),
                           builder: (context, snapshot) {
                             if (!snapshot.hasData) {
@@ -153,7 +153,44 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             }
 
                             final data = snapshot.data!.data() as Map<String, dynamic>?;
-                            final nickname = data?['nickname'] ?? '닉네임 없음';
+
+                            final nickname = data?['nickname'] ?? "닉네임 없음";
+                            final image = firebaseUser.photoURL;
+
+                            // 🔥 buildLoggedProfile 없이 바로 UI 렌더링
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 16),
+                                _buildProfileHeader(image, nickname),
+                                const SizedBox(height: 24),
+                                _buildProfileActionButtons(context),
+                                const SizedBox(height: 24),
+                                _buildAdsSection(),
+                                const SizedBox(height: 24),
+                                const RecentlyViewedList(),
+                              ],
+                            );
+                          },
+                        );
+                      }
+
+                      if (state is UserLogged) {
+                        final firebaseUser = firebase.FirebaseAuth.instance.currentUser;
+                        final image = firebaseUser?.photoURL;
+
+                        return StreamBuilder<DocumentSnapshot>(
+                          stream: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(firebaseUser!.uid)
+                              .snapshots(),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Center(child: CircularProgressIndicator());
+                            }
+
+                            final data = snapshot.data!.data() as Map<String, dynamic>?;
+                            final nickname = data?['nickname'] ?? "닉네임 없음";
 
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,22 +202,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 const SizedBox(height: 24),
                                 _buildAdsSection(),
                                 const SizedBox(height: 24),
-                                // 최근 본 상품
                                 const RecentlyViewedList(),
                               ],
                             );
                           },
                         );
-                      } else {
-                        return Column(
-                          children: [
-                            const SizedBox(height: 16),
-                            unloggedProfileContainer(context),
-                          ],
-                        );
                       }
+
+                      // 🔥 3. 로그인 안 됨
+                      return Column(
+                        children: [
+                          const SizedBox(height: 16),
+                          unloggedProfileContainer(context),
+                        ],
+                      );
                     },
                   ),
+
                 ),
               ),
             ],

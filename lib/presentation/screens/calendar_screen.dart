@@ -151,12 +151,24 @@ class _CalendarScreenState extends State<CalendarScreen> {
 
   Map<String, List<String>> getGroupedEvents(DateTime day) {
     final events = _getEventsForDay(day);
+
+    // 🔥 유효한 일정만 필터링
+    final validEvents = events.where((e) =>
+    e.type == '물주기' ||
+        e.type == '영양제' ||
+        e.type == '분갈이' ||
+        e.type == '햇빛 관리' ||
+        e.type == '기타').toList();
+
     final Map<String, List<String>> grouped = {};
-    for (var event in events) {
+
+    for (var event in validEvents) {
       grouped.putIfAbsent(event.type, () => []).add(event.plantName);
     }
+
     return grouped;
   }
+
 
   String getWeekdayName(DateTime date) {
     const weekdays = ['월', '화', '수', '목', '금', '토', '일'];
@@ -239,6 +251,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     },
                     markerBuilder: (context, date, events) {
                       if (events.isEmpty) return null;
+
                       return Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: events.map((e) {
@@ -253,13 +266,20 @@ class _CalendarScreenState extends State<CalendarScreen> {
                             case '분갈이':
                               color = Colors.brown;
                               break;
-                            default:
+                            case '햇빛 관리':
+                              color = Colors.orange;
+                              break;
+                            case '기타':
                               color = Colors.grey;
+                              break;
+                            default:
+                              return SizedBox.shrink(); // 혹시 모르는 예외
                           }
+
                           return Container(
                             width: 6,
                             height: 6,
-                            margin: const EdgeInsets.symmetric(horizontal: 0.5),
+                            margin: const EdgeInsets.symmetric(horizontal: 1),
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: color,
@@ -285,6 +305,16 @@ class _CalendarScreenState extends State<CalendarScreen> {
               Expanded(
                 child: Builder(
                   builder: (context) {
+
+                    if (_selectedDay == null) {
+                      return const Center(
+                        child: Text(
+                          '날짜를 선택하세요.',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      );
+                    }
+
                     final day = _selectedDay ?? _focusedDay;
                     final groupedEvents = getGroupedEvents(day);
 
@@ -335,37 +365,65 @@ class _CalendarScreenState extends State<CalendarScreen> {
                         ],
                       ));
                     }
+                    if (groupedEvents['햇빛 관리'] != null) {
+                      rows.add(Row(
+                        children: [
+                          const Icon(Icons.wb_sunny, color: Colors.orange, size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            '햇빛 관리 - ${groupedEvents['햇빛 관리']!.join(", ")}',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ],
+                      ));
+                    }
+
+                    if (groupedEvents['기타'] != null) {
+                      rows.add(Row(
+                        children: [
+                          const Icon(Icons.notes, color: Colors.grey, size: 18),
+                          const SizedBox(width: 8),
+                          Text(
+                            '기타 일정 - ${groupedEvents['기타']!.join(", ")}',
+                            style: const TextStyle(fontSize: 13),
+                          ),
+                        ],
+                      ));
+                    }
+
 
                     final weekday = getWeekdayName(day);
 
                     return Card(
                       color: Colors.grey.shade200,
-                      margin: const EdgeInsets.symmetric(
-                          vertical: 10, horizontal: 14),
+                      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 14),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${day.year}년 ${day.month}월 ${day.day}일 ($weekday)',
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: SingleChildScrollView(        // ← 추가
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('${day.year}년 ${day.month}월 ${day.day}일 ($weekday)',
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 10),
-                            ...rows.map((w) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 8.0),
-                                  child: w,
-                                )),
-                          ],
+                              const SizedBox(height: 10),
+                              ...rows.map((w) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8.0),
+                                child: w,
+                              )),
+                            ],
+                          ),
                         ),
                       ),
                     );
+
                   },
                 ),
               ),

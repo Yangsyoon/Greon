@@ -23,7 +23,7 @@ class OrdersScreen extends StatelessWidget {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text("Orders are Empty!"),
+                  const Text("주문 내역이 없습니다."),
                   SizedBox(
                     height: MediaQuery.of(context).size.height * 0.1,
                   )

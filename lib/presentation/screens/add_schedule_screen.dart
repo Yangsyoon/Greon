@@ -26,7 +26,7 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
 
   String? _selectedType;
 
-  final List<String> _scheduleTypes = ['물 주기', '양분 주기', '분갈이', '햇빛 관리', '기타'];
+  final List<String> _scheduleTypes = ['물주기', '양분주기', '분갈이', '햇빛 관리', '기타'];
 
   @override
   void dispose() {
@@ -38,20 +38,33 @@ class _AddScheduleScreenState extends State<AddScheduleScreen> {
   Future<void> _saveSchedule() async {
     if (!_formKey.currentState!.validate()) return;
 
-    final schedule = Schedule(
-      plantName: _plantNameController.text,
-      plantId: 'plant001', // 임시값, 필요하면 변경하세요
-      date: widget.selectedDate,
-      type: _selectedType!,
-      memo: _memoController.text,
-    );
+    // Firestore가 기대하는 구조대로 직접 저장
+    await FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.userId)
+        .collection('schedules')
+        .add({
+      'plant_id': 'plant001', // 현재 임시
+      'plant_name': _plantNameController.text,
+      'date': Timestamp.fromDate(
+        DateTime(
+          widget.selectedDate.year,
+          widget.selectedDate.month,
+          widget.selectedDate.day,
+          8,
+          0,
+          0,
+        ),
+      ),
+      'type': _selectedType!,
+      'memo': _memoController.text,
+      'auto_generated': false,
+    });
 
-    final repository = ScheduleRepositoryImpl(firestore: FirebaseFirestore.instance);
-    final useCase = AddSchedule(repository);
-
-    await useCase(widget.userId, schedule);
     Navigator.pop(context, true);
   }
+
+
 
   @override
   Widget build(BuildContext context) {
