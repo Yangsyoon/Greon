@@ -16,10 +16,11 @@ enum MeasurementState {
 
 class ARMeasurementScreen extends StatefulWidget {
   final String styleResult;
-
+  final int initialLightLevel;
   const ARMeasurementScreen({
     Key? key,
     required this.styleResult,
+    required this.initialLightLevel,
   }) : super(key: key);
 
   @override
@@ -225,7 +226,7 @@ class _ARMeasurementScreenState extends State<ARMeasurementScreen> {
 
     // --- [측정 결과 설정 및 추천 로직에 전달할 데이터] ---
     // ⚠️ actualLightLevel과 mockMoodScores는 실제 앱의 분석 로직에 맞게 구현해야 합니다.
-    const int actualLightLevel = 2; // 예시: 광도 레벨 2 (보통)으로 측정 가정
+    final int actualLightLevel = widget.initialLightLevel;
     final primaryMood = widget.styleResult; // AR 화면 진입 시 받은 주 무드
 
     // 무드 스코어 (주 무드 외에는 임시로 값 설정)

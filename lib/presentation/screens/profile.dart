@@ -19,7 +19,7 @@ import '../widgets/profile_action_button.dart';
 import 'ar_measurement_screen.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:arcore_flutter_plugin/arcore_flutter_plugin.dart';
-
+import 'light_level_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -84,7 +84,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         context,
         MaterialPageRoute(
           // 분석 결과를 ARMeasurementScreen으로 전달합니다.
-          builder: (context) => ARMeasurementScreen(styleResult: styleResult),
+          builder: (context) => LightLevelScreen(styleResult: styleResult!),
         ),
       );
 
