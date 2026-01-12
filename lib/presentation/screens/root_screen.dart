@@ -1,62 +1,95 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:greon/presentation/screens/post/post.dart';
+import 'package:greon/configs/app.dart';
+import 'package:greon/presentation/screens/my_plants_screen.dart';
+import 'package:greon/presentation/screens/post/post.dart'; // 게시판
+import 'package:greon/presentation/screens/home.dart';
 import 'package:greon/presentation/screens/product/products_list.dart';
+import 'package:greon/presentation/screens/profile.dart';
+import 'package:greon/presentation/widgets/bottom_navbar.dart';
+
+// [중요] 로그인 페이지 import를 꼭 추가해주세요! 경로가 다르면 수정해주세요.
+// 예: import 'package:greon/presentation/screens/login_screen.dart';
+import 'package:greon/presentation/screens/login.dart';
+
 import '../../application/bottom_navbar_cubit/bottom_navbar_cubit.dart';
 import '../../application/bottom_navbar_cubit/navigation_state.dart';
 import '../../core/enums/enums.dart';
-import 'home.dart';
-import 'my_plants_screen.dart';
 import 'calendar_screen.dart';
-import 'settings_page.dart';
+import 'login.dart';
 
 class RootScreen extends StatelessWidget {
   const RootScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final userId = FirebaseAuth.instance.currentUser?.uid ?? "";
+    App.init(context);
+    final String? userId = FirebaseAuth.instance.currentUser?.uid;
 
-    final tabs =  [
-      HomeScreen(),                  // 홈
-      BulletinBoardScreen(),         // 게시판
-      MyPlantsScreen(),              // 내식물
-      ProductsListScreen(),          // 쇼핑
-      CalendarScreen(userId: userId),  // 캘린더, userId 전달
-      SettingsPage(),                // 개인페이지
-    ];
+    Future<bool> _onWillPop() async {
+      return (await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("앱 종료", style: TextStyle(color: Colors.black)),
+          content: const Text("정말 앱을 종료하시겠습니까?"),
+          actions: <Widget>[
+            TextButton(
+              child: const Text("네", style: TextStyle(color: Colors.red)),
+              onPressed: () => SystemNavigator.pop(),
+            ),
+            TextButton(
+              child: const Text("아니오", style: TextStyle(color: Colors.black)),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
+          ],
+        ),
+      )) ?? false;
+    }
 
-    return BlocBuilder<NavigationCubit, NavigationState>(
-      builder: (context, state) {
-        final activeTab = state.tab;
-        final selectedIndex = activeTab.index;
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        bottomNavigationBar: const BottomNavigation(),
+        body: Center(
+          child: BlocBuilder<NavigationCubit, NavigationState>(
+            builder: (context, state) {
+              final activeTab = state.tab;
+              switch (activeTab) {
+                case NavigationTab.homeTab:
+                  return const HomeScreen();
+                case NavigationTab.boardTab:
+                  return const BulletinBoardScreen();
+                case NavigationTab.myPlantsTab:
+                  return const MyPlantsScreen();
+                case NavigationTab.shoppingTab:
+                  return const ProductsListScreen();
+                case NavigationTab.calendarTab:
+                  return CalendarScreen(userId: userId ?? '');
 
-        print("탭 변경 감지: $selectedIndex");
+              // ✅ [핵심 수정 부분] 개인페이지 탭
+                case NavigationTab.profileTab:
+                  return StreamBuilder<User?>(
+                    stream: FirebaseAuth.instance.authStateChanges(),
+                    builder: (context, snapshot) {
+                      // 1. 로그인 정보가 있으면 -> 개인 페이지 보여줌
+                      if (snapshot.hasData) {
+                        return const ProfileScreen();
+                      }
+                      // 2. 로그인 정보가 없으면 -> 로그인 페이지 보여줌
+                      // 'LoginScreen'은 실제 로그인 화면 위젯 이름으로 맞춰주세요.
+                      return const LoginScreen();
+                    },
+                  );
 
-        return Scaffold(
-          body: IndexedStack(
-            index: selectedIndex,
-            children: tabs,
+                default:
+                  return const HomeScreen();
+              }
+            },
           ),
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            currentIndex: selectedIndex,
-            // ✅ onTap에서 열거형 값을 업데이트합니다.
-            onTap: (i) => context.read<NavigationCubit>().updateTab(NavigationTab.values[i]),
-            selectedItemColor: Colors.black,
-            unselectedItemColor: Colors.black26,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.home), label: "홈"),
-              BottomNavigationBarItem(icon: Icon(Icons.forum), label: "게시판"),
-              BottomNavigationBarItem(icon: Icon(Icons.eco), label: "내식물"),
-              BottomNavigationBarItem(icon: Icon(Icons.shopping_cart), label: "쇼핑"),
-              BottomNavigationBarItem(icon: Icon(Icons.calendar_month), label: "캘린더"),
-              BottomNavigationBarItem(icon: Icon(Icons.person), label: "개인페이지"),
-            ],
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 }

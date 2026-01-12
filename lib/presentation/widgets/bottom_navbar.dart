@@ -62,7 +62,7 @@ class BottomNavigation extends StatelessWidget {
                       width: width,
                       fit: BoxFit.fill,
                       colorFilter: ColorFilter.mode(
-                        activeTab == NavigationTab.homeTab
+                        activeTab == NavigationTab.boardTab
                             ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
                             : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
                         BlendMode.srcIn,
@@ -81,7 +81,7 @@ class BottomNavigation extends StatelessWidget {
                       width: width,
                       fit: BoxFit.fill,
                       colorFilter: ColorFilter.mode(
-                        activeTab == NavigationTab.homeTab
+                        activeTab == NavigationTab.myPlantsTab
                             ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
                             : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
                         BlendMode.srcIn,
@@ -100,7 +100,7 @@ class BottomNavigation extends StatelessWidget {
                       width: width,
                       fit: BoxFit.fill,
                       colorFilter: ColorFilter.mode(
-                        activeTab == NavigationTab.homeTab
+                        activeTab == NavigationTab.shoppingTab
                             ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
                             : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
                         BlendMode.srcIn,
@@ -119,7 +119,7 @@ class BottomNavigation extends StatelessWidget {
                       width: width,
                       fit: BoxFit.fill,
                       colorFilter: ColorFilter.mode(
-                        activeTab == NavigationTab.homeTab
+                        activeTab == NavigationTab.calendarTab
                             ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
                             : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
                         BlendMode.srcIn,
@@ -138,7 +138,7 @@ class BottomNavigation extends StatelessWidget {
                       width: width,
                       fit: BoxFit.fill,
                       colorFilter: ColorFilter.mode(
-                        activeTab == NavigationTab.homeTab
+                        activeTab == NavigationTab.profileTab
                             ? Theme.of(context).bottomNavigationBarTheme.selectedItemColor!
                             : Theme.of(context).bottomNavigationBarTheme.unselectedItemColor!,
                         BlendMode.srcIn,

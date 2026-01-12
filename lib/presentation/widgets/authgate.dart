@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../screens/login.dart';
 import '../screens/profile.dart';
+import '../screens/root.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -20,7 +21,7 @@ class AuthGate extends StatelessWidget {
 
         // 로그인됨
         if (snapshot.hasData) {
-          return const ProfileScreen();
+          return const RootScreen();
         }
 
         // 로그아웃 상태
